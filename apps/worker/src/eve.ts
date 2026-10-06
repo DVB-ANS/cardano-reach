@@ -69,10 +69,13 @@ export function repairTables(report: string): string {
   return lines.join("\n");
 }
 
-// La recherche web d'OpenAI ajoute ses propres citations `([domaine](url?utm_source=openai))` à côté des liens
+// La recherche web d'OpenAI ajoute ses propres citations (marqueurs internes ou liens `([domaine](url?utm_source=openai))`) à côté des liens
 // sources : on les retire (le lien source reste) et on enlève le paramètre de suivi des liens restants.
 export function stripCitations(report: string): string {
   return report
+    // Marqueurs internes (`citeturn0search0` entre caractères à usage privé U+E200…U+E201), sans équivalent hors ChatGPT.
+    .replace(/[ \t]*\uE200[^\uE201\n]*\uE201/g, "")
+    .replace(/[ \t]*\bcite(?:turn\d+[a-z]+\d+)+/g, "")
     .replace(/[ \t]*\(\[[^\]\n]*\]\([^)\s]*[?&]utm_source=openai[^)\s]*\)\)/g, "")
     .replace(/([?&])utm_source=openai(&?)/g, (_, sep: string, next: string) => (next ? sep : ""));
 }
@@ -174,6 +177,6 @@ export class Agent {
     const session = this.#client.sessions.attach(at.sessionId, { streamIndex: at.streamIndex });
     const result = await (await session.send(phaseMessage("FOLLOWUP", comment))).result();
     if (result.status === "failed" || result.inputRequests.length) return undefined;
-    return result.message?.trim() || undefined;
+    return stripCitations(result.message ?? "").trim() || undefined;
   }
 }
