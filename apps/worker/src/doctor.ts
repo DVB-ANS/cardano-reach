@@ -54,7 +54,7 @@ checks.push(
     "configuration",
     async () => {
       config = loadConfig();
-      return { status: "ok", detail: `Coworker ${config.coworkerId}, scope ${config.scope.kind}, données dans ${config.dataDir}` };
+      return { status: "ok", detail: `Coworker ${config.coworkerId}, données dans ${config.dataDir}` };
     },
     "renseigner COWORKER_ID et SOKOSUMI_COWORKER_API_KEY dans .env.local (modèle : .env.example)",
   ),

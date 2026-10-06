@@ -41,7 +41,7 @@ if (config.paidEnabled) {
 }
 const runner = new Runner(config, soko, agent, paid);
 runner.markUncertain();
-log.info("worker started", { pid: process.pid, coworkerId: config.coworkerId, scope: config.scope.kind, mode: paid ? "paid" : "free", pollMs: config.pollMs });
+log.info("worker started", { pid: process.pid, coworkerId: config.coworkerId, mode: paid ? "paid" : "free", pollMs: config.pollMs });
 
 for (;;) {
   let error: string | undefined;

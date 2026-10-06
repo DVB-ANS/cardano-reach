@@ -33,6 +33,8 @@ export interface PendingQuestion extends AgentQuestion {
 export interface Journal {
   taskId: string;
   phase: Phase;
+  /** Workspace de la Task : `null` = Personal Workspace (absent dans les journaux d'avant cette version). */
+  organizationId?: string | null;
   input?: string;
   questions: number;
   question?: PendingQuestion;
@@ -113,8 +115,8 @@ export class Runner {
   }
 
   async begin(task: Task): Promise<void> {
-    let journal = this.#save({ taskId: task.id, phase: "starting", questions: 0, attempts: 0, comments: {} });
-    const started = this.#soko.runtimeStart(task.id);
+    let journal = this.#save({ taskId: task.id, phase: "starting", organizationId: task.organizationId, questions: 0, attempts: 0, comments: {} });
+    const started = this.#soko.runtimeStart(task.id, task.organizationId);
     journal = this.#save({ ...journal, phase: "started", input: started.description ?? "" });
     await this.advance(task.id, journal);
   }
@@ -174,8 +176,9 @@ export class Runner {
   // Crash entre l'écriture de « starting » et la confirmation du CLI : on relit la Task avant d'agir.
   async #recoverStart(j: Journal): Promise<Journal> {
     const task = await this.#soko.task(j.taskId);
-    if (task.status === "READY") return this.#save({ ...j, phase: "started", input: this.#soko.runtimeStart(j.taskId).description ?? "" });
-    if (task.status === "RUNNING") return this.#save({ ...j, phase: "started", input: task.description ?? "" });
+    const scoped = { ...j, organizationId: task.organizationId };
+    if (task.status === "READY") return this.#save({ ...scoped, phase: "started", input: this.#soko.runtimeStart(j.taskId, task.organizationId).description ?? "" });
+    if (task.status === "RUNNING") return this.#save({ ...scoped, phase: "started", input: task.description ?? "" });
     return this.#save({ ...j, phase: "inspection-required", note: `starting with Task status ${task.status}` });
   }
 
@@ -262,7 +265,7 @@ export class Runner {
   }
 
   #complete(j: Journal): Journal {
-    this.#soko.runtimeComplete(j.taskId, this.resultPath(j.taskId));
+    this.#soko.runtimeComplete(j.taskId, j.organizationId ?? null, this.resultPath(j.taskId));
     log.info("task completed", { taskId: j.taskId });
     return this.#save({ ...j, phase: "completed" });
   }

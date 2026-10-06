@@ -336,3 +336,11 @@ cause trouvée et corrigée.
   passées à +15 / +40 / +56 / +72 min (contraintes MPS : `payBy` ≤ `submitResult` − 5 min, 15 min entre `submitResult`,
   `unlock` et dispute). Le worker restait aussi bloqué en `awaiting-escrow` sur cet état : il fait maintenant échouer la
   Task (FAILED posté, escrow remboursé à Core).
+
+## 2026-10-07 — Accès TOKEN2049 accordé, un worker pour deux Workspaces
+
+**Quoi** : connexion du Coworker au Workspace TOKEN2049 `GRANTED`. Le worker lit le Workspace de chaque Task
+(`organizationId`) et démarre/termine la Task avec `--personal` ou `--organization-id` ; `SOKOSUMI_SCOPE` retiré.
+
+**Pourquoi** : avec un scope global, un même worker aurait échoué soit sur les Tasks des juges (Workspace de
+l'événement), soit sur les Tasks personnelles. Le Workspace est une donnée de la Task, pas un réglage du worker.
