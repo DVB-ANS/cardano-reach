@@ -25,7 +25,7 @@ Parcours d'une Task :
 flowchart LR
   U[Sokosumi] <--> W[apps/worker<br/>toi]
   W <-->|eve/client| A[apps/reach-agent<br/>Armand]
-  A --> S[Exa · gh · yt-dlp · Jina]
+  A --> S[API Exa · gh · yt-dlp · twitter-cli · rdt-cli]
   W <--> M[Masumi Payment Service + Postgres<br/>infra/ · toi]
   M <--> C[Cardano Preprod]
 ```
@@ -124,10 +124,11 @@ docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 
 - M0 validé : question → brief → rapport.
 - Cas réel (fixations titane EN 9100) : 0 question, recherche en ~57 s, fournisseurs réels avec liens et dates.
-- 15 tests verts, `eve build` OK, auth Basic vérifiée.
-- Golden : jusqu'à 8/9 avant l'épuisement d'Exa, 4/9 au dernier passage à cause des HTTP 429 d'Exa (pas du code).
-- **Bloquant démo** : le MCP Exa gratuit est épuisé → il faut `EXA_API_KEY` (dashboard.exa.ai).
-- YouTube bloqué sur le poste d'Armand (à tester sur le VPS) ; Twitter / Reddit non branchés (pas de comptes dédiés).
+- 22 tests verts, `eve build` OK, auth Basic vérifiée.
+- Golden : jusqu'à 8/9 avant l'épuisement du MCP Exa gratuit. Web, LinkedIn et lecture de pages passent maintenant par
+  l'API Exa (`/search`, `/contents`) : **il faut `EXA_API_KEY`** (https://dashboard.exa.ai/api-keys).
+- X et Reddit branchés (twitter-cli, rdt-cli) ; ils s'activent dès qu'un compte dédié est configuré.
+- YouTube bloqué sur le poste d'Armand (à tester sur le VPS).
 - Image Docker jamais construite (pas de Docker en local).
 
 ## 6. Ce qui te revient (lot B, détail dans `docs/PLAN.md`)

@@ -1,10 +1,10 @@
 # Image de l'agent Reach. Contexte de build : racine du repo.
 #   docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 # Variables runtime : OPENAI_API_KEY, REACH_MODEL, ROUTE_AUTH_BASIC_USER, ROUTE_AUTH_BASIC_PASSWORD (obligatoires au démarrage),
-#   GH_TOKEN (gh search), EXA_API_KEY (fortement recommandé : le MCP Exa gratuit renvoie vite HTTP 429),
-#   REACH_CHANNELS, JINA_API_KEY (optionnel).
+#   EXA_API_KEY (canaux web / linkedin et lecture de pages), GH_TOKEN (gh search), REACH_CHANNELS,
+#   TWITTER_AUTH_TOKEN + TWITTER_CT0 (canal twitter, compte X dédié).
 # Volumes : /app/.eve/.workflow-data (sessions durables), /app/.local/cache (cache de recherche),
-#   puis ~/.config/rdt-cli et le fichier d'environnement Twitter quand ces canaux sont configurés.
+#   /home/node/.config/rdt-cli/credential.json (canal reddit, compte dédié) quand il est configuré.
 FROM node:24-bookworm
 
 RUN apt-get update \
@@ -14,13 +14,12 @@ RUN apt-get update \
 ENV PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin
 RUN pipx install yt-dlp \
   && pipx install https://github.com/Panniantong/agent-reach/archive/main.zip \
-  && npm install -g mcporter@0.14.2 \
+  && pipx install twitter-cli \
+  && pipx install 'git+https://github.com/public-clis/rdt-cli.git@5e4fb3720d5c174e976cd425ccc3b879d52cac66' \
   && mkdir -p /app /packages \
   && chown node:node /app /packages
 
 USER node
-RUN mcporter config add exa https://mcp.exa.ai/mcp --scope home \
-  && mcporter config add exa-key https://mcp.exa.ai/mcp --header 'Authorization=Bearer ${EXA_API_KEY}' --scope home
 
 WORKDIR /app
 COPY --chown=node:node packages/contract /packages/contract

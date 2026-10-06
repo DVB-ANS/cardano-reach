@@ -1,49 +1,33 @@
-// Exa via mcporter (`web_search_exa`), sortie texte en blocs `Title:` / `URL:` / `Published:` séparés par `---`.
-// Serveur `exa` : MCP gratuit, limité en débit (HTTP 429 vite atteint). Serveur `exa-key` : même MCP avec
-// `Authorization: Bearer ${EXA_API_KEY}` (config mcporter), utilisé dès que la clé existe.
+// Canaux `web` et `linkedin` sur l'API Exa `/search` (requête recommandée : query + type auto + highlights).
 import { toIsoDate } from "../dates.ts";
-import { runCommand } from "../run-command.ts";
+import { callExa, type ExaResponse } from "../exa.ts";
 import type { Channel, ChannelSearch, SearchHit } from "../types.ts";
 
+// Décision produit : un lot compte jusqu'à 12 requêtes et le moteur garde 60 hits ; 8 par requête suffit.
 const RESULTS_PER_QUERY = 8;
-const BLOCK_SEPARATOR = /\n---\n/;
+// Le canal linkedin est par définition limité aux pages entreprise publiques (plan, lot A2).
+const LINKEDIN_COMPANY_PAGES = ["linkedin.com/company"];
 
-function field(block: string, name: string): string | undefined {
-  return new RegExp(`^${name}: (.*)$`, "m").exec(block)?.[1]?.trim();
+export function exaHits(response: ExaResponse, channel: Channel): SearchHit[] {
+  return response.results.map((result) => ({
+    channel,
+    title: result.title ?? result.url,
+    url: result.url,
+    snippet: result.highlights.join(" … ").replace(/\s+/g, " ").trim(),
+    publishedAt: toIsoDate(result.publishedDate),
+    source: new URL(result.url).hostname.replace(/^www\./, ""),
+  }));
 }
 
-export function parseExaOutput(output: string, channel: Channel): SearchHit[] {
-  const hits: SearchHit[] = [];
-  for (const block of output.split(BLOCK_SEPARATOR)) {
-    const title = field(block, "Title");
-    const url = field(block, "URL");
-    if (!title || !url || !URL.canParse(url)) continue;
-    const highlights = block.split(/^Highlights:\s*$/m)[1] ?? "";
-    hits.push({
-      channel,
-      title,
-      url,
-      snippet: highlights.replace(/^\.\.\.$/gm, " ").replace(/\s+/g, " ").trim(),
-      publishedAt: toIsoDate(field(block, "Published")),
-      source: new URL(url).hostname.replace(/^www\./, ""),
-    });
-  }
-  return hits;
+async function exaSearch(body: Record<string, unknown>, channel: Channel, signal: AbortSignal, timeoutMs: number): Promise<SearchHit[]> {
+  const request = { type: "auto", numResults: RESULTS_PER_QUERY, contents: { highlights: true }, ...body };
+  return exaHits(await callExa("/search", request, AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)])), channel);
 }
 
-async function callExa(query: string, objective: string, channel: Channel, signal: AbortSignal, timeoutMs: number): Promise<SearchHit[]> {
-  const server = process.env.EXA_API_KEY ? "exa-key" : "exa";
-  const args = ["call", `${server}.web_search_exa`, `query=${query}`, `numResults=${RESULTS_PER_QUERY}`, `objective=${objective}`];
-  return parseExaOutput(await runCommand("mcporter", args, { signal, timeoutMs }), channel);
-}
+const OBJECTIVE = "B2B research: rank company websites, certification pages, directories and dated announcements first; skip generic listicles.";
 
 export const searchWeb: ChannelSearch = (query, { signal, timeoutMs }) =>
-  callExa(query.query, `Company pages, directories and recent news relevant to: ${query.query}`, "web", signal, timeoutMs);
+  exaSearch({ query: query.query, objective: OBJECTIVE }, "web", signal, timeoutMs);
 
-const LINKEDIN_SITE = "site:linkedin.com/company";
-
-export const searchLinkedin: ChannelSearch = async (query, { signal, timeoutMs }) => {
-  const text = query.query.includes("site:") ? query.query : `${query.query} ${LINKEDIN_SITE}`;
-  const hits = await callExa(text, `Public LinkedIn company pages matching: ${query.query}`, "linkedin", signal, timeoutMs);
-  return hits.filter((hit) => hit.source === "linkedin.com" || hit.source.endsWith(".linkedin.com"));
-};
+export const searchLinkedin: ChannelSearch = (query, { signal, timeoutMs }) =>
+  exaSearch({ query: query.query, includeDomains: LINKEDIN_COMPANY_PAGES }, "linkedin", signal, timeoutMs);

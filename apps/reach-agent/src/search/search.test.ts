@@ -1,24 +1,33 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
-import { parseExaOutput } from "./channels/exa.ts";
+import { exaHits } from "./channels/exa.ts";
 import { parseGithubOutput } from "./channels/github.ts";
 import { parseYoutubeOutput } from "./channels/youtube.ts";
 import { isFresh, toIsoDate } from "./dates.ts";
 import { searchBatch } from "./engine.ts";
 import { collectBefore, createLimiter } from "./limit.ts";
-import { parseJinaOutput } from "./pages.ts";
 import { normalizeUrl, resolvePublicTarget } from "./url.ts";
+import { parseExaResponse } from "./exa.ts";
 
 const fixture = (name: string) => readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), "utf8");
 
 describe("parsers on captured outputs", () => {
-  it("parses Exa blocks without inventing dates", () => {
-    const hits = parseExaOutput(fixture("web.txt"), "web");
-    assert.equal(hits.length, 8);
-    assert.equal(hits[0]?.publishedAt, null);
-    assert.equal(hits[1]?.publishedAt, "2021-07-29T15:17:44.000Z");
-    assert.ok(hits.every((hit) => hit.url.startsWith("http") && hit.snippet.length > 0));
+  // Forme de réponse : skill Exa `build-with-exa` (references/search.md, contents.md) et types `SearchResult` d'exa-js 2.25.
+  it("maps Exa /search results without inventing dates", () => {
+    const response = parseExaResponse(JSON.parse(fixture("exa-search.json")));
+    assert.equal(response.results.length, 2);
+    assert.deepEqual(response.statuses, [{ id: "https://www.lls.it/en/", status: "success" }]);
+    const hits = exaHits(response, "web");
+    assert.equal(hits[0]?.publishedAt, "2021-07-29T15:17:44.000Z");
+    assert.equal(hits[0]?.source, "sffactory.eu");
+    assert.ok(hits[0]?.snippet.includes(" … "));
+    assert.equal(hits[1]?.publishedAt, null);
+    assert.equal(hits[1]?.source, "lls.it");
+  });
+
+  it("rejects a payload without results", () => {
+    assert.throws(() => parseExaResponse({ error: "rate limited" }), /unexpected payload/);
   });
 
   it("uses GitHub updatedAt as the date", () => {
@@ -35,12 +44,6 @@ describe("parsers on captured outputs", () => {
   it("converts YouTube upload_date YYYYMMDD to ISO", () => {
     const line = JSON.stringify({ title: "Demo", webpage_url: "https://www.youtube.com/watch?v=x", upload_date: "20260801", channel: "Acme" });
     assert.equal(parseYoutubeOutput(`${line}\n`)[0]?.publishedAt, "2026-08-01T00:00:00.000Z");
-  });
-
-  it("splits Jina headers from content", () => {
-    const page = parseJinaOutput(fixture("page.txt"));
-    assert.equal(page.title, "Fasteners for aeronautics, defense and space");
-    assert.ok(page.text.startsWith("Fasteners for aeronautics"));
   });
 });
 

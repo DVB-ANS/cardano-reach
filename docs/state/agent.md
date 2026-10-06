@@ -13,13 +13,19 @@
 
 | Canal | État | Note |
 | --- | --- | --- |
-| web | actif, **quota gratuit épuisé** | Exa via `mcporter` (`~/.mcporter`), ~5 s, ~50 % datés. MCP gratuit → HTTP 429 après quelques golden ; avec `EXA_API_KEY`, serveur `exa-key` (header Bearer) |
-| linkedin | idem web | Exa + `site:linkedin.com/company`, ~6 s, peu de dates |
+| web | **attend `EXA_API_KEY`** | API Exa `/search` (HTTP direct, skill officiel `build-with-exa`) : query + `type: auto` + highlights, `objective` B2B. Chemin vérifié jusqu'à l'API (401 avec une clé factice) |
+| linkedin | **attend `EXA_API_KEY`** | même appel avec `includeDomains: ["linkedin.com/company"]` |
 | github | actif | `gh search repos` : mots-clés courts uniquement (requête longue → 0 résultat) |
 | youtube | **désactivé de fait** | `www.youtube.com` refusé en local (connexion refusée) ; parseur testé, à vérifier sur le VPS |
-| twitter, reddit | non implémentés | pas de comptes dédiés ; `reach_search` renvoie `channel not implemented` |
+| twitter | **attend un compte X dédié** | `twitter search -n 10 --json -- "<q> since:YYYY-MM-DD"` (twitter-cli) ; `TWITTER_AUTH_TOKEN` + `TWITTER_CT0` |
+| reddit | **attend un compte Reddit dédié** | `rdt search --limit 10 --compact --json -- "<q>"` (rdt-cli épinglé) ; `~/.config/rdt-cli/credential.json` |
 
-Exa n'expose pas `web_search_advanced_exa` (pas de filtre de date côté Exa) : `freshnessDays` est filtré après coup.
+Sans `REACH_CHANNELS`, twitter et reddit s'activent seuls dès que leurs identifiants existent. Les deux CLI refusent
+de tourner sans identifiants explicites : sinon elles liraient les cookies du navigateur. Leurs fixtures sont
+reconstituées depuis le code source des CLI (aucune sortie réelle capturée, pas de compte).
+Lecture de pages : un appel Exa `/contents` (6 000 caractères/page, `statuses` vérifiés), GET direct épinglé en secours.
+Jina retiré (quota gratuit journalier atteint). `freshnessDays` reste filtré après coup (les dates dures d'Exa
+écarteraient les pages non datées).
 `web_search` (secours) n'est pas exposé au modèle avec `chatgpt()` : il n'existera qu'avec `openai()` + `OPENAI_API_KEY`.
 
 ## Checkpoints prouvés
@@ -41,5 +47,7 @@ Exa n'expose pas `web_search_advanced_exa` (pas de filtre de date côté Exa) : 
 ## Blocages
 
 - Pas d'`OPENAI_API_KEY` sur le poste : dev en `chatgpt()` (sans `web_search`).
-- **`EXA_API_KEY` nécessaire** (dashboard.exa.ai) : sans elle, le canal web tombe en 429 en démo.
+- **`EXA_API_KEY` à mettre dans `apps/reach-agent/.env.local`** (fichier créé, vide, ignoré par Git) : sans elle,
+  ni web, ni LinkedIn, ni lecture de pages via Exa.
+- Comptes X et Reddit dédiés au projet : à créer pour activer ces canaux.
 - Pas de Docker local : l'image n'a pas été construite (à faire sur le VPS).
