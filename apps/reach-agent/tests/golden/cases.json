@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1-aero-sourcing",
+    "text": "Je cherche un fournisseur de fixations titane certifié EN 9100, petites séries, Europe.",
+    "answers": [],
+    "expect": { "mode": "sourcing", "niche": "aero-spatial", "minRows": 5 }
+  },
+  {
+    "id": "2-aero-leads",
+    "text": "Je vends deux jets d'affaires d'occasion. Qui achète ?",
+    "answers": [],
+    "expect": { "mode": "leads", "niche": "aero-spatial", "minRows": 5 }
+  },
+  {
+    "id": "3-auto-sourcing",
+    "text": "Prototypage rapide de pièces plastique pour un tableau de bord, 50 unités.",
+    "answers": [],
+    "expect": { "mode": "sourcing", "niche": "automobile", "minRows": 5 }
+  },
+  {
+    "id": "4-auto-leads",
+    "text": "On fait des bancs de test batteries. Qui en a besoin maintenant ?",
+    "answers": [],
+    "expect": { "mode": "leads", "niche": "automobile", "minRows": 5 }
+  },
+  {
+    "id": "5-crypto-sourcing",
+    "text": "Je lance un DEX sur Cardano, il me faut un auditeur Plutus / Aiken.",
+    "answers": [],
+    "expect": { "mode": "sourcing", "niche": "crypto-defi", "minRows": 5 }
+  },
+  {
+    "id": "6-crypto-leads",
+    "text": "On est market maker. Quels protocoles viennent de lancer un token sans liquidité sérieuse ?",
+    "answers": [],
+    "expect": { "mode": "leads", "niche": "crypto-defi", "minRows": 5 }
+  },
+  {
+    "id": "7-saas-leads",
+    "text": "On vend un outil de conformité RGPD. Qui en a besoin ?",
+    "answers": [],
+    "expect": { "mode": "leads", "niche": "saas-tech-b2b", "minRows": 5 }
+  },
+  {
+    "id": "8-vague",
+    "text": "Trouve-moi des partenaires.",
+    "answers": ["1", "aéronautique, Europe"],
+    "expect": { "mode": "sourcing", "niche": "aero-spatial", "minRows": 0, "mustAsk": true }
+  },
+  {
+    "id": "9-impossible",
+    "text": "Un fournisseur de moteurs de fusée à 10 € pièce.",
+    "answers": [],
+    "expect": { "mode": "sourcing", "niche": "aero-spatial", "minRows": 0 }
+  }
+]
