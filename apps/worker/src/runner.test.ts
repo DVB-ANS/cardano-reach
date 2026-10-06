@@ -19,8 +19,9 @@ const question: IntakeOutcome = {
   question: { requestId: "r1", prompt: "Tu achètes ou tu vends ?", options: [{ id: "buy", label: "J'achète" }, { id: "sell", label: "Je vends" }] },
 };
 
-function fakes() {
+function fakes(org: string | null = null) {
   const events: TaskEvent[] = [];
+  const scopes: string[] = [];
   let status = "READY";
   let clock = 0;
   const add = (actorType: string, body: { status?: string; comment?: string }): TaskEvent => {
@@ -32,14 +33,18 @@ function fakes() {
   const answers: HumanAnswer[] = [];
   let intakes = 0;
   const soko = {
-    task: async (): Promise<Task> => ({ id: "t1", status, description: "Trouve-moi des partenaires." }),
+    task: async (): Promise<Task> => ({ id: "t1", status, description: "Trouve-moi des partenaires.", organizationId: org }),
     events: async () => [...events],
     postEvent: async (_id: string, body: { status?: string; comment?: string }) => add("coworker", body),
-    runtimeStart: (): Task => {
+    runtimeStart: (_id: string, organizationId: string | null): Task => {
+      scopes.push(`start:${organizationId ?? "personal"}`);
       add("coworker", { status: "RUNNING" });
-      return { id: "t1", status: "RUNNING", description: "Trouve-moi des partenaires." };
+      return { id: "t1", status: "RUNNING", description: "Trouve-moi des partenaires.", organizationId };
     },
-    runtimeComplete: (_id: string, file: string) => add("coworker", { status: "COMPLETED", comment: readFileSync(file, "utf8") }),
+    runtimeComplete: (_id: string, organizationId: string | null, file: string) => {
+      scopes.push(`complete:${organizationId ?? "personal"}`);
+      add("coworker", { status: "COMPLETED", comment: readFileSync(file, "utf8") });
+    },
   } as unknown as Sokosumi;
   const agent = {
     startIntake: async (): Promise<IntakeOutcome> => {
@@ -54,14 +59,14 @@ function fakes() {
     followUp: async () => "Commence par le premier.",
   } as unknown as Agent;
   const config = { dataDir: mkdtempSync(join(tmpdir(), "reach-runner-")), intakeTimeoutMs: 60_000 } as Config;
-  return { soko, agent, config, events, answers, user: (comment: string) => add("user", { comment }), status: () => status, intakes: () => intakes };
+  return { soko, agent, config, events, answers, scopes, user: (comment: string) => add("user", { comment }), status: () => status, intakes: () => intakes };
 }
 
 test("parcours gratuit : question, reprise sans doublon, réponse chiffrée, rapport, suivi", async () => {
   const f = fakes();
   let runner = new Runner(f.config, f.soko, f.agent);
 
-  await runner.begin({ id: "t1", status: "READY", description: "Trouve-moi des partenaires." });
+  await runner.begin({ id: "t1", status: "READY", description: "Trouve-moi des partenaires.", organizationId: null });
   assert.equal(f.status(), "INPUT_REQUIRED");
   const questions = () => f.events.filter((e) => e.status === "INPUT_REQUIRED").length;
   assert.equal(questions(), 1);
@@ -91,7 +96,7 @@ test("parcours gratuit : question, reprise sans doublon, réponse chiffrée, rap
 test("pas de réponse humaine dans le délai : hypothèses explicites", async () => {
   const f = fakes();
   const runner = new Runner({ ...f.config, intakeTimeoutMs: 1 }, f.soko, f.agent);
-  await runner.begin({ id: "t1", status: "READY", description: "Trouve-moi des partenaires." });
+  await runner.begin({ id: "t1", status: "READY", description: "Trouve-moi des partenaires.", organizationId: null });
   await new Promise((resolve) => setTimeout(resolve, 5));
   await runner.advance("t1");
   assert.deepEqual(f.answers, [{ text: "Pas de réponse : continue avec des hypothèses explicites." }]);
@@ -132,4 +137,14 @@ test("une recherche payée qui échoue est plafonnée à 3 tentatives", async ()
   assert.equal(calls, 3);
   assert.equal(f.status(), "FAILED");
   assert.deepEqual(runner.activeTaskIds(), []);
+});
+
+test("une Task du Workspace de l'événement est démarrée et terminée dans ce Workspace", async () => {
+  const f = fakes("org-token2049");
+  const runner = new Runner({ ...f.config, intakeTimeoutMs: 1 }, f.soko, f.agent);
+  await runner.begin({ id: "t1", status: "READY", description: "Trouve-moi des partenaires.", organizationId: "org-token2049" });
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  await runner.advance("t1");
+  assert.deepEqual(f.scopes, ["start:org-token2049", "complete:org-token2049"]);
+  assert.equal(f.status(), "COMPLETED");
 });

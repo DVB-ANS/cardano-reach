@@ -62,7 +62,7 @@ Sans ça, rien d'autre ne compte.
 
 - [ ] **M4 Déploiement** (A) : `infra/docker-compose.yml` (postgres, mps, reach-agent, worker, agent-api, caddy),
   `restart: unless-stopped`, test **ordinateurs fermés** depuis un autre appareil.
-- [ ] **Workspace TOKEN2049** (N) : demander l'accès **tôt** (validation humaine chez Masumi), puis `SOKOSUMI_SCOPE=org`.
+- [ ] **Workspace TOKEN2049** (N) : accès accordé (`GRANTED`) ; le worker suit le Workspace de chaque Task (personnel ou événement), sans réglage.
 - [ ] **Qualité du rapport** (A) : golden 8/8 avec `gpt-6.1-sol`, relecture manuelle des liens (grille `BRIEF.md` §9.2).
 - [ ] **Vérification codée des liens** (A) : avant de rendre le rapport, re-fetch de chaque URL, suppression des lignes
   dont la source ne répond pas ou ne mentionne pas l'entreprise. « No link, no line » garanti par le code, pas le prompt.

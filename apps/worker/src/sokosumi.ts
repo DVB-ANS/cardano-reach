@@ -13,6 +13,8 @@ export interface Task {
   id: string;
   status: string;
   description: string | null;
+  /** `null` pour une Task du Personal Workspace, sinon l'organisation (ex. Workspace TOKEN2049). */
+  organizationId: string | null;
 }
 
 export interface TaskEvent {
@@ -43,7 +45,7 @@ export function parseTask(value: unknown): Task {
   const id = str(raw?.id);
   const status = str(raw?.status);
   if (!raw || !id || !status) throw new Error("Invalid Task payload");
-  return { id, status, description: str(raw.description) };
+  return { id, status, description: str(raw.description), organizationId: str(raw.organizationId) };
 }
 
 export function parseEvent(value: unknown): TaskEvent {
@@ -121,17 +123,18 @@ export class Sokosumi {
   }
 
   // runtime start / complete passent par le CLI : il vérifie l'identité du Coworker, la Task et le Workspace.
-  runtimeStart(taskId: string): Task {
-    return parseTask(this.#runtime(["start", taskId]));
+  // Le Workspace vient de la Task elle-même : un seul worker sert le Personal Workspace et celui de l'événement.
+  runtimeStart(taskId: string, organizationId: string | null): Task {
+    return parseTask(this.#runtime(["start", taskId], organizationId));
   }
 
-  runtimeComplete(taskId: string, resultFile: string): void {
-    const data = record(this.#runtime(["complete", taskId, "--result-file", resultFile]));
+  runtimeComplete(taskId: string, organizationId: string | null, resultFile: string): void {
+    const data = record(this.#runtime(["complete", taskId, "--result-file", resultFile], organizationId));
     if (data?.status !== "COMPLETED") throw new Error("Runtime completion was not confirmed");
   }
 
-  #runtime(args: string[]): unknown {
-    const scope = this.#config.scope.kind === "personal" ? ["--personal"] : ["--organization-id", this.#config.scope.orgId];
+  #runtime(args: string[], organizationId: string | null): unknown {
+    const scope = organizationId ? ["--organization-id", organizationId] : ["--personal"];
     const result = spawnSync(
       "sokosumi",
       ["--preprod", "runtime", ...args, ...scope, "--coworker-id", this.#config.coworkerId, "--api-key-stdin", "--json"],

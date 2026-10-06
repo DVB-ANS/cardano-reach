@@ -1,9 +1,6 @@
-export type Scope = { kind: "personal" } | { kind: "org"; orgId: string; orgSlug: string };
-
 export interface Config {
   coworkerId: string;
   apiKey: string;
-  scope: Scope;
   eveUrl: string;
   eveAuth: { username: string; password: string } | undefined;
   dataDir: string;
@@ -36,11 +33,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const apiKey = required(env, "SOKOSUMI_COWORKER_API_KEY");
   if (!/^coworker_[A-Za-z0-9_-]+$/.test(apiKey)) throw new Error("SOKOSUMI_COWORKER_API_KEY must be a coworker_* key");
 
-  const scopeName = env.SOKOSUMI_SCOPE?.trim() || "personal";
-  let scope: Scope;
-  if (scopeName === "personal") scope = { kind: "personal" };
-  else if (scopeName === "org") scope = { kind: "org", orgId: required(env, "SOKOSUMI_ORG_ID"), orgSlug: required(env, "SOKOSUMI_ORG_SLUG") };
-  else throw new Error("SOKOSUMI_SCOPE must be personal or org");
 
   const user = env.ROUTE_AUTH_BASIC_USER?.trim();
   const password = env.ROUTE_AUTH_BASIC_PASSWORD?.trim();
@@ -48,7 +40,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
     coworkerId,
     apiKey,
-    scope,
     eveUrl: env.EVE_URL?.trim() || "http://127.0.0.1:21949",
     eveAuth: user && password ? { username: user, password } : undefined,
     dataDir: env.WORKER_DATA_DIR?.trim() || ".local",

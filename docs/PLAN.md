@@ -334,8 +334,8 @@ On porte 1:1 en TS strict, sans changer le comportement à cette étape :
 
 Adaptations obligatoires pendant le portage :
 - **Portée du workspace** :
-  - variable `SOKOSUMI_SCOPE` = `personal` (défaut) ou `org` ;
-  - si `org`, `SOKOSUMI_ORG_ID` et `SOKOSUMI_ORG_SLUG` sont requis ;
+  - (mis à jour le 2026-10-07) le Workspace vient de chaque Task (`organizationId` : `null` → `--personal`, sinon
+    `--organization-id <id>`) ; plus de variable `SOKOSUMI_SCOPE` ;
   - les commandes `runtime` utilisent `--personal` ou `--organization-id <id>` ;
   - les commandes `tasks` utilisent `--personal` ou `--organization-slug <slug>` ;
   - il n'y a plus de `--personal` en dur.
