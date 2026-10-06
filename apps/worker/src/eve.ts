@@ -45,6 +45,30 @@ function toQuestion(request: InputRequest): AgentQuestion {
   };
 }
 
+const SEPARATOR = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+
+function cells(line: string): string[] {
+  const trimmed = line.trim().replace(/^\|/, "").replace(/(?<!\\)\|$/, "");
+  return trimmed.split(/(?<!\\)\|/);
+}
+
+// Le modèle écrit parfois une ligne de séparation avec une colonne de trop ou de moins : le tableau ne s'affiche
+// alors plus. On l'aligne sur l'en-tête, en gardant l'alignement (`:---`, `---:`) des colonnes existantes.
+export function repairTables(report: string): string {
+  const lines = report.split("\n");
+  for (let i = 1; i < lines.length; i++) {
+    const header = lines[i - 1] ?? "";
+    const separator = lines[i] ?? "";
+    if (!header.trim().startsWith("|") || !SEPARATOR.test(separator) || !separator.includes("-")) continue;
+    const width = cells(header).length;
+    const current = cells(separator).map((cell) => cell.trim());
+    if (current.length === width) continue;
+    const aligned = Array.from({ length: width }, (_, k) => current[k] || "---");
+    lines[i] = `|${aligned.join("|")}|`;
+  }
+  return lines.join("\n");
+}
+
 // Tronque à la dernière ligne complète sous MAX_REPORT_BYTES (contrat), avec une mention explicite.
 export function fitReport(report: string): string {
   const encoder = new TextEncoder();
@@ -124,7 +148,7 @@ export class Agent {
     assertTurn(result, "Research");
     const report = result.message?.trim();
     if (!report) throw new Error("Research returned no report");
-    return { session: ref(session), report: fitReport(report) };
+    return { session: ref(session), report: fitReport(repairTables(report)) };
   }
 
   // API standard Masumi : pas d'humain pour répondre, l'intake avance avec des hypothèses explicites.
