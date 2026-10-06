@@ -2,7 +2,7 @@ import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Brief } from "../../../packages/contract/src/index.ts";
 import type { Config } from "./config.ts";
-import { type Agent, type AgentQuestion, type IntakeOutcome, NO_ANSWER_TEXT, type SessionRef } from "./eve.ts";
+import { type Agent, type AgentQuestion, type IntakeOutcome, NO_ANSWER_TEXT, type ResearchOutcome, type SessionRef } from "./eve.ts";
 import { findReply, formatQuestion, humanComments, intakeMessage, parseAnswer } from "./intake.ts";
 import type { Sokosumi, Task } from "./sokosumi.ts";
 import { readJson, writeJson } from "./store.ts";
@@ -44,16 +44,24 @@ export interface Journal {
   note?: string;
 }
 
-// Branché en mode payé (PAID_TASKS_ENABLED) : paiement Masumi entre le brief et la recherche.
-export interface PaidFlow {
-  advance(journal: Journal, research: (brief: Brief) => Promise<string>): Promise<Journal>;
+export interface PaidHooks {
+  save(journal: Journal): Journal;
+  research(brief: Brief): Promise<ResearchOutcome>;
+  resultPath(taskId: string): string;
 }
+
+// Branché en mode payé (PAID_TASKS_ENABLED) : paiement Masumi entre le brief et la recherche, puis collecte.
+export interface PaidFlow {
+  advance(journal: Journal, hooks: PaidHooks): Promise<Journal>;
+}
+
+const paidStage = (journal: Journal): string | undefined => (journal.paid as { stage?: string } | undefined)?.stage;
 
 const MAX_QUESTIONS = 2;
 const MAX_ATTEMPTS = 3;
 const FAILED_COMMENT = "Reach n'a pas pu cadrer la demande : reformule ton besoin.";
 const ERROR_COMMENT = "Reach a rencontré une erreur et n'a pas pu terminer cette Task.";
-const IDLE: readonly Phase[] = ["awaiting-human", "completed", "failed", "inspection-required"];
+const IDLE: readonly Phase[] = ["awaiting-human", "failed", "inspection-required"];
 const REPLAYABLE: readonly Phase[] = ["started", "intake-sent", "answer-sent", "research-sent"];
 
 export class Runner {
@@ -115,9 +123,9 @@ export class Runner {
     if (!journal) return;
     try {
       for (let step = 0; step < 20; step++) {
-        const before = journal.phase;
+        const before = `${journal.phase}:${paidStage(journal)}`;
         journal = await this.#step(journal);
-        if (journal.phase === before || IDLE.includes(journal.phase)) break;
+        if (`${journal.phase}:${paidStage(journal)}` === before || IDLE.includes(journal.phase)) break;
       }
       if (journal.phase === "completed") await this.#followUps(journal);
     } catch (error) {
@@ -139,7 +147,7 @@ export class Runner {
       case "answer-sent":
         return this.#sendAnswer(j);
       case "brief-ready":
-        if (this.#paid) return this.#paid.advance(j, (brief) => this.#researchReport(j.taskId, brief));
+        if (this.#paid) return this.#paid.advance(j, this.#hooks());
         return this.#save({ ...j, phase: "research-sent" });
       case "research-sent":
         return this.#research(j);
@@ -147,6 +155,12 @@ export class Runner {
         return this.#complete(this.#save({ ...j, phase: "complete-pending" }));
       case "complete-pending":
         return this.#recoverComplete(j);
+      case "completed": {
+        // Après la complétion payée : suivi du retrait jusqu'à la preuve de collecte.
+        const stage = paidStage(j);
+        if (this.#paid && stage && stage !== "settled") return this.#paid.advance(j, this.#hooks());
+        return j;
+      }
       default:
         return j;
     }
@@ -227,11 +241,12 @@ export class Runner {
     return this.#handleIntake(this.#save({ ...j, question: undefined, answer: undefined }), outcome);
   }
 
-  async #researchReport(taskId: string, brief: Brief): Promise<string> {
-    const { session, report } = await this.#agent.research(brief);
-    const journal = this.#load(taskId);
-    if (journal) this.#save({ ...journal, researchSession: session });
-    return report;
+  #hooks(): PaidHooks {
+    return {
+      save: (journal) => this.#save(journal),
+      research: (brief) => this.#agent.research(brief),
+      resultPath: (taskId) => this.resultPath(taskId),
+    };
   }
 
   async #research(j: Journal): Promise<Journal> {

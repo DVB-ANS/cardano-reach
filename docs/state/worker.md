@@ -28,7 +28,21 @@ Référence Masumi clonée dans `/Users/noew/VSCode/TOKEN2049/demo-agent-token20
   réponse humaine est un événement `actor.type = "user"` sans statut, la Task reste `INPUT_REQUIRED` jusqu'à ce que
   le worker poste `RUNNING`.
 - La clé runtime liste les Tasks du Coworker (`GET /v1/tasks?coworkerId=…`) : le worker ne dépend pas de l'OAuth.
-- Paiement Masumi (M2) pas encore porté ; MPS attendu sur le VPS d'Armand.
+- Paiement Masumi porté et testé hors ligne (faux MPS / faux Core, 26 tests) : devis signé (+5 / +30 / +46 / +62 min),
+  achat posté sur la Task, recherche seulement après `FundsLocked` confirmé et ≥ 8 min avant `submitResultTime`, hash
+  du résultat exact soumis, complétion au même texte, retrait vérifié (reçu Core + transaction MPS + Blockfrost).
+  Jamais testé contre un vrai MPS : attend le MPS d'Armand.
+
+## Procédure M2 (dès que le MPS est prêt)
+
+1. Tunnel : `ssh -N -L 3012:127.0.0.1:3012 <vps>` ; dans `apps/worker/.env.local` (valeurs fournies par Armand) :
+   `MPS_URL`, `MPS_ADMIN_KEY`, `MPS_SELLING_WALLET_ID`, `MPS_PAYMENT_SOURCE_ID`, `BLOCKFROST_API_KEY_PREPROD`.
+2. `npm run registration -- key` : clé MPS limitée au wallet vendeur dans `.local/mps-runtime.env` (0600).
+3. `npm run agent-api` (port 21950) puis `npm run registration -- register` (URL publique : `AGENT_API_PUBLIC_URL`,
+   sinon loopback) ; `npm run registration -- status` jusqu'à `RegistrationConfirmed`.
+4. Retirer `MPS_ADMIN_KEY` du `.env.local`, puis `PAID_TASKS_ENABLED=true npm start`.
+5. Task complète (cas 1 du brief) ; suivre `.local/tasks/<id>.json` (`paid.stage`) jusqu'à `settled` ;
+   `sokosumi --preprod runtime receipt <id> --coworker-id … --json` doit donner `settled: true` + `txHash`.
 
 ## Lancer (local)
 
