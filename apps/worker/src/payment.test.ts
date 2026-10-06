@@ -116,8 +116,10 @@ test("parcours complet : devis → achat → escrow → recherche → hash soumi
   assert.equal(stage(j), "terms-saved");
   const terms = h.mpsCalls[0]?.body as Record<string, unknown>;
   assert.equal(terms.inputHash, taskHash("Trouve-moi un usineur titane"));
-  assert.equal(terms.submitResultTime, new Date(NOW + 30 * MINUTE).toISOString());
-  assert.equal(terms.unlockTime, new Date(NOW + 46 * MINUTE).toISOString());
+  // MPS ne voit l'escrow qu'après 20 confirmations + un poll de 3 min (~10 min) : 5 min ont fait échouer la 1re Task payée.
+  const payBy = Date.parse(String(terms.payByTime));
+  assert.ok(payBy - NOW >= 15 * MINUTE, "payByTime laisse à MPS le temps de constater l'escrow");
+  assert.ok(Date.parse(String(terms.submitResultTime)) - payBy >= 18 * MINUTE, "un escrow verrouillé au dernier moment laisse grâce + recherche");
 
   j = await h.flow.advance(j, h.hooks);
   assert.equal(stage(j), "awaiting-escrow");
@@ -171,6 +173,14 @@ test("un achat à l'issue inconnue n'est jamais reposté", async () => {
 
 test("échéance trop proche au verrouillage : pas de recherche, Task en échec, escrow remboursé", async () => {
   const h = harness({ observed: () => locked(), now: NOW + 25 * MINUTE });
+  const j = await h.flow.advance(h.journal({ stage: "awaiting-escrow", nonce: "n", payment: payment() }), h.hooks);
+  assert.equal(j.phase, "failed");
+  assert.equal(h.researches(), 0);
+  assert.equal(h.posts.at(-1)?.body.status, "FAILED");
+});
+
+test("escrow jugé invalide par MPS après payByTime : Task en échec au lieu d'attendre indéfiniment", async () => {
+  const h = harness({ observed: () => payment({ onChainState: "FundsOrDatumInvalid" }), now: NOW + 16 * MINUTE });
   const j = await h.flow.advance(h.journal({ stage: "awaiting-escrow", nonce: "n", payment: payment() }), h.hooks);
   assert.equal(j.phase, "failed");
   assert.equal(h.researches(), 0);
