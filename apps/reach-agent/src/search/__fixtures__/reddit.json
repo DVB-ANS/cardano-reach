@@ -1,0 +1,40 @@
+{
+  "ok": true,
+  "schema_version": "1",
+  "data": [
+    {
+      "id": "1nabc12",
+      "name": "t3_1nabc12",
+      "title": "Who supplies EN 9100 titanium fasteners in small batches?",
+      "subreddit": "AerospaceEngineering",
+      "author": "throwaway_buyer",
+      "score": 57,
+      "num_comments": 23,
+      "created_utc": 1758700800.0,
+      "permalink": "/r/AerospaceEngineering/comments/1nabc12/who_supplies_en_9100_titanium_fasteners_in_small/",
+      "url": "https://www.reddit.com/r/AerospaceEngineering/comments/1nabc12/who_supplies_en_9100_titanium_fasteners_in_small/",
+      "selftext": "We need ~500 Ti-6Al-4V bolts per quarter,\n\nEurope only. Any recommendations?",
+      "is_self": true,
+      "over_18": false,
+      "is_video": false,
+      "stickied": false
+    },
+    {
+      "id": "1mzzz99",
+      "name": "t3_1mzzz99",
+      "title": "Titanium machining shop opens new 5-axis line",
+      "subreddit": "manufacturing",
+      "author": "shopnews",
+      "score": 12,
+      "num_comments": 4,
+      "created_utc": 0.0,
+      "permalink": "/r/manufacturing/comments/1mzzz99/titanium_machining_shop_opens_new_5axis_line/",
+      "url": "https://news.example.com/titanium-5-axis",
+      "selftext": "",
+      "is_self": false,
+      "over_18": false,
+      "is_video": false,
+      "stickied": false
+    }
+  ]
+}

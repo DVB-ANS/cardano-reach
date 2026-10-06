@@ -1,6 +1,8 @@
 import { readCache, SEARCH_TTL_MS, writeCache } from "./cache.ts";
 import { searchLinkedin, searchWeb } from "./channels/exa.ts";
 import { searchGithub } from "./channels/github.ts";
+import { redditCredentialsPresent, searchReddit } from "./channels/reddit.ts";
+import { searchTwitter, twitterCredentialsPresent } from "./channels/twitter.ts";
 import { searchYoutube } from "./channels/youtube.ts";
 import { isFresh } from "./dates.ts";
 import { collectBefore, createLimiter, type Limiter } from "./limit.ts";
@@ -8,7 +10,7 @@ import { CHANNELS, type Channel, type ChannelSearch, type SearchBatchResult, typ
 import { normalizeUrl } from "./url.ts";
 
 export const DEFAULT_SEARCH_DEADLINE_MS = 25_000;
-const DEFAULT_CHANNELS: readonly Channel[] = ["web", "linkedin", "github", "youtube"];
+const BASE_CHANNELS: readonly Channel[] = ["web", "linkedin", "github", "youtube"];
 const MAX_SNIPPET_LENGTH = 300;
 const MAX_HITS = 60;
 
@@ -16,8 +18,7 @@ interface ChannelConfig {
   /** Plafond de requêtes simultanées, partagé par toutes les sessions du processus. */
   limit: Limiter;
   timeoutMs: number;
-  /** Absent : canal prévu mais sans implémentation (Twitter, Reddit tant que les comptes n'existent pas). */
-  search?: ChannelSearch;
+  search: ChannelSearch;
 }
 
 const CHANNEL_CONFIG: Record<Channel, ChannelConfig> = {
@@ -25,12 +26,18 @@ const CHANNEL_CONFIG: Record<Channel, ChannelConfig> = {
   linkedin: { limit: createLimiter(3), timeoutMs: 12_000, search: searchLinkedin },
   github: { limit: createLimiter(3), timeoutMs: 10_000, search: searchGithub },
   youtube: { limit: createLimiter(2), timeoutMs: 20_000, search: searchYoutube },
-  twitter: { limit: createLimiter(2), timeoutMs: 15_000 },
-  reddit: { limit: createLimiter(2), timeoutMs: 15_000 },
+  twitter: { limit: createLimiter(2), timeoutMs: 15_000, search: searchTwitter },
+  reddit: { limit: createLimiter(2), timeoutMs: 15_000, search: searchReddit },
 };
 
+/** `REACH_CHANNELS` explicite, sinon les canaux de base + X / Reddit dès que leurs identifiants dédiés sont configurés. */
 export function enabledChannels(raw = process.env.REACH_CHANNELS): Set<Channel> {
-  if (!raw?.trim()) return new Set(DEFAULT_CHANNELS);
+  if (!raw?.trim()) {
+    const channels = new Set(BASE_CHANNELS);
+    if (twitterCredentialsPresent()) channels.add("twitter");
+    if (redditCredentialsPresent()) channels.add("reddit");
+    return channels;
+  }
   const requested = raw.split(",").map((name) => name.trim());
   return new Set(CHANNELS.filter((channel) => requested.includes(channel)));
 }
@@ -77,13 +84,11 @@ export async function searchBatch(
   const runQuery = async (query: SearchQuery): Promise<QueryOutcome> => {
     const config = CHANNEL_CONFIG[query.channel];
     if (!channels.has(query.channel)) return { failure: { channel: query.channel, query: query.query, reason: "channel disabled" } };
-    const search = config.search;
-    if (!search) return { failure: { channel: query.channel, query: query.query, reason: "channel not implemented" } };
     const key = `${query.channel}|${query.query}|${query.freshnessDays ?? ""}`;
     try {
       const cached = await readCache(key, SEARCH_TTL_MS, isHitList);
       if (cached) return { hits: cached, cached: true };
-      const hits = await config.limit(() => search(query, { signal: deadline, timeoutMs: config.timeoutMs }), deadline);
+      const hits = await config.limit(() => config.search(query, { signal: deadline, timeoutMs: config.timeoutMs }), deadline);
       const now = Date.now();
       const fresh = hits.filter((hit) => isFresh(hit.publishedAt, query.freshnessDays, now));
       await writeCache(key, fresh);

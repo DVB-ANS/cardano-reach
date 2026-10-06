@@ -2,7 +2,8 @@ import { defineAgent } from "eve";
 import { chatgpt, openai } from "eve/models/openai";
 
 const DEFAULT_MODEL = "gpt-6-luna";
-const modelId = process.env.REACH_MODEL ?? DEFAULT_MODEL;
+// `||` et non `??` : une ligne `REACH_MODEL=` vide dans `.env.local` doit retomber sur le modèle par défaut.
+const modelId = process.env.REACH_MODEL || DEFAULT_MODEL;
 
 // Sans OPENAI_API_KEY (poste local uniquement), on passe par l'abonnement ChatGPT connecté via Codex.
 // En déploiement la clé est obligatoire : chatgpt() refuse de tourner hors `eve dev`.

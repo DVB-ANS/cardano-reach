@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "schema_version": "1",
+  "data": [
+    {
+      "id": "1975512345678901234",
+      "text": "We just shipped EN 9100 certified titanium fasteners\nfor small aerospace batches. Lead time 3 weeks. https://t.co/abc123",
+      "author": {
+        "id": "1122334455",
+        "name": "Acme Aero Parts",
+        "screenName": "acmeaero",
+        "profileImageUrl": "https://pbs.twimg.com/profile_images/1/acme_normal.jpg",
+        "verified": false
+      },
+      "metrics": { "likes": 42, "retweets": 7, "replies": 3, "quotes": 1, "views": 5120, "bookmarks": 4 },
+      "createdAt": "Wed Sep 24 08:15:30 +0000 2026",
+      "createdAtLocal": "2026-09-24 10:15",
+      "createdAtISO": "2026-09-24T08:15:30+00:00",
+      "media": [],
+      "urls": ["https://acme-aero.example/fasteners"],
+      "isRetweet": false,
+      "retweetedBy": null,
+      "lang": "en",
+      "score": null
+    },
+    {
+      "id": "1970000000000000001",
+      "text": "Looking for a titanium machining partner in Europe, DM open.",
+      "author": {
+        "id": "998877",
+        "name": "Jane Buyer",
+        "screenName": "janebuyer",
+        "profileImageUrl": "",
+        "verified": true
+      },
+      "metrics": { "likes": 3, "retweets": 0, "replies": 1, "quotes": 0, "views": 210, "bookmarks": 0 },
+      "createdAt": "Tue Sep 09 17:02:00 +0000 2026",
+      "createdAtLocal": "2026-09-09 19:02",
+      "createdAtISO": "2026-09-09T17:02:00+00:00",
+      "media": [{ "type": "photo", "url": "https://pbs.twimg.com/media/x.jpg", "width": 1200, "height": 800 }],
+      "urls": [],
+      "isRetweet": true,
+      "retweetedBy": "someone",
+      "lang": "en",
+      "score": null,
+      "quotedTweet": { "id": "1969999999999999999", "text": "Quoted", "author": { "screenName": "quoted", "name": "Quoted" } }
+    }
+  ]
+}
