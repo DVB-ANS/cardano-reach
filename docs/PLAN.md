@@ -508,5 +508,5 @@ Prérequis : Node 24 (`export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`)
   Si un rapport dépasse 300 s avec sol, on passe à `reasoning: "low"` avant de toucher au reste.
 - **Rejet de l'INPUT_REQUIRED** : si Core refuse `status: "INPUT_REQUIRED"` posté par le Coworker, on poste la question
   en commentaire seul (sans changer le statut) et on garde la même détection de réponse.
-- **Front** : Nuxt, la stack d'Armand, dans `front/`, statique. Contenu repris des sections 1 à 5 de `BRIEF.md`.
-  La direction artistique est fournie par Armand au moment de M6.
+- **Front** : fait (PR #7) — Nuxt 4 + Tailwind 4 statique dans `front/`, DA tirée des illustrations fournies.
+  Reste : déploiement statique et lien vers le Coworker.

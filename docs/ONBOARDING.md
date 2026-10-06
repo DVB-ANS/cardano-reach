@@ -1,7 +1,7 @@
 # Onboarding — ce qui est fait, comment ça marche, ce qui reste
 
 Doc pour reprendre le projet en 10 minutes. Détails produit : `BRIEF.md`. Plan complet et jalons : `docs/PLAN.md`.
-Contrat worker ↔ agent : `docs/CONTRACT.md`. Historique des décisions : `docs/DEVLOG.md`.
+Contrat worker ↔ agent : `docs/CONTRACT.md`. Historique des décisions : `docs/DEVLOG.md`. Suite : `docs/ROADMAP.md`.
 
 ## 1. Le projet
 
@@ -36,7 +36,7 @@ flowchart LR
 | `packages/contract/`, `docs/CONTRACT.md` | partagé, gelé | **fait** |
 | `apps/worker/` | toi | à faire (lot B) |
 | `infra/` | toi | à faire (lot B) |
-| `front/` | premier libre | branche `feat/front` existante, pas encore mergée |
+| `front/` | toi | **fait** (landing statique, PR #7), pas encore déployée |
 
 Règles : un `package.json` + lockfile par app (pas de workspaces npm), TypeScript strict sans `any`, branches
 `feat/worker-<sujet>` pour toi, PR squash sur `main`, personne ne pousse sur `main`. Toute modif du contrat = PR qui
@@ -135,9 +135,24 @@ docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 
 1. **B1** : compte Sokosumi Preprod, Vendor, Coworker ; MPS + Postgres sur le VPS ; wallet vendeur financé.
 2. **B2** : porter le worker de référence (`~/dev/demo-agent-token2049/live-team-names-20261006/`) en TS strict
-   dans `apps/worker/src/`.
+   dans `apps/worker/src/`. À cloner d'abord : `git clone -b live-demo-name-finder
+   https://github.com/masumi-network/demo-agent-token2049 ~/dev/demo-agent-token2049`.
 3. **B3** : intake `INPUT_REQUIRED` avant paiement (machine de phases du plan, section 3 ci-dessus pour le code eve).
 4. **M1** Task gratuite avec question → **M2** Task payée, collecte confirmée on-chain (**éliminatoire**) →
    **M4** déploiement serveur.
 
 Un seul exécuteur de Tasks à la fois : ton worker. Armand ne lance jamais de worker, il teste avec `research.ts`.
+
+## 7. Front
+
+`front/` : landing statique Nuxt 4 + Tailwind 4, gérée avec **pnpm** (lockfile `pnpm-lock.yaml` ; `pnpm-workspace.yaml`
+n'autorise que le script d'installation d'esbuild).
+
+```bash
+cd front && pnpm install
+pnpm dev        # http://localhost:3000
+pnpm generate   # site statique dans .output/public (front/dist en est un lien, ignoré par Git)
+```
+
+Sections : hero, exemple de Task, deux modes, « how it works », paiement Masumi, footer. Images dans
+`front/public/images/` (WebP). Liens « Open Sokosumi » génériques : à remplacer par l'URL du Coworker.

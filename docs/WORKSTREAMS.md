@@ -1,5 +1,7 @@
 # Plan parallèle — 4 sessions Claude
 
+> **Obsolète** : remplacé par `docs/PLAN.md` (lots A/B, contrat, jalons) et `docs/ROADMAP.md`. Gardé pour l'historique.
+
 Source de vérité : `BRIEF.md` (produit, UX, décisions, pièges) et `docs/masumi/agent-guide.md` (guide officiel,
 à donner à chaque session). Implémentation de référence vérifiée par Masumi :
 `~/dev/demo-agent-token2049/live-team-names-20261006/` (branche `live-demo-name-finder`).

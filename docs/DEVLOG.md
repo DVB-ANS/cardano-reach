@@ -82,8 +82,8 @@ unique pour aligner les sessions parallèles et le pitch.
 
 ## 2026-10-06 — Front vitrine
 
-**Quoi** : `front/` (Nuxt 4 + Tailwind 4, statique via `npm run generate`), page unique en anglais : hero animé,
-problème, deux modes, pipeline, démo de Task animée, niches, garde-fous, paiement Masumi.
+**Quoi** : `front/` (Nuxt 4 + Tailwind 4, statique via `pnpm generate`), landing en anglais. Version finale : hero,
+exemple de Task, deux modes, « how it works », paiement Masumi, footer.
 
 **Pourquoi** : ~20 % de la note sur l'UI/UX ; la vitrine reste hors du chemin de paiement.
 
@@ -96,5 +96,36 @@ problème, deux modes, pipeline, démo de Task animée, niches, garde-fous, paie
   6 images seulement, la DA bleu/crème reste celle des illustrations.
 - Recentrée en landing page (retour de Noé) : hero statique sans canvas, exemple de Task réduit, deux modes,
   « how it works » en 3 étapes, paiement, footer. Retirés : manifeste, carrousel d'étapes, démo de Task, niches, garde-fous.
-- Slogan « Leads with receipts. » (receipts = preuves + reçu de paiement), accent orange remplacé par un bleu,
-  image rouge du mode leads remplacée (cabine sous la galaxie), flux de paiement réduit à une ligne.
+- Slogan « Leads with receipts. » (receipts = preuves + reçu de paiement), accent orange retiré (survols en noir et
+  blanc), image rouge du mode leads remplacée (cabine sous la galaxie), flux de paiement réduit à une ligne.
+
+## 2026-10-07 — Intégration et ménage Git
+
+**Quoi** : front mergé (PR #7), correctif `front/dist` (PR #8), API Exa + X / Reddit d'Armand (PR #6) ; toutes les
+branches mergées supprimées, `main` seule branche ; `docs/ROADMAP.md` (démo → signaux → e-mail entreprise → envoi validé).
+
+**Pourquoi** : partir du lot B sur un `main` propre et partagé.
+
+**Cheminement** :
+- Branches squash-mergées : Git les voit « en avance » ; vérifié que chaque tête de branche = tête de sa PR mergée
+  avant suppression.
+- Roadmap : adresses génériques d'entreprise par défaut, nominatives seulement avec base légale validée ; DM LinkedIn
+  automatisés exclus (CGU) ; envoi depuis la boîte de l'utilisateur après validation explicite.
+
+**Bugs & fix** :
+- `nuxt generate` crée `front/dist`, lien absolu vers `.output/public` ; le motif `dist/` ne matche pas un lien et il a
+  été commité. Retiré, motif `dist`.
+- `origin/HEAD` local pointait sur `feat/masumi-setup` (figé au clone) : `git remote set-head origin --auto`.
+
+## 2026-10-07 — Tooling minimum
+
+**Quoi** : CI GitHub Actions (gitleaks sur l'historique, agent typecheck + tests, front build), `.gitleaks.toml`,
+hook `.githooks/pre-commit`, template de PR, pnpm épinglé (PR #9) ; suppression auto des branches mergées.
+
+**Pourquoi** : repo public à la soumission, clés et mnémoniques manipulés, deux devs qui mergent en parallèle.
+
+**Bugs & fix** :
+- gitleaks : faux positif `twitter-api-key` sur l'identifiant `twitterCredentialsPresent` → allowlist dans `.gitleaks.toml`.
+- pnpm 12 avec `packageManager` enregistre sa version dans le lockfile : `--frozen-lockfile` échouait tant que le
+  lockfile n'était pas régénéré.
+- Protection de branche : HTTP 403 sur un repo privé d'organisation gratuite ; à activer quand le repo sera public.
