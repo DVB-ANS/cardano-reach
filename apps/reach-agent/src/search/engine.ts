@@ -83,10 +83,7 @@ export async function searchBatch(
     try {
       const cached = await readCache(key, SEARCH_TTL_MS, isHitList);
       if (cached) return { hits: cached, cached: true };
-      const hits = await config.limit(() => {
-        if (deadline.aborted) throw new Error("timeout");
-        return search(query, { signal: deadline, timeoutMs: config.timeoutMs });
-      });
+      const hits = await config.limit(() => search(query, { signal: deadline, timeoutMs: config.timeoutMs }), deadline);
       const now = Date.now();
       const fresh = hits.filter((hit) => isFresh(hit.publishedAt, query.freshnessDays, now));
       await writeCache(key, fresh);

@@ -1,30 +1,28 @@
-# 🎯 Reach — 5 auditeurs Cardano Plutus/Aiken pour ton DEX
+# 🎯 Reach — 4 pistes d’auditeurs Cardano pour votre DEX
 
-**Verdict** : commence par **Tweag** pour une revue DEX avec références directement comparables. Mets **MLabs** en parallèle si tu veux aussi cadrer l’off-chain et la phase de re-audit.
+**Verdict** : commencez par **Tweag** et **MLabs** pour comparer deux approches solides, toutes deux directement centrées sur la sécurité Cardano. Tweag publie des audits de DEX Cardano ; MLabs décrit une offre couvrant explicitement Aiken et l’ensemble du protocole, y compris l’off-chain. Demandez à chacun un périmètre et un devis sur le même commit.
 
-**Ton brief** : sourcing · crypto/DeFi · audit Plutus/Aiken d’un DEX Cardano · zone mondiale  
-**Hypothèses** : budget, taille du code et échéance non précisés. Les scores évaluent l’adéquation et les preuves publiques, pas la qualité garantie de l’audit.
+**Votre brief** : sourcing · crypto / DeFi · audit de smart contracts Plutus et/ou Aiken · DEX Cardano  
+**Hypothèses** : zone, budget et calendrier non précisés. Les scores sont indicatifs ; les tarifs, délais et disponibilités sont à confirmer.
 
 | # | Entreprise | Pays | Pourquoi elle | Preuve | Fraîcheur | Score |
 |---|---|---|---|---|---|---:|
-| 1 | **Tweag** | Non précisé dans les sources consultées | Références directes sur des DEX Cardano — Genius Yield, CardaxDEX, MinSwap — et plus de 20 audits Cardano revendiqués dans sa rétrospective publiée le 23 juillet 2026. | [Portefeuille d’audits](https://www.tweag.io/audits/) · [Rétrospective](https://tweag.io/blog/2026-07-23-cardano-audits-retrospective/) | 🟢 2026-07 pour la rétrospective ; références DEX anciennes | 92 |
-| 2 | **MLabs** | Non précisé dans les sources consultées | Audit indépendant annoncé pour Aiken, Plutarch et Plinth ; décrit une méthode avec tests reproductibles, revue du code on-chain et off-chain, puis re-audit. Un article de sécurité Cardano est daté du 7 septembre 2025. | [Service d’audit](https://www.mlabs.city/audit) · [Article](https://www.mlabs.city/blog/from-bugs-to-breakthroughs) | 🟡 2025-09, ancien de 13 mois au 2026-10-06 | 89 |
-| 3 | **Anastasia Labs** | Non précisé dans les sources consultées | Audit Aiken confirmé par un rapport FluidTokens de 2024 et audit des contrats DEX de Genius Yield attesté par leur documentation publique. | [Rapport Aquarium, déc. 2024](https://fluidtokens.com/audits/FluidTokens_Aquarium_Anastasia_Labs.pdf) · [Référence DEX Genius Yield](https://github.com/geniusyield/dex-contracts-api/blob/main/geniusyield-onchain/src/GeniusYield/OnChain/DEX/README.md) | 🔴 2024-12, ancien | 86 |
-| 4 | **Vacuumlabs** | Non précisé dans les sources consultées | Propose explicitement l’audit Cardano et mentionne de l’expertise en Plutus, Plutarch et Aiken. La page consultée est datée du 6 juillet 2023 ; preuve d’expérience précise sur un DEX non trouvée. | [Service d’audit](https://vacuumlabs.com/services/smart-contract-auditing/) | 🔴 2023-07, ancien | 76 |
-| 5 | **MLabs / audit de l’écosystème Cardano (preuve historique)** | — | L’audit MuesliSwap v2 par MLabs est rapporté par le projet ; c’est une référence DEX utile à demander lors du cadrage, mais la preuve publique consultée date de 2022. | [Annonce MuesliSwap](https://medium.com/@muesliswap/muesliswap-v2-smart-contract-successfully-passed-an-audit-by-mlabs-fb2434771521) | 🔴 2022-02, ancien | 68 |
+| 1 | [Tweag](https://www.tweag.io/audits/) | Non précisé | Expérience directement pertinente : sa liste documente des audits de DEX Cardano, dont MinSwap, Genius Yield et Cerra AMM. La rétrospective publiée en 2026 indique plus de 20 audits Cardano. Confirmez que l’équipe prend en charge votre langage et votre périmètre actuels. | [Audits et rapports publics](https://www.tweag.io/audits/) · [rétrospective](https://www.tweag.io/blog/2026-07-23-cardano-audits-retrospective/) | 🟢 2026-07 pour la rétrospective ; audits listés jusqu’à 2025 | 94 |
+| 2 | [MLabs](https://www.mlabs.city/audit) | Non précisé | Offre spécialisée Cardano : Aiken, Plutarch et Plinth. L’audit annoncé couvre le code on-chain, le transaction-building off-chain et la conception du protocole — bon alignement avec un DEX. Aucun rapport de DEX nommé n’a été confirmé dans les pages consultées. | [Périmètre et méthode d’audit](https://www.mlabs.city/audit) | non daté | 88 |
+| 3 | [Vacuumlabs](https://vacuumlabs.com/services/smart-contract-auditing/) | Non précisé | Présente une expertise d’audit de smart contracts Cardano et nomme Plutus, Plutarch et Aiken. Demandez des rapports Cardano comparables et confirmez la portée du contrôle off-chain. | [Service d’audit](https://vacuumlabs.com/services/smart-contract-auditing/) | 🔴 ancien — page datée du 2023-07-06 | 75 |
+| 4 | [CertiK](https://www.certik.com/ecosystems/cardano) | Non précisé | Déclare couvrir les audits Plutus/Aiken et les risques EUTxO. La page indique une inscription au registre d’auditeurs Cardano CIP-52 ; vérifiez les références DEX Cardano et l’équipe assignée avant de retenir l’offre. | [Offre Cardano](https://www.certik.com/ecosystems/cardano) · [CIP-52](https://cips.cardano.org/cip/CIP-0052) | non daté | 73 |
 
 **⚠️ Points de vigilance**
-- Un audit vaut pour un périmètre, un commit et un instant donnés. Fais chiffrer séparément les contrats **on-chain**, le code de construction des transactions **off-chain**, les tests et le re-audit.
-- Demande les références DEX récentes et les disponibilités actuelles : plusieurs références publiques datent de 2022–2024.
-- Pour Aiken, vérifie explicitement ce qui est inclus ou exclu : outil de compilation, bibliothèques, configuration de déploiement et scripts de migration.
-- La page de MLabs indique que la durée dépend du périmètre et ajoute typiquement une à deux semaines pour le délai de correction côté client. Aucun prix ferme n’a été trouvé dans les sources consultées.
+- Faites chiffrer le même périmètre : contrats on-chain, construction des transactions off-chain, tests, modèle de menace et ré-audit après correctifs.
+- Pour un DEX, demandez une revue explicite des risques EUTxO : composition des transactions, concurrence, authentification des UTxO, redeemers, minting policies et risques de déni de service.
+- Faites confirmer par écrit le langage effectivement audité — Plutus, Aiken ou les deux — et demandez des rapports Cardano publiés ou des références vérifiables. Un historique ne garantit pas l’absence de vulnérabilités.
+- Les pages consultées ne confirment pas les prix, les délais, la disponibilité ni les conditions de confidentialité.
 
-**✉️ Premier message (à copier)**
-
+**✉️ Premier message (à copier)**  
 > Bonjour,  
-> Nous lançons un DEX sur Cardano et cherchons un audit indépendant de nos contrats Plutus/Aiken.  
-> Pouvez-vous nous partager vos références DEX comparables, votre périmètre type (on-chain et off-chain), vos délais et vos modalités de re-audit ?  
-> Nous pouvons transmettre le dépôt et le commit ciblé pour cadrer le devis.  
+> Nous lançons un DEX sur Cardano et cherchons un audit de sécurité de nos contrats Plutus/Aiken.  
+> Pouvez-vous préciser vos références DEX/Cardano, votre périmètre (on-chain, off-chain, conception), vos disponibilités et le format de devis ?  
+> Nous pouvons partager le dépôt, la spécification et un commit cible pour cadrer l’estimation.  
 > Merci.
 
-**🔍 Ce que je n’ai pas trouvé** : tarifs et disponibilités vérifiables pour ces auditeurs ; confirmation publique de leur capacité actuelle ; comparatif indépendant permettant de départager la qualité des équipes.
+**🔍 Ce que je n’ai pas trouvé** : tarif ou délai public comparable, ni preuve récente d’audit DEX pour chaque prestataire. Les pages de MLabs, Vacuumlabs et CertiK ne sont pas datées dans les contenus lus ; je ne les présente donc pas comme des signaux d’activité récents.

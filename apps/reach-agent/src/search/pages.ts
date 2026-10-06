@@ -1,8 +1,9 @@
-// Lecture de pages : Jina Reader d'abord, `fetch` direct en secours. Toute URL passe par le garde SSRF.
+// Lecture de pages : Jina Reader d'abord, GET direct épinglé en secours. Toute URL passe par le garde SSRF.
 import { PAGE_TTL_MS, readCache, writeCache } from "./cache.ts";
 import { toIsoDate } from "./dates.ts";
+import { fetchPublic } from "./direct-fetch.ts";
 import { collectBefore, createLimiter } from "./limit.ts";
-import { assertPublicUrl, BlockedHostError } from "./url.ts";
+import { BlockedHostError, resolvePublicTarget } from "./url.ts";
 
 export interface PageResult {
   url: string;
@@ -18,7 +19,6 @@ const PAGE_CONCURRENCY = 8;
 const JINA_TIMEOUT_MS = 15_000;
 const DIRECT_TIMEOUT_MS = 10_000;
 const MAX_TEXT_LENGTH = 6_000;
-const MAX_REDIRECTS = 5;
 const JINA_READER_URL = "https://r.jina.ai/";
 
 const pageLimit = createLimiter(PAGE_CONCURRENCY);
@@ -60,23 +60,9 @@ export function htmlToPage(html: string): PageContent {
   return { title, publishedAt: toIsoDate(published), text };
 }
 
-/** Suit les redirections à la main pour vérifier chaque saut avec le garde SSRF. */
 async function readDirect(url: string, signal: AbortSignal): Promise<PageContent> {
-  const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(DIRECT_TIMEOUT_MS)]);
-  let current = url;
-  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    await assertPublicUrl(current);
-    const response = await fetch(current, { redirect: "manual", signal: requestSignal });
-    const location = response.headers.get("location");
-    if (response.status >= 300 && response.status < 400 && location) {
-      current = new URL(location, current).toString();
-      continue;
-    }
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const body = await response.text();
-    return (response.headers.get("content-type") ?? "").includes("html") ? htmlToPage(body) : { title: null, publishedAt: null, text: body.trim() };
-  }
-  throw new Error("too many redirects");
+  const response = await fetchPublic(url, AbortSignal.any([signal, AbortSignal.timeout(DIRECT_TIMEOUT_MS)]));
+  return response.contentType.includes("html") ? htmlToPage(response.body) : { title: null, publishedAt: null, text: response.body.trim() };
 }
 
 function errorMessage(error: unknown): string {
@@ -85,7 +71,7 @@ function errorMessage(error: unknown): string {
 
 async function readPage(url: string, signal: AbortSignal): Promise<PageResult> {
   try {
-    await assertPublicUrl(url);
+    await resolvePublicTarget(url);
   } catch (error) {
     const reason = error instanceof BlockedHostError ? error.message : `invalid url: ${errorMessage(error)}`;
     return { url, ok: false, title: null, publishedAt: null, text: "", error: reason };
@@ -112,6 +98,8 @@ async function readPage(url: string, signal: AbortSignal): Promise<PageResult> {
 export async function readPages(urls: readonly string[], options: { deadlineMs?: number; signal: AbortSignal }): Promise<PageResult[]> {
   const deadline = AbortSignal.any([options.signal, AbortSignal.timeout(options.deadlineMs ?? DEFAULT_PAGES_DEADLINE_MS)]);
   const unique = [...new Set(urls)];
-  const results = await collectBefore(unique, deadline, (url) => pageLimit(() => readPage(url, deadline)));
-  return results.map((result, index) => result ?? { url: unique[index] ?? "", ok: false, title: null, publishedAt: null, text: "", error: "timeout" });
+  const timedOut = (url: string): PageResult => ({ url, ok: false, title: null, publishedAt: null, text: "", error: "timeout" });
+  // Le limiteur rejette une attente annulée par l'échéance : on la convertit en échec, `collectBefore` exige un worker qui ne rejette pas.
+  const results = await collectBefore(unique, deadline, (url) => pageLimit(() => readPage(url, deadline), deadline).catch(() => timedOut(url)));
+  return results.map((result, index) => result ?? timedOut(unique[index] ?? ""));
 }

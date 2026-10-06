@@ -1,5 +1,6 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { assertSearchAllowed } from "../../src/phase.ts";
 import { readPages } from "../../src/search/pages.ts";
 
 const PAGES_DEADLINE_MS = 20_000;
@@ -13,6 +14,7 @@ export default defineTool({
     start: ({ urls }) => `Lecture de ${urls.length} pages`,
   },
   async execute({ urls }, ctx) {
+    assertSearchAllowed(ctx.messages);
     return readPages(urls, { deadlineMs: PAGES_DEADLINE_MS, signal: ctx.abortSignal });
   },
 });

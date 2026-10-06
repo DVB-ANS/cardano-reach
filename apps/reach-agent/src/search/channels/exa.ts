@@ -1,4 +1,6 @@
-// Exa via mcporter (`exa.web_search_exa`), sortie texte en blocs `Title:` / `URL:` / `Published:` séparés par `---`.
+// Exa via mcporter (`web_search_exa`), sortie texte en blocs `Title:` / `URL:` / `Published:` séparés par `---`.
+// Serveur `exa` : MCP gratuit, limité en débit (HTTP 429 vite atteint). Serveur `exa-key` : même MCP avec
+// `Authorization: Bearer ${EXA_API_KEY}` (config mcporter), utilisé dès que la clé existe.
 import { toIsoDate } from "../dates.ts";
 import { runCommand } from "../run-command.ts";
 import type { Channel, ChannelSearch, SearchHit } from "../types.ts";
@@ -30,7 +32,8 @@ export function parseExaOutput(output: string, channel: Channel): SearchHit[] {
 }
 
 async function callExa(query: string, objective: string, channel: Channel, signal: AbortSignal, timeoutMs: number): Promise<SearchHit[]> {
-  const args = ["call", "exa.web_search_exa", `query=${query}`, `numResults=${RESULTS_PER_QUERY}`, `objective=${objective}`];
+  const server = process.env.EXA_API_KEY ? "exa-key" : "exa";
+  const args = ["call", `${server}.web_search_exa`, `query=${query}`, `numResults=${RESULTS_PER_QUERY}`, `objective=${objective}`];
   return parseExaOutput(await runCommand("mcporter", args, { signal, timeoutMs }), channel);
 }
 

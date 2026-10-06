@@ -1,26 +1,31 @@
-# 🎯 Reach — 5 acheteurs potentiels pour deux jets d’affaires d’occasion
+# 🎯 Reach — 5 pistes pour vendre deux jets d’affaires d’occasion
 
-**Verdict** : commencez par **FAI rent-a-jet** si vos appareils sont des jets long-courriers Bombardier, puis **Baker Aviation** pour des Challenger 300. Ce sont les signaux d’achat récents les plus concrets que j’ai trouvés. Attention : leur activité passée ne garantit pas qu’ils achètent encore, ni que le type de vos jets corresponde.
+**Verdict** : commencez par **SKYSHARE**. Leur actualité mentionne un Gulfstream G200 rejoignant leur flotte fractionnée — c’est le signal d’achat le plus concret trouvé. Attention toutefois : il date d’environ un mois d’après la page LinkedIn consultée, et l’adéquation dépend entièrement du modèle de vos appareils.
 
-**Votre brief** : vente · jets d’affaires d’occasion · 2 appareils · zone non précisée  
-**Hypothèses** : ciblage d’acheteurs directs ; modèles, années, prix, état et lieu des appareils inconnus.
+**Votre brief** : leads · aviation d’affaires · 2 jets d’occasion · zone mondiale  
+**Hypothèses** : modèle, année, état, prix et calendrier inconnus. Les entreprises ci-dessous sont des opérateurs, gestionnaires ou courtiers susceptibles d’acheter ou de placer des appareils — pas des acheteurs confirmés.
 
-| # | Entreprise | Pays | Pourquoi la cibler | Why now | Angle | Fraîcheur | Score |
+| # | Entreprise | Pays | Pourquoi elle | Why now | Angle | Fraîcheur | Score |
 |---|---|---|---|---|---|---|---:|
-| 1 | [FAI rent-a-jet](https://www.fai.ag/news-press/fai-strengthens-long-range-charter-fleet-with-second-global-6000-in-a-year) | Allemagne | Opérateur de charter long-courrier Bombardier ; l’achat d’un Global 6000 récent est un signal fort si vos jets sont comparables. | Achat d’un deuxième Global 6000 annoncé le **19 août 2026** ; la flotte atteint 18 Bombardier. [Source](https://airpronews.com/2026/08/20/fai-rent-a-jet-adds-second-bombardier-global-6000-in-2026/) | Proposer les deux appareils comme capacité additionnelle, avec heures, configuration et historique de maintenance en tête. | 🟢 2026-08 | 88 |
-| 2 | [Baker Aviation](https://airpronews.com/2025/12/09/baker-aviation-acquires-20-challenger-300-jets-from-flexjet-in-fleet-boost/) | États-Unis | Opérateur charter qui a acheté un lot important de Challenger 300 ; piste particulièrement pertinente pour ce modèle. | Acquisition de **20 Challenger 300** rapportée le **9 décembre 2025**, pour renforcer sa capacité charter. [Source](https://airpronews.com/2025/12/09/baker-aviation-acquires-20-challenger-300-jets-from-flexjet-in-fleet-boost/) | Présenter une vente groupée ou un lot homogène si vos deux appareils sont des Challenger 300. | 🟡 2025-12 | 84 |
-| 3 | [AirSprint](https://financialpost.com/transportation/airsprint-to-buy-large-cabin-jets) | Canada | Opérateur de propriété fractionnée ayant annoncé vouloir acheter plusieurs appareils de grande cabine. | Le **3 juillet 2026**, l’entreprise annonçait prévoir au moins cinq achats de jets grande cabine dans les années suivantes. [Source](https://financialpost.com/transportation/airsprint-to-buy-large-cabin-jets) | Vérifier si vos appareils correspondent à leur besoin de grande cabine et au calendrier d’acquisition annoncé. | 🟢 2026-07 | 78 |
-| 4 | [Valiair](https://www.valiair.com/news/valiair-acquires-superior-air-charter) | États-Unis | Groupe de services aéronautiques en expansion, avec activité charter et services de vente/acquisition ; l’intérêt dépend fortement du modèle. | Acquisition de Superior Air Charter achevée le **24 février 2026**, ajoutant trois Phenom 100 à ses opérations charter. [Source](https://www.valiair.com/news/valiair-acquires-superior-air-charter) | À approcher surtout si vos jets sont des appareils légers compatibles avec leur segment charter. | 🟢 2026-02 | 72 |
-| 5 | [flyExclusive](https://www.corporatejetinvestor.com/news/flyexclusive-jet-ai/) | États-Unis | Opérateur privé qui a récemment intégré des actifs aéronautiques et des avions à sa plateforme ; prospect secondaire, sans preuve d’un nouveau besoin actuel. | Acquisition des actifs aéronautiques de Jet.AI finalisée le **15 juillet 2026**, incluant deux HondaJet et un Citation CJ4. [Source](https://www.corporatejetinvestor.com/news/flyexclusive-jet-ai/) | Demander si un type précis d’appareil compléterait leur flotte ; éviter une approche générique sans fiche avion solide. | 🟢 2026-07 | 67 |
+| 1 | [SKYSHARE](https://www.linkedin.com/company/cbskyshare) | États-Unis | Opérateur d’aviation privée proposant propriété fractionnée, charter, gestion et acquisitions d’appareils. | Publication LinkedIn : un Gulfstream G200 rejoint la flotte fractionnée. Signal récent, date exacte non affichée dans la page consultée. | Présenter les deux appareils au responsable acquisitions ou brokerage, avec dossier technique et options de mise en flotte. | 🟢 env. 2026-09 · date exacte non datée | 83 |
+| 2 | [Leviate Air Group](https://www.linkedin.com/company/privatejets) | États-Unis | Groupe d’aviation privée actif en charter, gestion et ventes/acquisitions d’appareils. | La page LinkedIn consultée affiche une publication « Another acquisition successfully completed » ; date exacte non visible dans le contenu extrait. | Proposer les appareils pour acquisition, gestion ou revente via leur activité de ventes et acquisitions. | non daté | 74 |
+| 3 | [Elevate Aviation Group](https://eag.aero/) | États-Unis / international | Plateforme intégrée : charter, gestion d’avions et acquisition/disposition d’appareils. | Page LinkedIn consultée : lancement récent de l’application Elevate Jet et activité de services aviation. Pas de signal public confirmé d’achat de jets d’occasion. | Demander si un appareil correspondant à leur flotte ou à leurs mandats clients est recherché. | 🟢 signal récent, date exacte non datée | 67 |
+| 4 | [Hera Flight](https://www.linkedin.com/company/hera-flight) | États-Unis | Opérateur de charter offrant aussi gestion, maintenance, et assistance à l’achat et à la vente d’avions. | Activité d’acquisition ou d’achat récente non trouvée ; intérêt surtout lié à leur rôle de gestionnaire et intermédiaire. | Vérifier s’ils achètent pour leur propre flotte ou peuvent présenter les avions à leurs clients. | non daté | 59 |
+| 5 | [ACshares Aviation Group](https://www.linkedin.com/company/acshares) | États-Unis | Spécialiste jets d’affaires : ventes, gestion et pièces, avec expérience de plusieurs modèles d’affaires. | Publications LinkedIn récentes sur la gestion d’avions et le support aux opérateurs ; aucun achat récent confirmé. | Tester l’intérêt pour achat direct, reprise, gestion ou mise en relation avec un opérateur. | 🟢 publications récentes, dates exactes non datées | 55 |
 
-**⚠️ Points de vigilance** : les signaux d’achat recensés sont concentrés chez des opérateurs, et certains portent sur des types très précis. Ce n’est pas une confirmation qu’ils recherchent vos appareils. Le marché des jets grande cabine est aussi plus contrasté : une analyse publiée le **12 septembre 2026** rapporte une baisse de l’activité grande cabine en juin et une baisse des vols des départements de vol d’entreprise au premier semestre. [Analyse de marché](https://www.paramountbusinessjets.com/blog/research-and-trends/private-aviation-trends-industry-statistics)
+**Pourquoi ces pistes** : elles ont toutes une activité vérifiable dans l’aviation privée et les ventes, acquisitions ou la gestion d’avions. Mais les signaux publics démontrent surtout une **capacité à acheter ou à faciliter une transaction**, pas une intention confirmée d’acheter vos deux jets.
 
-**✉️ Premier message (à copier)** :
+**⚠️ Points de vigilance**
+- Sans modèle, année, heures, état moteur, historique de maintenance, juridiction d’immatriculation et prix indicatif, impossible de qualifier l’adéquation ou le pouvoir d’achat.
+- SKYSHARE et Leviate sont des pistes prioritaires à tester, mais les publications relevées ne prouvent pas qu’ils recherchent actuellement vos modèles.
+- Pour l’international, l’éligibilité dépendra notamment de l’immatriculation, des dossiers techniques et des contraintes d’export applicables.
+
+**✉️ Premier message (à copier)**
 
 > Bonjour,  
-> Je propose à la vente deux jets d’affaires d’occasion : [modèle, année, immatriculation/pays].  
-> Je peux transmettre les heures cellule/moteurs, la configuration, l’historique de maintenance et le prix demandé.  
-> Votre équipe étudie-t-elle actuellement des acquisitions de ce type ?  
-> Bien cordialement,
+> Nous proposons à la vente deux jets d’affaires d’occasion et souhaitons vérifier leur adéquation avec vos besoins d’acquisition ou ceux de vos clients.  
+> Je peux vous transmettre une fiche par appareil avec modèle, année, heures, configuration, statut de maintenance et prix indicatif.  
+> Êtes-vous la bonne équipe pour examiner ces opportunités ?  
+> Cordialement,
 
-**🔍 Ce que je n’ai pas trouvé** : les acheteurs ne peuvent pas être qualifiés sérieusement sans modèles, années, état, prix et localisation. Les pistes ci-dessus sont des acheteurs potentiels fondés sur des signaux publics, pas des acheteurs confirmés pour vos deux appareils.
+**🔍 Ce que je n’ai pas trouvé** : un acheteur ayant annoncé une recherche correspondant à vos deux appareils précis. Les modèles et caractéristiques manquants empêchent aussi de cibler des opérateurs de flotte pertinents. Les sources consultées sont principalement des pages LinkedIn d’entreprises, dont certaines n’affichent pas de date de publication précise ; je les traite donc comme pistes, pas comme signaux d’achat établis.

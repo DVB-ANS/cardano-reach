@@ -1,5 +1,6 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { assertSearchAllowed } from "../../src/phase.ts";
 import { searchBatch } from "../../src/search/engine.ts";
 import { CHANNELS } from "../../src/search/types.ts";
 
@@ -27,6 +28,7 @@ export default defineTool({
     start: ({ queries }) => `Recherche sur ${new Set(queries.map((query) => query.channel)).size} canaux (${queries.length} requêtes)`,
   },
   async execute({ queries }, ctx) {
+    assertSearchAllowed(ctx.messages);
     return searchBatch(queries, { deadlineMs: SEARCH_DEADLINE_MS, signal: ctx.abortSignal });
   },
 });

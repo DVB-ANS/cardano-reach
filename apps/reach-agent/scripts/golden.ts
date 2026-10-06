@@ -50,6 +50,8 @@ function check(golden: GoldenCase, result: SimulationResult): string[] {
 const { values } = parseArgs({ options: { only: { type: "string", multiple: true, default: [] } } });
 const parsed: unknown = JSON.parse(await readFile(CASES_PATH, "utf8"));
 if (!Array.isArray(parsed) || !parsed.every(isGoldenCase)) throw new Error("tests/golden/cases.json is malformed");
+const unknownIds = values.only.filter((id) => !parsed.some((golden) => golden.id === id));
+if (unknownIds.length) throw new Error(`Unknown golden case id: ${unknownIds.join(", ")}`);
 const cases = values.only.length ? parsed.filter((golden) => values.only.includes(golden.id)) : parsed;
 
 await mkdir(OUT_DIR, { recursive: true });

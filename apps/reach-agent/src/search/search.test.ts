@@ -8,7 +8,7 @@ import { isFresh, toIsoDate } from "./dates.ts";
 import { searchBatch } from "./engine.ts";
 import { collectBefore, createLimiter } from "./limit.ts";
 import { parseJinaOutput } from "./pages.ts";
-import { assertPublicUrl, normalizeUrl } from "./url.ts";
+import { normalizeUrl, resolvePublicTarget } from "./url.ts";
 
 const fixture = (name: string) => readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), "utf8");
 
@@ -25,6 +25,11 @@ describe("parsers on captured outputs", () => {
     const [repo] = parseGithubOutput(fixture("github.txt"));
     assert.equal(repo?.url, "https://github.com/quex-tech/plutus-auditor");
     assert.equal(repo?.publishedAt, "2026-05-15T11:26:41.000Z");
+  });
+
+  it("keeps GitHub repos without description", () => {
+    const payload = JSON.stringify([{ fullName: "a/b", url: "https://github.com/a/b", description: null, updatedAt: "2026-01-01T00:00:00Z", stargazersCount: 3 }]);
+    assert.equal(parseGithubOutput(payload)[0]?.snippet, "(★ 3)");
   });
 
   it("converts YouTube upload_date YYYYMMDD to ISO", () => {
@@ -55,10 +60,24 @@ describe("urls", () => {
     assert.equal(normalizeUrl("https://example.com/"), "https://example.com");
   });
 
-  it("blocks non-public targets", async () => {
-    for (const url of ["http://127.0.0.1/", "http://[::1]/", "file:///etc/passwd", "http://printer.local/", "http://10.0.0.1/", "http://[::ffff:192.168.1.1]/"]) {
-      await assert.rejects(assertPublicUrl(url), /blocked host/, url);
-    }
+  it("blocks non-public targets, including IPv4 hidden in IPv6", async () => {
+    const blocked = [
+      "http://127.0.0.1/",
+      "http://[::1]/",
+      "file:///etc/passwd",
+      "http://printer.local/",
+      "http://10.0.0.1/",
+      "http://[::ffff:192.168.1.1]/",
+      "http://[::ffff:127.0.0.1]/",
+      "http://[::ffff:7f00:1]/",
+      "http://[64:ff9b::7f00:1]/",
+      "http://169.254.169.254/latest/meta-data",
+    ];
+    for (const url of blocked) await assert.rejects(resolvePublicTarget(url), /blocked host/, url);
+  });
+
+  it("returns the validated address to pin the connection", async () => {
+    assert.deepEqual(await resolvePublicTarget("http://93.184.215.14/"), { url: new URL("http://93.184.215.14/"), address: "93.184.215.14", family: 4 });
   });
 });
 
@@ -93,6 +112,23 @@ describe("concurrency", () => {
     await Promise.resolve();
     controller.abort();
     assert.deepEqual(await pending, [1, undefined]);
+  });
+
+  it("drops an aborted waiter from the queue and never runs it", async () => {
+    const limit = createLimiter(1);
+    const holder = Promise.withResolvers<void>();
+    const first = limit(() => holder.promise);
+    const controller = new AbortController();
+    let ran = false;
+    const waiter = limit(async () => {
+      ran = true;
+    }, controller.signal);
+    controller.abort();
+    await assert.rejects(waiter);
+    holder.resolve();
+    await first;
+    await limit(async () => undefined);
+    assert.equal(ran, false);
   });
 
   it("reports disabled channels as failures without running them", async () => {

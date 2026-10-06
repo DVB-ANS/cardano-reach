@@ -8,7 +8,7 @@ const RESULTS_PER_QUERY = 8;
 interface GithubRepo {
   fullName: string;
   url: string;
-  description: string;
+  description: string | null;
   updatedAt: string;
   stargazersCount: number;
 }
@@ -19,7 +19,7 @@ function isGithubRepo(value: unknown): value is GithubRepo {
   return (
     typeof repo.fullName === "string" &&
     typeof repo.url === "string" &&
-    typeof repo.description === "string" &&
+    (typeof repo.description === "string" || repo.description === null) &&
     typeof repo.updatedAt === "string" &&
     typeof repo.stargazersCount === "number"
   );
@@ -32,7 +32,7 @@ export function parseGithubOutput(output: string): SearchHit[] {
     channel: "github",
     title: repo.fullName,
     url: repo.url,
-    snippet: `${repo.description} (★ ${repo.stargazersCount})`.trim(),
+    snippet: `${repo.description ?? ""} (★ ${repo.stargazersCount})`.trim(),
     publishedAt: toIsoDate(repo.updatedAt),
     source: "github.com",
   }));

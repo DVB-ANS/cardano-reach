@@ -13,22 +13,25 @@
 
 | Canal | État | Note |
 | --- | --- | --- |
-| web | actif | Exa via `mcporter` (config `~/.mcporter`), ~5 s, ~50 % de hits datés |
-| linkedin | actif | Exa + `site:linkedin.com/company`, ~6 s, peu de dates |
+| web | actif, **quota gratuit épuisé** | Exa via `mcporter` (`~/.mcporter`), ~5 s, ~50 % datés. MCP gratuit → HTTP 429 après quelques golden ; avec `EXA_API_KEY`, serveur `exa-key` (header Bearer) |
+| linkedin | idem web | Exa + `site:linkedin.com/company`, ~6 s, peu de dates |
 | github | actif | `gh search repos` : mots-clés courts uniquement (requête longue → 0 résultat) |
 | youtube | **désactivé de fait** | `www.youtube.com` refusé en local (connexion refusée) ; parseur testé, à vérifier sur le VPS |
 | twitter, reddit | non implémentés | pas de comptes dédiés ; `reach_search` renvoie `channel not implemented` |
 
 Exa n'expose pas `web_search_advanced_exa` (pas de filtre de date côté Exa) : `freshnessDays` est filtré après coup.
+`web_search` (secours) n'est pas exposé au modèle avec `chatgpt()` : il n'existera qu'avec `openai()` + `OPENAI_API_KEY`.
 
 ## Checkpoints prouvés
 
 - M0 : `research.ts --text "Je cherche un usineur titane" --answer 1` → 1 question, `Brief` valide, rapport `# 🎯 Reach — …`.
 - Cas 1 (luna) : 0 question, intake 6 s, recherche 57 s, 4 lignes sourcées (liens vérifiés par l'agent via `read_pages`).
 - `eve build` OK ; `eve start` : 401 sans / avec mauvais identifiants Basic, 200 avec les bons.
-- Golden avec `gpt-6-luna` (`chatgpt()`), dernier passage par cas : 8/9 verts. `6-crypto-leads` rend 4 lignes sourcées
-  sur 5 attendues (l'agent refuse honnêtement d'en inventer) ; à rejouer avec `gpt-6.1-sol` pour M5.
-  Intake parfois trop prudent avec luna (question inutile) : rattrapé par la relance unique « bloc JSON Brief ».
+- Golden `gpt-6-luna`, après audit (garde de phase, relance Brief) : tous les cas passent l'intake. Premier passage
+  avant épuisement d'Exa : 7/9 (`4` : rapport rédigé en intake → corrigé par la garde codée ; `6` : 2 lignes).
+  Dernier passage : 4/9, dégradé par les HTTP 429 d'Exa (0 ligne sur 6 et 7), pas par le code.
+- Garde SSRF vérifiée en direct : `localhost`, IPv4 mappées / NAT64, métadonnées cloud bloqués ; redirection
+  http→https suivie avec connexion épinglée.
 
 ## Notes contrat
 
@@ -37,5 +40,6 @@ Exa n'expose pas `web_search_advanced_exa` (pas de filtre de date côté Exa) : 
 
 ## Blocages
 
-- Pas d'`OPENAI_API_KEY` sur le poste : dev en `chatgpt()`.
+- Pas d'`OPENAI_API_KEY` sur le poste : dev en `chatgpt()` (sans `web_search`).
+- **`EXA_API_KEY` nécessaire** (dashboard.exa.ai) : sans elle, le canal web tombe en 429 en démo.
 - Pas de Docker local : l'image n'a pas été construite (à faire sur le VPS).

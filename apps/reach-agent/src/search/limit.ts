@@ -1,16 +1,31 @@
-export type Limiter = <T>(task: () => Promise<T>) => Promise<T>;
+export type Limiter = <T>(task: () => Promise<T>, signal?: AbortSignal) => Promise<T>;
 
-/** Sémaphore : au plus `max` tâches en cours ; une place libérée passe directement au suivant. */
+/**
+ * Sémaphore : au plus `max` tâches en cours ; une place libérée passe directement au suivant.
+ * Une attente dont le `signal` est annulé sort de la file et rejette ; `task` n'est jamais lancée après annulation.
+ */
 export function createLimiter(max: number): Limiter {
   let active = 0;
   const waiting: Array<() => void> = [];
-  return async (task) => {
+  return async (task, signal) => {
+    signal?.throwIfAborted();
     if (active >= max) {
       const turn = Promise.withResolvers<void>();
+      const onAbort = () => {
+        const index = waiting.indexOf(turn.resolve);
+        if (index >= 0) waiting.splice(index, 1);
+        turn.reject(signal?.reason);
+      };
       waiting.push(turn.resolve);
-      await turn.promise;
+      signal?.addEventListener("abort", onAbort, { once: true });
+      try {
+        await turn.promise;
+      } finally {
+        signal?.removeEventListener("abort", onAbort);
+      }
     } else active++;
     try {
+      signal?.throwIfAborted();
       return await task();
     } finally {
       const next = waiting.shift();

@@ -13,7 +13,8 @@ export function normalizeUrl(raw: string): string {
   return url.toString().replace(/\/$/, "");
 }
 
-const PRIVATE_RANGES = new BlockList();
+// Deux listes séparées : une BlockList qui contient `::ffff:0:0/96` matcherait aussi toutes les IPv4.
+const PRIVATE_IPV4 = new BlockList();
 for (const [network, prefix] of [
   ["0.0.0.0", 8],
   ["10.0.0.0", 8],
@@ -21,27 +22,34 @@ for (const [network, prefix] of [
   ["127.0.0.0", 8],
   ["169.254.0.0", 16],
   ["172.16.0.0", 12],
+  ["192.0.0.0", 24],
   ["192.168.0.0", 16],
+  ["198.18.0.0", 15],
+  ["224.0.0.0", 3],
 ] as const) {
-  PRIVATE_RANGES.addSubnet(network, prefix, "ipv4");
+  PRIVATE_IPV4.addSubnet(network, prefix, "ipv4");
 }
+// Les plages IPv6 qui embarquent une IPv4 (mappée, NAT64, 6to4) sont bloquées en entier : l'IPv4 cachée pourrait être privée.
+const PRIVATE_IPV6 = new BlockList();
 for (const [network, prefix] of [
   ["::", 128],
   ["::1", 128],
+  ["::ffff:0:0", 96],
+  ["64:ff9b::", 96],
+  ["2002::", 16],
   ["fc00::", 7],
   ["fe80::", 10],
+  ["ff00::", 8],
 ] as const) {
-  PRIVATE_RANGES.addSubnet(network, prefix, "ipv6");
+  PRIVATE_IPV6.addSubnet(network, prefix, "ipv6");
 }
 
-const IPV4_MAPPED = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i;
 const LOCAL_SUFFIXES = [".localhost", ".local", ".internal"];
 
 function isPrivateAddress(address: string): boolean {
-  const mapped = IPV4_MAPPED.exec(address)?.[1];
-  if (mapped) return PRIVATE_RANGES.check(mapped, "ipv4");
   const family = isIP(address);
-  return family === 0 || PRIVATE_RANGES.check(address, family === 4 ? "ipv4" : "ipv6");
+  if (family === 4) return PRIVATE_IPV4.check(address, "ipv4");
+  return family !== 6 || PRIVATE_IPV6.check(address, "ipv6");
 }
 
 export class BlockedHostError extends Error {
@@ -50,21 +58,25 @@ export class BlockedHostError extends Error {
   }
 }
 
+export interface PublicTarget {
+  url: URL;
+  /** Adresse validée, à réutiliser pour la connexion (pas de seconde résolution DNS → pas de DNS rebinding). */
+  address: string;
+  family: 4 | 6;
+}
+
 /**
- * Refuse les schémas non http(s), les noms locaux et toute adresse privée ou loopback,
- * y compris quand un nom public résout vers une IP privée.
+ * Refuse les schémas non http(s), les noms locaux et toute adresse privée, loopback ou réservée,
+ * y compris quand un nom public résout vers une IP privée. Rend l'adresse validée à épingler.
  */
-export async function assertPublicUrl(raw: string): Promise<URL> {
+export async function resolvePublicTarget(raw: string): Promise<PublicTarget> {
   if (!URL.canParse(raw)) throw new BlockedHostError();
   const url = new URL(raw);
   if (url.protocol !== "http:" && url.protocol !== "https:") throw new BlockedHostError();
   const host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (host === "localhost" || LOCAL_SUFFIXES.some((suffix) => host.endsWith(suffix))) throw new BlockedHostError();
-  if (isIP(host)) {
-    if (isPrivateAddress(host)) throw new BlockedHostError();
-    return url;
-  }
-  const addresses = await lookup(host, { all: true });
-  if (addresses.some(({ address }) => isPrivateAddress(address))) throw new BlockedHostError();
-  return url;
+  const addresses = isIP(host) ? [{ address: host, family: isIP(host) }] : await lookup(host, { all: true });
+  const [first] = addresses;
+  if (!first || addresses.some(({ address }) => isPrivateAddress(address))) throw new BlockedHostError();
+  return { url, address: first.address, family: first.family === 6 ? 6 : 4 };
 }
