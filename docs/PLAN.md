@@ -3,7 +3,7 @@
 ## Context
 
 Implémenter le Coworker Sokosumi « Reach » décrit dans `BRIEF.md` (repo `DVB-ANS/cardano-reach`, branche actuelle
-`feat/masumi-setup`, dossier local `/Users/armandsechon/dev/agent-reach`). Reach :
+`feat/masumi-setup`). Reach :
 1. pose ses questions de départ en `INPUT_REQUIRED` ;
 2. se fait payer 1 test USDM via Masumi sur Cardano Preprod ;
 3. cherche vite sur le web, LinkedIn, GitHub, YouTube, X et Reddit ;

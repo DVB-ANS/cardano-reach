@@ -108,6 +108,10 @@ fixtures réelles + tests, comme les canaux existants. Dédoublonnage des entrep
 
 ## Phase 5 — La personne, son e-mail, le hook (intégration)
 
+> **Décision produit (2026-10-07)** : c'est le cœur du produit (« mettre en relation avec le bon humain »), pas une
+> option. Elle démarre dès que M2 est prouvé. Le golden suit : cas 6 (market maker) retiré, cas « personne » 6, 10 et
+> 11 ajoutés au `BRIEF.md` §4.
+
 Demande type : « trouve-moi un dev Aiken freelance en Europe » ou « le responsable achats d'un usineur titane ».
 Pour chaque ligne du rapport : **la personne** (nom, rôle, lien de profil public), **son e-mail** avec un statut,
 **une accroche** tirée d'un fait daté et sourcé, et l'entreprise ou la structure (freelance = entreprise individuelle).

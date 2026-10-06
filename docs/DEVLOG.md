@@ -208,3 +208,28 @@ fiche du Coworker appliquée sur Sokosumi ; README, ROADMAP, TASKS, ONBOARDING, 
 **Bugs & fix** :
 - `coworkers update --company` : l'API répond 422 « Unrecognized key: company » ; seuls `caption` et `description` ont
   été appliqués.
+
+## 2026-10-07 — Décision produit : « le bon humain », garde-fous du mode payé
+
+**Quoi** : le cœur du produit passe de « la bonne entreprise » à « le bon humain » (personne à contacter, e-mail
+professionnel avec statut, accroche datée), écrit dans `BRIEF.md` §1, §3, §4, §6.4 et `ROADMAP.md` phase 5 ; cas golden 6
+(market maker) retiré ; trois correctifs du worker en mode payé (#21) ; infos privées retirées des docs.
+
+**Pourquoi** : une liste d'entreprises, beaucoup d'outils la font ; savoir à qui parler et quoi lui écrire, c'est ce
+qui fait gagner des heures. Le socle livré pour la démo reste la shortlist sourcée ; la personne arrive juste après M2.
+
+**Cheminement** :
+- Erreurs sur une personne : chaque contact vient avec ses liens de preuve, l'humain vérifie avant d'écrire.
+- Freelances : trouvés, mais sur Malt / Upwork / Fiverr / Codeur on donne seulement le lien du profil et le message à
+  envoyer sur la plateforme (CGU, `docs/research/phase5.md`).
+- Accroche : posts LinkedIn illisibles sans compte connecté (exclu) ; sources publiques (blog, GitHub, talks, presse,
+  X dès que le compte dédié existe).
+- Cas golden 6 : « tokens sans liquidité sérieuse » n'est pas prouvable avec une date sans source on-chain ; garder le
+  refus de l'agent plutôt que de lui faire compléter avec des pistes faibles.
+
+**Bugs & fix** (#21, relevés par l'audit) :
+- Task déjà payée relancée avec `PAID_TASKS_ENABLED=false` : la recherche repartait en gratuit et le texte livré ne
+  correspondait plus au hash on-chain. Elle reste maintenant en attente du mode payé.
+- Recherche payée en échec relancée à chaque poll : plafonnée à 3 tentatives, puis `FAILED` (escrow remboursé).
+- Échéance MPS illisible : `Number(undefined)` donnait `NaN`, et toute comparaison avec `NaN` est fausse, ce qui
+  désactivait les contrôles de délai. Erreur explicite désormais.

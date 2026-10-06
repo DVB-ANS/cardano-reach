@@ -6,16 +6,15 @@ IDs, ports, checkpoints prouvés, blocages.
 
 | Élément | Valeur |
 | --- | --- |
-| Compte | `armand.noe.sw@gmail.com` (CLI 1.0.4, Node 24 via `brew install node@24`) |
+| Compte | compte Sokosumi de Noé (CLI 1.0.4, Node 24 via `brew install node@24`) |
 | Organisation (prérequis Vendor) | `Richard` (`richard-y37uag`) |
 | Vendor | `Cardano Reach` (`cardano-reach`) · `01a11272-9017-740c-9f1b-cd446384ccb4` |
 | Coworker | `Reach` (`reach`) · `01a11272-c015-748f-9f1a-cfd1e504c497`, capability `tasks` |
-| Personal Workspace | `01a11268-64f2-7765-804b-45a56f3a4d95` |
-| Accès personnel du Coworker | `01a11272-c226-753a-a9ea-feabfd3ae0b2` · `GRANTED` |
+| Accès personnel du Coworker | `GRANTED` |
 | Fiche marketplace | accroche + description EN appliquées (`coworkers update`), Coworker encore privé (`isShown: false`) |
 | Clé runtime | `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`, 0600, ignoré) + coffre du CLI : import OK |
 
-Référence Masumi clonée dans `/Users/noew/VSCode/TOKEN2049/demo-agent-token2049` (branche `live-demo-name-finder`).
+Référence Masumi clonée à côté du repo (`../demo-agent-token2049`) (branche `live-demo-name-finder`).
 
 ## Checkpoints prouvés
 
