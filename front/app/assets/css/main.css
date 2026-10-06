@@ -112,6 +112,7 @@
   .chars .w { display: inline-block; white-space: nowrap; }
 }
 
+/* biome-ignore-start lint/complexity/noImportantStyles: reduced-motion must override every animation */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
@@ -120,3 +121,4 @@
   }
   .reveal, .chars .ch { opacity: 1 !important; transform: none !important; }
 }
+/* biome-ignore-end lint/complexity/noImportantStyles: reduced-motion must override every animation */
