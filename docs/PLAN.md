@@ -316,7 +316,7 @@ l'outil, `inputSchema` est en zod.
 
 #### B2. Portage TypeScript du worker de référence (`apps/worker/src/`)
 
-Source : `~/dev/demo-agent-token2049/live-team-names-20261006/`, à cloner depuis
+Source : `../demo-agent-token2049/live-team-names-20261006/` (cloné à côté du repo), à cloner depuis
 `github.com/masumi-network/demo-agent-token2049` (branche `live-demo-name-finder`) s'il est absent.
 On porte 1:1 en TS strict, sans changer le comportement à cette étape :
 
@@ -450,9 +450,9 @@ Armand et le coéquipier avancent en parallèle de M0 à M3. M4 attend M2 et M3.
 
 ## Critical files & anchors
 
-- `~/dev/demo-agent-token2049/live-team-names-20261006/paid-task.mjs` : machine `stage` du paiement et appel modèle
+- `../demo-agent-token2049/live-team-names-20261006/paid-task.mjs` : machine `stage` du paiement et appel modèle
   dans `awaiting-escrow`. C'est l'endroit où brancher `research-sent` en mode payé.
-- `~/dev/demo-agent-token2049/live-team-names-20261006/worker.mjs` : boucle de polling, `--personal` en dur aux lignes 22 et 32.
+- `../demo-agent-token2049/live-team-names-20261006/worker.mjs` : boucle de polling, `--personal` en dur aux lignes 22 et 32.
 - `~/.nvm/versions/node/v24.21.0/lib/node_modules/@masumi_network/sokosumi/dist/src/api/services/task-service.js` :
   `createTaskEvent(client, taskId, payload)`, qui envoie le payload tel quel sur `POST /v1/tasks/:id/events` (champs `status`, `comment`).
 - `docs/masumi/agent-guide.md` : commandes officielles (Vendor, Coworker, clé runtime, MPS, Workspace TOKEN2049).

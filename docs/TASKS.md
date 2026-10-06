@@ -33,20 +33,21 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 ## Noé — Sokosumi, worker, paiement, tooling
 
 1. **Compte Sokosumi** (B1)
-   - [ ] `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal`.
-   - [ ] Clé runtime dans `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`) et dans le coffre du CLI.
+   - [x] `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal` (IDs : `docs/state/worker.md`).
+   - [x] Clé runtime dans `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`) et dans le coffre du CLI.
    - [ ] Demander tôt l'accès au Workspace TOKEN2049 (validation humaine chez Masumi).
 2. **Worker** (B2, B3) → **M1**
-   - [ ] Cloner la référence : `git clone -b live-demo-name-finder https://github.com/masumi-network/demo-agent-token2049 ~/dev/demo-agent-token2049`.
-   - [ ] Portage TS strict dans `apps/worker/src/` (tableau de correspondance dans `PLAN.md` §B2).
-   - [ ] Questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon (`PLAN.md` §B3).
-   - [ ] M1 : Task gratuite avec question → réponse → rapport.
+   - [x] Cloner la référence à côté du repo : `git clone -b live-demo-name-finder https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
+   - [x] Portage TS strict dans `apps/worker/src/` : partie Sokosumi + intake (paiement : à faire, voir 3).
+   - [x] Questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon (`PLAN.md` §B3).
+   - [x] M1 : Task gratuite avec question → réponse → rapport (preuves : `docs/state/worker.md`).
 3. **Paiement** → **M2**
+   - [ ] Porter `payment.ts`, `settlement.ts`, `registration.ts`, `agent-api.ts` (testés avec un faux MPS).
    - [ ] Brancher le worker sur le MPS d'Armand (tunnel SSH), enregistrement Masumi (B4).
    - [ ] M2 : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
    - [ ] Image worker + agent-api (Dockerfile dans `apps/worker/`) pour le compose d'Armand.
 4. **Tooling restant** (dans les temps morts)
-   - [ ] Job worker dans la CI (typecheck + tests) dès que `apps/worker/` existe.
+   - [x] Job worker dans la CI (typecheck + tests).
    - [x] README racine (quoi, schéma, lancer en local, déployer).
    - [x] Biome (lint + format) sur `front/`, en CI ; Dependabot (agent, front, actions).
    - [ ] Biome pour `apps/worker/` (et `apps/reach-agent/` si Armand le veut).

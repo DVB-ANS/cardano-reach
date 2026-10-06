@@ -47,4 +47,4 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
   déploiement M4 et front (détail : `docs/TASKS.md`).
 - À faire (coéquipier) : compte Sokosumi, worker, paiement, M1 → M2 (éliminatoire), tooling restant, puis phase 5.
 - Bloquants : `EXA_API_KEY`, `OPENAI_API_KEY`, compte Sokosumi / Coworker, Blockfrost, accès VPS, domaine ;
-  worker de référence Masumi à cloner dans `~/dev/demo-agent-token2049`.
+  worker de référence Masumi à cloner dans `../demo-agent-token2049`.

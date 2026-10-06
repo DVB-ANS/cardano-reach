@@ -144,3 +144,29 @@ hook `.githooks/pre-commit`, template de PR, pnpm épinglé (PR #9) ; suppressio
   variables de `<script setup>` comme inutilisées. Formateur HTML/Vue désactivé.
 - Corrigé dans `front/` : deux `!` non nuls (`obs` du callback d'IntersectionObserver, `charAt`), `type="button"`,
   `!important` du `prefers-reduced-motion` gardés avec une suppression ciblée.
+
+## 2026-10-07 — Worker Sokosumi et M1
+
+**Quoi** : compte Sokosumi (organisation de démo, Vendor « Cardano Reach », Coworker « Reach », clé runtime) et
+`apps/worker/` : client Sokosumi, verrou d'exécuteur unique, journal atomique par Task, machine de phases avec
+questions `INPUT_REQUIRED` avant paiement, réponses aux commentaires. M1 prouvé sur Sokosumi Preprod.
+
+**Pourquoi** : M2 (Task payée) est éliminatoire ; le paiement se branche entre le brief et la recherche.
+
+**Cheminement** :
+- Sonde manuelle avant le code : Sokosumi accepte `INPUT_REQUIRED` posté par le Coworker ; la réponse humaine est un
+  événement `user` sans statut ; la Task reste `INPUT_REQUIRED` jusqu'au `RUNNING` du worker.
+- Polling par la clé runtime (`GET /v1/tasks?coworkerId=…&status=READY`) plutôt que `sokosumi tasks list`, qui dépend
+  de l'OAuth du compte (jeton de quelques heures) ; `runtime start` / `complete` restent sur le CLI (`--api-key-stdin`),
+  qui vérifie identité, Task et Workspace.
+- Reprise : les tours modèle (intake, réponse, recherche) sont rejoués dans une nouvelle session eve à partir de
+  Sokosumi (description + réponses humaines en `Commentaire:`), sans effet externe à dédoublonner ; une question déjà
+  postée est retrouvée dans les événements au lieu d'être reposée.
+- Deux questions au plus, puis hypothèses explicites ; 3 échecs d'un tour modèle → Task `FAILED` (statut vérifié dans
+  l'enum `TaskStatus` de Sokosumi).
+
+**Bugs & fix** :
+- `EVE_PORT=` et `REACH_CACHE_DIR=` vides dans `.env.local` : `launch.ts` refuse le port 0 et le cache part à la racine
+  de l'app (`??` au lieu de `||`). Contourné en les passant en variables d'environnement ; correctif côté agent.
+- La commande `coworkers register` renvoie déjà une clé dans sa réponse ; seule celle de `coworkers api-key`, récupérée
+  par le script du guide, est stockée.

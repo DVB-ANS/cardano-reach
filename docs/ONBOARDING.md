@@ -135,9 +135,9 @@ docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 ## 6. Ce qui te revient (lot B, détail dans `docs/PLAN.md`)
 
 1. **B1** : compte Sokosumi Preprod, Vendor, Coworker ; MPS + Postgres sur le VPS ; wallet vendeur financé.
-2. **B2** : porter le worker de référence (`~/dev/demo-agent-token2049/live-team-names-20261006/`) en TS strict
+2. **B2** : porter le worker de référence (`../demo-agent-token2049/live-team-names-20261006/` (cloné à côté du repo)) en TS strict
    dans `apps/worker/src/`. À cloner d'abord : `git clone -b live-demo-name-finder
-   https://github.com/masumi-network/demo-agent-token2049 ~/dev/demo-agent-token2049`.
+   https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
 3. **B3** : intake `INPUT_REQUIRED` avant paiement (machine de phases du plan, section 3 ci-dessus pour le code eve).
 4. **M1** Task gratuite avec question → **M2** Task payée, collecte confirmée on-chain (**éliminatoire**) →
    **M4** déploiement serveur.

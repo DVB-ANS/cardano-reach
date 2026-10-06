@@ -1,0 +1,22 @@
+{
+  "name": "reach-worker",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env.local src/main.ts",
+    "agent-api": "node --env-file-if-exists=.env.local src/agent-api.ts",
+    "registration": "node --env-file-if-exists=.env.local src/registration.ts",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "eve": "0.71.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "typescript": "7.0.2"
+  }
+}
