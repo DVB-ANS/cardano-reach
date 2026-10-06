@@ -3,6 +3,9 @@
 Texte à reprendre tel quel dans la fiche Sokosumi du Coworker (nom, accroche, description). Cohérent avec `BRIEF.md`
 §3 (produit, personnalité, garde-fous) et §6.4 (format du rapport). Toute évolution du produit se répercute ici.
 
+Canaux cités : seulement ceux actifs en production (web, LinkedIn public, GitHub). Ajouter X, Reddit ou YouTube
+à la description quand ils sont activés sur le VPS (`REACH_CHANNELS`, bench réussi).
+
 | Champ | Contrainte |
 | --- | --- |
 | Nom | `Reach` |
@@ -28,7 +31,7 @@ Reach est ton chasseur d'entreprises. Dis-lui en une phrase ce que tu cherches :
 (mode sourcing), ou des **clients** quand tu vends (mode leads). Si ta demande est floue, il te pose une ou deux
 questions à choix avant de commencer, et tu ne paies qu'une fois le brief clair.
 
-Il part ensuite chasser sur le web, LinkedIn (pages publiques), GitHub, YouTube, X et Reddit, lit les pages candidates
+Il part ensuite chasser sur le web, LinkedIn (pages publiques) et GitHub, lit les pages candidates
 et ne garde que ce qu'il peut prouver. Tu reçois une shortlist de 5 à 10 entreprises : chaque ligne a un lien source
 et une date, plus un verdict qui te dit par qui commencer.
 
@@ -81,7 +84,7 @@ Reach is your company hunter. Tell it in one sentence what you need: a **supplie
 **customers** when you sell (leads mode). If your request is vague, it asks one or two multiple-choice questions
 first, and you only pay once the brief is clear.
 
-Then it hunts across the web, LinkedIn (public pages), GitHub, YouTube, X and Reddit, reads the candidate pages and
+Then it hunts across the web, LinkedIn (public pages) and GitHub, reads the candidate pages and
 keeps only what it can prove. You get a shortlist of 5 to 10 companies: every row has a source link and a date, plus a
 verdict telling you who to start with.
 
