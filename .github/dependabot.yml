@@ -12,6 +12,17 @@ updates:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
 
+  - package-ecosystem: npm
+    directory: /apps/worker
+    schedule:
+      interval: weekly
+    groups:
+      worker:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+
   # L'écosystème npm de Dependabot gère aussi pnpm (pnpm-lock.yaml).
   - package-ecosystem: npm
     directory: /front
