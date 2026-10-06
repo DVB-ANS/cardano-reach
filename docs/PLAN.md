@@ -24,7 +24,7 @@ Tout est en TypeScript, sans `any`, et tout le serveur tourne sur le VPS Linux d
 | --- | --- | --- |
 | `apps/reach-agent/**` | Armand | projet eve : `agent/`, moteur `src/search/`, scripts de bench et golden |
 | `apps/worker/**` | Coéquipier | worker Sokosumi + paiement Masumi, portage TS de la référence |
-| `infra/**` | Coéquipier | `docker-compose.yml`, Dockerfiles, Caddyfile, runbook serveur |
+| `infra/**` | Armand (réaffecté, voir `docs/TASKS.md`) | `docker-compose.yml`, Dockerfiles, Caddyfile, runbook serveur |
 | `packages/contract/**`, `docs/CONTRACT.md` | **partagé, gelé** | types et protocole entre worker et agent |
 | `front/**` | le premier libre | vitrine |
 | `docs/state/agent.md` / `docs/state/worker.md` | chacun le sien | IDs, ports, checkpoints prouvés, blocages |

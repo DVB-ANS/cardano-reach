@@ -5,7 +5,8 @@ sur les plateformes de freelance), trouve son e-mail professionnel, puis écrit 
 accroché à un élément daté et sourcé. Tout se joue sur l'exécution : chaque phase a une condition de sortie vérifiable.
 Ordre : tooling minimum → chemin payé (éliminatoire) → démo → reste du tooling → personnes, e-mails, hooks.
 
-Propriétaires : **A** = Armand (agent, recherche), **N** = Noé (worker, paiement, infra, front).
+Propriétaires : **A** = Armand (agent, VPS, Docker, déploiement), **N** = Noé (Sokosumi, worker, paiement, tooling).
+Liste de tâches par personne : `docs/TASKS.md`.
 Ce qui n'est pas vérifié est marqué **[À VÉRIFIER]**. Plan détaillé des lots A/B : `docs/PLAN.md`.
 
 ## État au 2026-10-07
@@ -35,7 +36,7 @@ développeurs qui mergent en parallèle.
 - [ ] **Protection de `main`** (PR + checks `secrets`, `agent`, `front` obligatoires) : refusée sur un repo privé
   d'organisation gratuite (HTTP 403) ; à activer dès que le repo passe public pour la soumission.
 - [ ] **Plafond de coût eve** (A) : `limits.maxTokenCostUsdPerSession` dans `apps/reach-agent/agent/agent.ts`.
-- [ ] **Sauvegarde MPS** (N) : `pg_dump` quotidien hors du VPS, **dès que les wallets existent**.
+- [ ] **Sauvegarde MPS** (A) : `pg_dump` quotidien hors du VPS, **dès que les wallets existent**.
 
 **Sortie** : une PR qui contient un faux secret est bloquée ; `main` ne reçoit que des PR vertes.
 
@@ -45,7 +46,7 @@ Sans ça, rien d'autre ne compte.
 
 - [ ] **Clés** (A) : `OPENAI_API_KEY`, `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
 - [ ] **B1 Compte** (N) : `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal`, clé runtime.
-- [ ] **B1 Serveur** (N + A pour l'accès) : SSH au VPS, Postgres + MPS en Docker (port 3012 sur 127.0.0.1), clé
+- [ ] **B1 Serveur** (A) : SSH au VPS, Postgres + MPS en Docker (port 3012 sur 127.0.0.1), clé
   Blockfrost Preprod, seed (sortie supprimée), selling wallet financé.
 - [ ] **B2 Worker** (N) : cloner `masumi-network/demo-agent-token2049` (branche `live-demo-name-finder`), porter en
   TS strict dans `apps/worker/src/` (tableau de correspondance dans `PLAN.md` §B2).
@@ -57,13 +58,13 @@ Sans ça, rien d'autre ne compte.
 
 ## Phase 2 — Démo et soumission (avant la fin du hack)
 
-- [ ] **M4 Déploiement** (N) : `infra/docker-compose.yml` (postgres, mps, reach-agent, worker, agent-api, caddy),
+- [ ] **M4 Déploiement** (A) : `infra/docker-compose.yml` (postgres, mps, reach-agent, worker, agent-api, caddy),
   `restart: unless-stopped`, test **ordinateurs fermés** depuis un autre appareil.
 - [ ] **Workspace TOKEN2049** (N) : demander l'accès **tôt** (validation humaine chez Masumi), puis `SOKOSUMI_SCOPE=org`.
 - [ ] **Qualité du rapport** (A) : golden 9/9 avec `gpt-6.1-sol`, relecture manuelle des liens (grille `BRIEF.md` §9.2).
 - [ ] **Vérification codée des liens** (A) : avant de rendre le rapport, re-fetch de chaque URL, suppression des lignes
   dont la source ne répond pas ou ne mentionne pas l'entreprise. « No link, no line » garanti par le code, pas le prompt.
-- [ ] **Front en ligne** (N) : `pnpm generate` → Cloudflare Pages ou Vercel (statique), lien Sokosumi = URL du Coworker.
+- [ ] **Front en ligne** (A) : `pnpm generate` → Cloudflare Pages ou Vercel (statique), lien Sokosumi = URL du Coworker.
 - [ ] **Vidéo + slides** (N + A) : Task aéro sourcing + Task leads, question à choix, lien cliqué, hash de collecte.
 - [ ] **Livrables** (`BRIEF.md` §10) : repo public sans secrets, Coworker ID, Task IDs, hash + lien explorer,
   adresse vendeur, unité USDM, montant net, slides avec vidéo intégrée, date de disponibilité.
@@ -109,7 +110,7 @@ Demande type : « trouve-moi un dev Aiken freelance en Europe » ou « le respon
 Pour chaque ligne du rapport : **la personne** (nom, rôle, lien de profil public), **son e-mail** avec un statut,
 **une accroche** tirée d'un fait daté et sourcé, et l'entreprise ou la structure (freelance = entreprise individuelle).
 
-Tout est dans l'agent (A) : outils eve dans `apps/reach-agent/agent/tools/`, canaux dans `src/search/channels/`,
+Tout est dans l'agent, porté par **N** (A relit, l'agent est son code) : outils eve dans `apps/reach-agent/agent/tools/`, canaux dans `src/search/channels/`,
 fixtures réelles + tests comme les canaux existants. **Après M2.**
 
 ### 5.1 Trouver la personne

@@ -1,6 +1,6 @@
 # Onboarding — ce qui est fait, comment ça marche, ce qui reste
 
-Doc pour reprendre le projet en 10 minutes. Détails produit : `BRIEF.md`. Plan complet et jalons : `docs/PLAN.md`.
+Doc pour reprendre le projet en 10 minutes. Répartition à jour : `docs/TASKS.md`. Détails produit : `BRIEF.md`. Plan complet et jalons : `docs/PLAN.md`.
 Contrat worker ↔ agent : `docs/CONTRACT.md`. Historique des décisions : `docs/DEVLOG.md`. Suite : `docs/ROADMAP.md`.
 
 ## 1. Le projet
@@ -35,11 +35,12 @@ flowchart LR
 | `apps/reach-agent/` | Armand | **fait** (étape 0 + lot A, mergé) |
 | `packages/contract/`, `docs/CONTRACT.md` | partagé, gelé | **fait** |
 | `apps/worker/` | toi | à faire (lot B) |
-| `infra/` | toi | à faire (lot B) |
-| `front/` | toi | **fait** (landing statique, PR #7), pas encore déployée |
+| `infra/` | Armand | à faire (VPS, Docker, Postgres + MPS) |
+| `front/` | toi (déploiement : Armand) | **fait** (landing statique, PR #7), pas encore déployée |
 
 Règles : un `package.json` + lockfile par app (pas de workspaces npm), TypeScript strict sans `any`, branches
-`feat/worker-<sujet>` pour toi, PR squash sur `main`, personne ne pousse sur `main`. Toute modif du contrat = PR qui
+`feat/worker-<sujet>` pour toi, PR squash sur `main`, personne ne pousse sur `main`. Armand passe toujours par une
+branche + PR et voit avec Noé avant de merger ou de pousser sur `main`. Toute modif du contrat = PR qui
 ne contient que le contrat, relue par l'autre.
 
 ## 3. Le contrat (ce dont tu as besoin pour le worker)
