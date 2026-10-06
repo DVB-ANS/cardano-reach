@@ -7,6 +7,7 @@ Historique et décisions : `docs/DEVLOG.md`.
 Coworker payant sur Sokosumi Preprod (standard Masumi, 1 test USDM par Task) : « Reach », shortlist sourcée et
 datée d'entreprises, mode `sourcing` (fournisseurs) ou `leads` (clients, style TamTam), par niche.
 Brief complet : `BRIEF.md`. Plan d'implémentation (lots, contrat, jalons M0-M6) : `docs/PLAN.md`.
+Pour reprendre le projet (coéquipier, nouvelle session) : `docs/ONBOARDING.md`.
 
 ## Structure
 
@@ -38,4 +39,5 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
   (détails et canaux actifs : `docs/state/agent.md`).
 - À faire (Armand) : golden complet vert avec `gpt-6.1-sol` (M3/M5), Twitter/Reddit si comptes dédiés, build Docker sur le VPS.
 - À faire (coéquipier) : lot B (worker, paiement, infra), M1 → M2 → M4.
-- Bloqué sur Armand : `OPENAI_API_KEY`, compte Sokosumi / Coworker, Blockfrost, accès VPS, domaine.
+- Bloqué sur Armand : `EXA_API_KEY` (quota Exa gratuit épuisé), `OPENAI_API_KEY`, compte Sokosumi / Coworker,
+  Blockfrost, accès VPS, domaine.
