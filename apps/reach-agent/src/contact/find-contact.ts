@@ -5,9 +5,9 @@ import { assertSearchAllowed } from "../phase.ts";
 import { callExa, type ExaResponse } from "../search/exa.ts";
 import { readPages, type PageResult } from "../search/pages.ts";
 import { normalizeUrl } from "../search/url.ts";
-import { extractEmails, genericContacts, isPersonal, localPart, type FoundEmail } from "./emails.ts";
+import { companyMailDomains, extractEmails, genericContacts, isPersonal, localPart, type FoundEmail } from "./emails.ts";
 import { checkMailDomain, systemDns, type MailDns, type MailDomainCheck } from "./mail-domain.ts";
-import { linkedinProfilesRequest, officialPagesRequest, peopleSearchRequest, toCandidates, type PersonCandidate, type PlatformProfile } from "./people.ts";
+import { companyKey, linkedinProfilesRequest, officialPagesRequest, peopleSearchRequest, toCandidates, type PersonCandidate, type PlatformProfile } from "./people.ts";
 import { isReadBlocked, PLATFORM_CONTACT } from "./platforms.ts";
 import { bareDomain, fold, hostMatches } from "./text.ts";
 import { buildLocal, emailVariants, inferFormat, matchingPatterns, splitName, type EmailPattern, type NameParts } from "./variants.ts";
@@ -59,6 +59,7 @@ export interface FindContactResult {
   otherCandidates: PersonCandidate[];
   email: EmailFinding;
   genericEmails: FoundEmail[];
+  /** MX du domaine de courrier retenu pour deviner (celui des adresses publiées, sinon celui du site). */
   mailDomain: MailDomainCheck | null;
   /** Profils de plateformes freelance : jamais lus, contact sur la plateforme uniquement. */
   platformProfiles: PlatformProfile[];
@@ -88,22 +89,27 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-/** Statut de l'e-mail de `person` à partir des adresses lues sur les pages officielles. Ne contacte aucun serveur. */
+/**
+ * Statut de l'e-mail de `person` à partir des adresses lues sur les pages officielles. Ne contacte aucun serveur.
+ * `domains` : domaines de courrier de l'entreprise (`companyMailDomains`) ; on devine sur le premier.
+ */
 export function decideEmail(params: {
   person: NameParts | null;
-  domain: string;
+  domains: readonly string[];
   emails: readonly FoundEmail[];
   knownNames: readonly NameParts[];
   mail: MailDomainCheck | null;
 }): EmailFinding {
-  const { person, domain, emails, knownNames, mail } = params;
-  const generic = genericContacts(emails, domain)[0] ?? null;
+  const { person, domains, emails, knownNames, mail } = params;
+  const generic = genericContacts(emails, domains)[0] ?? null;
   if (!person) return { status: "not_found", reason: "personne non identifiée", generic };
-  const personal = emails.filter((email) => isPersonal(email.address, domain));
-  const own = personal.find((email) => matchingPatterns(localPart(email.address), person).length > 0);
+  const own = emails.find((email) => isPersonal(email.address, domains) && matchingPatterns(localPart(email.address), person).length > 0);
   if (own) return { status: "published", address: own.address, sourceUrl: own.sourceUrl };
+  const [domain] = domains;
+  if (!domain) return { status: "not_found", reason: "aucun domaine de courrier", generic };
   if (mail && (mail.mx === "none" || mail.mx === "null_mx")) return { status: "not_found", reason: `le domaine ne reçoit pas de courrier (${mail.mx})`, generic };
 
+  const personal = emails.filter((email) => isPersonal(email.address, [domain]));
   const format = inferFormat(personal.map((email) => email.address), [person, ...knownNames]);
   const pattern = format?.pattern ?? emailVariants(person)[0]?.pattern ?? "first.last";
   const evidence = format ? personal.filter((email) => format.evidence.includes(email.address)) : [];
@@ -201,11 +207,10 @@ export async function findContact(
   const read = (urls: readonly string[]) => attempt("read_pages", () => deps.readPages(urls, { deadlineMs: remaining(), signal: deadline }));
 
   const standardUrls = STANDARD_PATHS.map((path) => `https://${domain}/${path}`);
-  const [peopleHits, profileHits, siteHits, mailDomain, standardPages] = await Promise.all([
+  const [peopleHits, profileHits, siteHits, standardPages] = await Promise.all([
     exa("exa_people", peopleSearchRequest(input.role, input.company)),
     exa("linkedin_profiles", linkedinProfilesRequest(input.role, input.company)),
     exa("official_pages_search", officialPagesRequest(input.role, input.company, domain)),
-    attempt("mx", () => checkMailDomain(domain, deps.dns(deadline))),
     read(standardUrls),
   ]);
 
@@ -223,6 +228,8 @@ export async function findContact(
   const pages = [...(standardPages ?? []), ...(discoveredPages ?? [])].filter((page) => page.ok);
   if (!pages.length) failures.push({ step: "read_pages", reason: "aucune page officielle lisible" });
   const emails = pages.flatMap((page) => extractEmails(page.text).map((address) => ({ address, sourceUrl: page.url })));
+  const mailDomains = companyMailDomains(emails, domain, companyKey(input.company));
+  const mailDomain = await attempt("mx", () => checkMailDomain(mailDomains[0] ?? domain, deps.dns(deadline)));
 
   const { people, platformProfiles } = toCandidates([...(peopleHits?.results ?? []), ...(profileHits?.results ?? [])], input.company, input.role);
   const { person, others } = choosePerson(people, pages);
@@ -231,8 +238,8 @@ export async function findContact(
   return result({
     person,
     otherCandidates: others,
-    email: decideEmail({ person: person ? splitName(person.name) : null, domain, emails, knownNames, mail: mailDomain }),
-    genericEmails: genericContacts(emails, domain),
+    email: decideEmail({ person: person ? splitName(person.name) : null, domains: mailDomains, emails, knownNames, mail: mailDomain }),
+    genericEmails: genericContacts(emails, mailDomains),
     mailDomain,
     platformProfiles,
     pagesRead: pages.map((page) => page.url),

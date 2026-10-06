@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import type { ModelMessage } from "ai";
 import type { ExaResponse, ExaResult } from "../search/exa.ts";
 import type { PageResult } from "../search/pages.ts";
-import { extractEmails, genericContacts } from "./emails.ts";
+import { companyMailDomains, extractEmails, genericContacts } from "./emails.ts";
 import { decideEmail, findContact, runFindContact, type ContactDeps } from "./find-contact.ts";
 import { checkMailDomain, type MailDns, type MailDomainCheck } from "./mail-domain.ts";
 import { linkedinProfilesRequest, parseProfileTitle, peopleSearchRequest, toCandidates } from "./people.ts";
@@ -29,7 +29,7 @@ describe("email extraction", () => {
 
   it("keeps only useful generic addresses of the domain, by preference", () => {
     const found = ["contact@acme.fr", "noreply@acme.fr", "sales@acme.fr", "sales@other.com", "dpo@acme.fr"].map((address) => ({ address, sourceUrl: "https://acme.fr/contact" }));
-    assert.deepEqual(genericContacts(found, "acme.fr").map((email) => email.address), ["sales@acme.fr", "contact@acme.fr"]);
+    assert.deepEqual(genericContacts(found, ["acme.fr"]).map((email) => email.address), ["sales@acme.fr", "contact@acme.fr"]);
   });
 });
 
@@ -65,7 +65,7 @@ describe("email status", () => {
   const emails = (...addresses: string[]) => addresses.map((address) => ({ address, sourceUrl: source }));
 
   it("published: the person's own address read on a page", () => {
-    assert.deepEqual(decideEmail({ person: JANE, domain: "acme.fr", emails: emails("contact@acme.fr", "jdoe@acme.fr"), knownNames: [], mail: VALID_MX }), {
+    assert.deepEqual(decideEmail({ person: JANE, domains: ["acme.fr"], emails: emails("contact@acme.fr", "jdoe@acme.fr"), knownNames: [], mail: VALID_MX }), {
       status: "published",
       address: "jdoe@acme.fr",
       sourceUrl: source,
@@ -73,7 +73,7 @@ describe("email status", () => {
   });
 
   it("guessed: format deduced from colleagues, with its evidence", () => {
-    const finding = decideEmail({ person: JANE, domain: "acme.fr", emails: emails("psmith@acme.fr"), knownNames: [{ first: "paul", last: "smith" }], mail: VALID_MX });
+    const finding = decideEmail({ person: JANE, domains: ["acme.fr"], emails: emails("psmith@acme.fr"), knownNames: [{ first: "paul", last: "smith" }], mail: VALID_MX });
     assert.equal(finding.status, "guessed");
     if (finding.status !== "guessed") return;
     assert.equal(finding.address, "jdoe@acme.fr");
@@ -84,16 +84,16 @@ describe("email status", () => {
   });
 
   it("guessed with the default pattern when nothing is published", () => {
-    const finding = decideEmail({ person: JANE, domain: "acme.fr", emails: [], knownNames: [], mail: null });
+    const finding = decideEmail({ person: JANE, domains: ["acme.fr"], emails: [], knownNames: [], mail: null });
     assert.equal(finding.status === "guessed" && finding.basis, "default_pattern");
     assert.equal(finding.status === "guessed" && finding.confidence, "low");
     assert.equal(finding.status === "guessed" && finding.address, "jane.doe@acme.fr");
   });
 
   it("not_found: no person, or a domain that receives no mail; generic address kept", () => {
-    const noPerson = decideEmail({ person: null, domain: "acme.fr", emails: emails("contact@acme.fr"), knownNames: [], mail: VALID_MX });
+    const noPerson = decideEmail({ person: null, domains: ["acme.fr"], emails: emails("contact@acme.fr"), knownNames: [], mail: VALID_MX });
     assert.deepEqual(noPerson, { status: "not_found", reason: "personne non identifiée", generic: { address: "contact@acme.fr", sourceUrl: source } });
-    const nullMx = decideEmail({ person: JANE, domain: "acme.fr", emails: [], knownNames: [], mail: { ...VALID_MX, mx: "null_mx", hosts: [] } });
+    const nullMx = decideEmail({ person: JANE, domains: ["acme.fr"], emails: [], knownNames: [], mail: { ...VALID_MX, mx: "null_mx", hosts: [] } });
     assert.equal(nullMx.status, "not_found");
   });
 });
@@ -241,5 +241,54 @@ describe("findContact (mocked Exa, pages and DNS)", () => {
     const mocks = deps({ exaSearch: () => assert.fail("no search") });
     await assert.rejects(runFindContact(messages, { company: "Acme", domain: "acme.fr", role: "achats" }, { signal: new AbortController().signal, deps: mocks }), /INTAKE/);
     assert.deepEqual(mocks.readUrls, []);
+  });
+});
+
+describe("mail domain differing from the site (published on official pages)", () => {
+  const contactPage = (domain: string) => `https://${domain}/contact`;
+
+  function siteDeps(domain: string, contactText: string, profileTitle: string | null): ContactDeps & { mxDomains: string[] } {
+    const mxDomains: string[] = [];
+    return {
+      mxDomains,
+      exaSearch: async (body) => ({
+        results: body.category === "people" && profileTitle ? [exaResult("https://www.linkedin.com/in/x", profileTitle)] : [],
+        statuses: [],
+      }),
+      readPages: async (urls) =>
+        urls.map((url) => (url === contactPage(domain) ? page(url, contactText) : { url, ok: false, title: null, publishedAt: null, text: "", error: "HTTP 404" })),
+      dns: () => ({
+        resolveMx: async (mailDomain) => {
+          mxDomains.push(mailDomain);
+          return [{ exchange: `mx.${mailDomain}`, priority: 10 }];
+        },
+        resolveAddresses: async () => [],
+      }),
+    };
+  }
+
+  it("keeps branded mail domains, drops hosting and webmail addresses", () => {
+    const found = (...addresses: string[]) => addresses.map((address) => ({ address, sourceUrl: "https://laro-nc.eu/impressum" }));
+    assert.deepEqual(companyMailDomains(found("info@laro-nc.de", "support@ovh.com", "x@gmail.com"), "laro-nc.eu", "laro"), ["laro-nc.de", "laro-nc.eu"]);
+    assert.deepEqual(companyMailDomains(found("direction@dinoxsavisalp.fr"), "dinoxsa.com", "dinox"), ["dinoxsavisalp.fr", "dinoxsa.com"]);
+    assert.deepEqual(companyMailDomains(found("contact@acme.fr", "info@acme-group.de"), "acme.fr", "acme"), ["acme.fr", "acme-group.de"]);
+  });
+
+  it("LARO (laro-nc.eu publishes info@laro-nc.de): generic kept with its page, guess on @laro-nc.de", async () => {
+    const mocks = siteDeps("laro-nc.eu", "Kontakt : info@laro-nc.de — Hosting : support@ovh.com", "Jane Doe - Einkaufsleiterin - LARO NC");
+    const result = await findContact({ company: "LARO NC GmbH", domain: "laro-nc.eu", role: "Einkaufsleiterin" }, { signal: new AbortController().signal, deps: mocks });
+    assert.deepEqual(result.genericEmails, [{ address: "info@laro-nc.de", sourceUrl: contactPage("laro-nc.eu") }]);
+    assert.equal(result.email.status, "guessed");
+    assert.equal(result.email.status === "guessed" && result.email.address, "jane.doe@laro-nc.de");
+    assert.deepEqual(mocks.mxDomains, ["laro-nc.de"]);
+    assert.equal(result.mailDomain?.domain, "laro-nc.de");
+  });
+
+  it("DINOX (dinoxsa.com publishes on @dinoxsavisalp.fr): person's address published, generic otherwise", async () => {
+    const text = "Direction : direction@dinoxsavisalp.fr. Achats : Jean Martin, jean.martin@dinoxsavisalp.fr";
+    const found = await findContact({ company: "Dinox SA", domain: "dinoxsa.com", role: "Responsable achats" }, { signal: new AbortController().signal, deps: siteDeps("dinoxsa.com", text, "Jean Martin - Responsable achats - Dinox SA") });
+    assert.deepEqual(found.email, { status: "published", address: "jean.martin@dinoxsavisalp.fr", sourceUrl: contactPage("dinoxsa.com") });
+    const nobody = await findContact({ company: "Dinox SA", domain: "dinoxsa.com", role: "Responsable achats" }, { signal: new AbortController().signal, deps: siteDeps("dinoxsa.com", "Écrivez à direction@dinoxsavisalp.fr", null) });
+    assert.deepEqual(nobody.email, { status: "not_found", reason: "personne non identifiée", generic: { address: "direction@dinoxsavisalp.fr", sourceUrl: contactPage("dinoxsa.com") } });
   });
 });
