@@ -148,6 +148,8 @@ export class Runner {
         return this.#sendAnswer(j);
       case "brief-ready":
         if (this.#paid) return this.#paid.advance(j, this.#hooks());
+        // Task déjà engagée dans un paiement : une recherche gratuite livrerait un texte différent du hash on-chain.
+        if (j.paid) return j;
         return this.#save({ ...j, phase: "research-sent" });
       case "research-sent":
         return this.#research(j);
@@ -293,7 +295,8 @@ export class Runner {
     const message = (error instanceof Error ? error.message : String(error)).slice(0, 300);
     console.error(`Task ${j.taskId} blocked at ${j.phase}: ${message}`);
     const current = this.#load(j.taskId) ?? j;
-    if (!REPLAYABLE.includes(current.phase)) return;
+    // La recherche payée se rejoue elle aussi, avec le même plafond ; au-delà, l'escrow est remboursé à l'échéance.
+    if (!REPLAYABLE.includes(current.phase) && paidStage(current) !== "model-pending") return;
     const attempts = current.attempts + 1;
     if (attempts < MAX_ATTEMPTS) {
       this.#save({ ...current, attempts });

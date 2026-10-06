@@ -123,7 +123,12 @@ export function termsRequest(input: string, nonce: string, registration: Registr
   };
 }
 
-const time = (value: string | undefined): number => Number(value);
+// Une échéance illisible ne doit jamais désactiver en silence les contrôles de délai.
+function time(value: string | undefined): number {
+  const ms = Number(value);
+  if (!value || !Number.isFinite(ms)) throw new Error(`Invalid MPS deadline: ${String(value)}`);
+  return ms;
+}
 
 export function createPaidFlow(options: {
   core: CoreClient;
