@@ -129,3 +129,18 @@ hook `.githooks/pre-commit`, template de PR, pnpm épinglé (PR #9) ; suppressio
 - pnpm 12 avec `packageManager` enregistre sa version dans le lockfile : `--frozen-lockfile` échouait tant que le
   lockfile n'était pas régénéré.
 - Protection de branche : HTTP 403 sur un repo privé d'organisation gratuite ; à activer quand le repo sera public.
+
+## 2026-10-07 — Tooling restant (README, Dependabot, Biome front)
+
+**Quoi** : `README.md` racine (quoi, schéma, structure, lancer en local, CI, liens), `.github/dependabot.yml`
+(npm agent, front, actions ; hebdomadaire, PR groupées), Biome 2.5 sur `front/` (`pnpm lint`, étape du job `front`).
+
+**Pourquoi** : README exigé par la soumission ; dépendances à jour sans bruit ; un style vérifié en CI.
+
+**Cheminement** :
+- Biome calé sur le style existant (2 espaces, quotes simples, sans point-virgule) pour éviter un reformatage massif ;
+  formateur CSS désactivé (aurait éclaté toutes les règles sur une ligne), lint CSS gardé avec `tailwindDirectives`.
+- `html.experimentalFullSupportEnabled` : sans lui, Biome ne voit pas les templates Vue et signale à tort les
+  variables de `<script setup>` comme inutilisées. Formateur HTML/Vue désactivé.
+- Corrigé dans `front/` : deux `!` non nuls (`obs` du callback d'IntersectionObserver, `charAt`), `type="button"`,
+  `!important` du `prefers-reduced-motion` gardés avec une suppression ciblée.
