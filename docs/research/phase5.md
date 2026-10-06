@@ -12,7 +12,7 @@ trois API ATS. Toutes les sources ont été consultées le **2026-10-07**.
 | # | Point | Conclusion actionnable |
 | --- | --- | --- |
 | 1 | Exa, catégorie personnes | `category: "people"` (remplace `"linkedin"` depuis le 2025-12-19) ; ne jamais passer `startPublishedDate`, `endPublishedDate`, `excludeDomains` (erreur 400). |
-| 2 | CGU Malt, Upwork, Fiverr, Codeur.com | Toutes interdisent ou encadrent la collecte automatisée et le contournement : pas de lecture de ces pages par Reach, seulement l'URL publique renvoyée par le moteur, contact **sur** la plateforme. |
+| 2 | CGU Malt, Upwork, Fiverr, Codeur.com | Toutes interdisent ou encadrent la collecte automatisée et le contournement : pas de lecture de ces pages par Richard, seulement l'URL publique renvoyée par le moteur, contact **sur** la plateforme. |
 | 3 | Endpoints publics ATS | Greenhouse, Lever, Ashby : GET sans authentification ; aucune limite de débit publiée → cache et appels sobres. |
 | 4 | Port 25 sortant | Bloqué par défaut chez presque tous (sauf OVHcloud VPS / dédiés) : envoi via relais authentifié (587/465) ou API HTTP, quel que soit l'hébergeur. |
 | 5 | Prospection B2B par e-mail | France : opt-out si en rapport avec la fonction, information et opposition dès le 1er message. Allemagne (§7 UWG) : consentement préalable exprès, même en B2B → pas d'envoi à froid vers l'Allemagne. |
@@ -221,7 +221,7 @@ Test du 2026-10-07 : HTTP 200 sans authentification sur les trois (`greenhouse/a
 - [BGH, I ZR 218/07 (PDF)](https://www.bundesgerichtshof.de/SharedDocs/Entscheidungen/DE/Zivilsenate/I_ZS/2007/I_ZR_218-07.pdf?__blob=publicationFile&v=1) — consulté le 2026-10-07
 - [EUR-Lex — Règlement (UE) 2016/679 (RGPD)](https://eur-lex.europa.eu/legal-content/FR/TXT/HTML/?uri=CELEX:32016R0679) — consulté le 2026-10-07
 
-**Conclusion actionnable** (Reach affiche des adresses et prépare des messages)
+**Conclusion actionnable** (Richard affiche des adresses et prépare des messages)
 
 1. **Afficher n'est pas envoyer** : envoi uniquement sur validation humaine, message par message ; l'utilisateur est
    l'expéditeur.

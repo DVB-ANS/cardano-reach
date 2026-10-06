@@ -1,4 +1,4 @@
-# Image de l'agent Reach. Contexte de build : racine du repo.
+# Image de l'agent Richard. Contexte de build : racine du repo.
 #   docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 # Variables runtime : OPENAI_API_KEY, REACH_MODEL, ROUTE_AUTH_BASIC_USER, ROUTE_AUTH_BASIC_PASSWORD (obligatoires au démarrage),
 #   EXA_API_KEY (canaux web / linkedin et lecture de pages), GH_TOKEN (gh search), REACH_CHANNELS,

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const steps = [
-  { t: 'Ask', d: 'Describe what you buy or sell in one sentence, as a Task on Sokosumi. If something is missing, Reach asks one question.' },
-  { t: 'Hunt & verify', d: 'Reach searches the web, company pages and niche directories. Every row keeps a source link and a date.' },
-  { t: 'Get your shortlist', d: '5 to 10 companies, a verdict and a first message ready to send. Paid 1 USDM per Task, settled on Cardano.' },
+  { t: 'Ask', d: 'Describe what you buy or sell in one sentence, as a Task on Sokosumi. If something is missing, Richard asks one question.' },
+  { t: 'Hunt & verify', d: 'Richard searches the web, company pages and niche directories. Every row keeps a source link and a date.' },
+  { t: 'Get your shortlist', d: '5 to 10 companies, a verdict and a first message ready to send. Paid 1 test USDM per Task, settled on Cardano Preprod.' },
 ]
 </script>
 

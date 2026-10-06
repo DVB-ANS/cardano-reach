@@ -81,10 +81,10 @@ Les slides sont figées à l'échéance : tout remplir avant.
 
 ## Plan des slides
 
-1. **Titre** : Reach, « Leads with receipts. » ; logo, équipe, track Agentic Payments on Cardano.
+1. **Titre** : Richard, « Leads with receipts. » ; logo, équipe, track Agentic Payments on Cardano.
 2. **Problème** : trouver le bon fournisseur ou client B2B = des jours d'annuaires périmés et de LinkedIn ; les outils
    vendent des listes de contacts, pas des réponses.
-3. **Reach** : un Coworker Sokosumi à qui on parle comme à un collègue ; deux modes (sourcing / leads), quatre niches.
+3. **Richard** : un Coworker Sokosumi à qui on parle comme à un collègue ; deux modes (sourcing / leads), quatre niches.
 4. **Démo** : vidéo intégrée (voir script ci-dessous).
 5. **Comment ça marche** : schéma Task → questions → paiement escrow → recherche multi-sources → vérification →
    rapport → collecte (`BRIEF.md` §5.1).
@@ -104,11 +104,11 @@ Découpage de `BRIEF.md` §10. Enregistrement réel sur preprod.sokosumi.com, mo
 | Temps | Écran | Voix off |
 | --- | --- | --- |
 | 0:00 – 0:20 | Annuaires, onglets LinkedIn, tableur vide | « Trouver le bon fournisseur ou le bon client B2B, c'est des jours de recherche dans des annuaires périmés. Les outils vendent des listes de contacts, pas des réponses. » |
-| 0:20 – 0:40 | Landing Reach, fiche du Coworker sur Sokosumi | « Voici Reach. Tu lui parles comme à un collègue : il pose deux questions, part chasser sur le web, GitHub, X, Reddit, LinkedIn et YouTube, et revient avec des entreprises sourcées, datées, et un verdict. » |
-| 0:40 – 1:20 | Task aéro sourcing : « fixations titane EN 9100, petites séries, Europe » ; Reach annonce sa chasse ; rapport ; clic sur un lien de certification qui confirme | « Côté achat : un fournisseur de fixations titane certifié. Chaque ligne a sa preuve et sa date. Je clique : la certification est bien là. » |
-| 1:20 – 2:10 | Task leads floue : « Je vends des jets d'affaires d'occasion » ; question à choix `INPUT_REQUIRED` ; réponse « 1 » ; rapport avec colonne « Why now » | « Côté vente : la demande est floue, alors Reach pose une question à choix avant de facturer. Une réponse, et il revient avec des acheteurs et un signal daté pour chacun. » |
-| 2:10 – 2:40 | Reçu vendeur `settled: true`, transaction de collecte sur l'explorateur Preprod, montant net | « Reach se fait payer à la Task : 1 USDM en escrow Masumi, résultat haché, collecte prouvée sur Cardano. Un agent qui gagne sa vie, sans abonnement ni clé d'API côté acheteur. » |
-| 2:40 – 3:00 | Liste des niches, roadmap, logo | « Nouvelle niche, nouveau fichier. Reach reste en ligne après le hack, et demain d'autres agents peuvent l'embaucher. Pas une liste de contacts : une réponse sourcée. » |
+| 0:20 – 0:40 | Landing Richard, fiche du Coworker sur Sokosumi | « Voici Richard. Tu lui parles comme à un collègue : il pose deux questions, part chasser sur le web, GitHub, X, Reddit, LinkedIn et YouTube, et revient avec des entreprises sourcées, datées, et un verdict. » |
+| 0:40 – 1:20 | Task aéro sourcing : « fixations titane EN 9100, petites séries, Europe » ; Richard annonce sa chasse ; rapport ; clic sur un lien de certification qui confirme | « Côté achat : un fournisseur de fixations titane certifié. Chaque ligne a sa preuve et sa date. Je clique : la certification est bien là. » |
+| 1:20 – 2:10 | Task leads floue : « Je vends des jets d'affaires d'occasion » ; question à choix `INPUT_REQUIRED` ; réponse « 1 » ; rapport avec colonne « Why now » | « Côté vente : la demande est floue, alors Richard pose une question à choix avant de facturer. Une réponse, et il revient avec des acheteurs et un signal daté pour chacun. » |
+| 2:10 – 2:40 | Reçu vendeur `settled: true`, transaction de collecte sur l'explorateur Preprod, montant net | « Richard se fait payer à la Task : 1 USDM en escrow Masumi, résultat haché, collecte prouvée sur Cardano. Un agent qui gagne sa vie, sans abonnement ni clé d'API côté acheteur. » |
+| 2:40 – 3:00 | Liste des niches, roadmap, logo | « Nouvelle niche, nouveau fichier. Richard reste en ligne après le hack, et demain d'autres agents peuvent l'embaucher. Pas une liste de contacts : une réponse sourcée. » |
 
 Avant d'enregistrer :
 

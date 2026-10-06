@@ -59,8 +59,8 @@ const paidStage = (journal: Journal): string | undefined => (journal.paid as { s
 
 const MAX_QUESTIONS = 2;
 const MAX_ATTEMPTS = 3;
-const FAILED_COMMENT = "Reach n'a pas pu cadrer la demande : reformule ton besoin.";
-const ERROR_COMMENT = "Reach a rencontré une erreur et n'a pas pu terminer cette Task.";
+const FAILED_COMMENT = "Richard n'a pas pu cadrer la demande : reformule ton besoin.";
+const ERROR_COMMENT = "Richard a rencontré une erreur et n'a pas pu terminer cette Task.";
 const IDLE: readonly Phase[] = ["awaiting-human", "failed", "inspection-required"];
 const REPLAYABLE: readonly Phase[] = ["started", "intake-sent", "answer-sent", "research-sent"];
 

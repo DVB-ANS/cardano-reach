@@ -1,9 +1,9 @@
-# Plan d'implémentation — Reach (cardano-reach)
+# Plan d'implémentation — Richard (cardano-reach)
 
 ## Context
 
-Implémenter le Coworker Sokosumi « Reach » décrit dans `BRIEF.md` (repo `DVB-ANS/cardano-reach`, branche actuelle
-`feat/masumi-setup`). Reach :
+Implémenter le Coworker Sokosumi « Richard » décrit dans `BRIEF.md` (repo `DVB-ANS/cardano-reach`, branche actuelle
+`feat/masumi-setup`). Richard :
 1. pose ses questions de départ en `INPUT_REQUIRED` ;
 2. se fait payer 1 test USDM via Masumi sur Cardano Preprod ;
 3. cherche vite sur le web, LinkedIn, GitHub, YouTube, X et Reddit ;
@@ -132,7 +132,7 @@ export const MAX_REPORT_BYTES = 900_000;
      `import { askQuestion } from "eve/tools/ask_question"; export default askQuestion();`
 5. Écrire une première version de `agent/instructions.md`, suffisante pour le contrat :
    - en `INTAKE`, `ask_question` si `mode`, `niche` ou `need` manque, sinon un bloc JSON `Brief` ;
-   - en `RESEARCH`, un rapport `# Reach — …`, encore sans outil de recherche.
+   - en `RESEARCH`, un rapport `# Richard — …`, encore sans outil de recherche.
 6. Écrire `apps/reach-agent/scripts/research.ts`, le simulateur de worker :
    - arguments : `--text "<task>"`, `--answer "<réponse>"` (répétable), `--out <fichier>` ;
    - crée une session et envoie `PHASE: INTAKE` ;
@@ -161,7 +161,7 @@ On n'utilise pas de sous-agents eve : chaque enfant ajoute ses propres allers-re
 
 #### A1. Installer les canaux et capturer leurs sorties réelles (avant tout parseur)
 
-1. En local, installer Agent-Reach :
+1. En local, installer Agent-Richard :
    - `pipx install https://github.com/Panniantong/agent-reach/archive/main.zip`, puis `agent-reach install --env=auto` ;
    - ne jamais installer le paquet PyPI du même nom ;
    - `npm i -g mcporter`, puis `mcporter config add exa https://mcp.exa.ai/mcp` ;
@@ -290,7 +290,7 @@ l'outil, `inputSchema` est en zod.
 #### A6. Image Docker de l'agent (`apps/reach-agent/Dockerfile`, écrit par Armand, branché par le coéquipier dans `infra/`)
 
 - Image `node:24-bookworm`.
-- Paquets : `python3`, `pipx`, `gh`, `yt-dlp` (via pipx), Agent-Reach, `mcporter` (npm global, `mcporter config add exa …` au build).
+- Paquets : `python3`, `pipx`, `gh`, `yt-dlp` (via pipx), Agent-Richard, `mcporter` (npm global, `mcporter config add exa …` au build).
 - Copie de `packages/contract` en `/packages/contract` pour garder l'import relatif.
 - `npm ci`, puis `npx eve build`, puis `CMD ["npx","eve","start","--host","0.0.0.0","--port","3000"]`.
 - Ajouter `agent/channels/eve.ts` :
@@ -372,7 +372,7 @@ brief-ready  → [PAID_TASKS_ENABLED=false] research-sent → result-saved → c
   - prendre `r.inputRequests.find(x => x.kind === "question")` ;
   - poster `createTaskEvent(core, taskId, { status: "INPUT_REQUIRED", comment })` ;
   - `comment` est construit par `formatQuestion(prompt, options)`, au format exact :
-    `**🎯 Reach** — <prompt>\n\n1️⃣ **<label>** — <description>\n2️⃣ …\n\n_Réponds juste \`1\`, \`2\` ou en texte libre._`
+    `**🎯 Richard** — <prompt>\n\n1️⃣ **<label>** — <description>\n2️⃣ …\n\n_Réponds juste \`1\`, \`2\` ou en texte libre._`
   - on sauvegarde `requestId`, `options` et l'`eventId` posté ;
   - si on redémarre en `question-post-pending`, on lit les événements de la Task : un événement du Coworker avec le même
     commentaire fait passer en `awaiting-human` sans reposter.
@@ -386,7 +386,7 @@ brief-ready  → [PAID_TASKS_ENABLED=false] research-sent → result-saved → c
 - **Brief** :
   - `extractBrief(r.message)` ;
   - en cas d'échec, une seule relance : `session.send("Réponds uniquement avec le bloc JSON Brief.")` ;
-  - deuxième échec : `createTaskEvent(..., { status: "FAILED", comment: "Reach n'a pas pu cadrer la demande : reformule ton besoin." })`
+  - deuxième échec : `createTaskEvent(..., { status: "FAILED", comment: "Richard n'a pas pu cadrer la demande : reformule ton besoin." })`
     et phase `failed`. Lire le statut d'échec exact dans l'enum `TaskStatus` de Sokosumi
     (`packages/database/prisma/schema.prisma`, non vérifié, à confirmer d'abord) ; s'il n'existe pas de `FAILED`,
     utiliser le statut d'échec présent dans l'enum.
@@ -408,8 +408,8 @@ brief-ready  → [PAID_TASKS_ENABLED=false] research-sent → result-saved → c
   eve et MPS ne sont jamais publics.
 - Enregistrement avec la commande `register` de `registration.ts` :
   - `apiBaseUrl: https://REACH_DOMAIN/agent-api` ;
-  - `name: "Reach"`, `Tags: ["sourcing","leads","b2b","research"]`, `pricing { pricingType: "Dynamic" }` ;
-  - `Capability { name: REACH_MODEL, version: "1" }`, `Author { name: "Cardano Reach" }`.
+  - `name: "Richard"`, `Tags: ["sourcing","leads","b2b","research"]`, `pricing { pricingType: "Dynamic" }` ;
+  - `Capability { name: REACH_MODEL, version: "1" }`, `Author { name: "Richard" }`.
 - Attendre `RegistrationConfirmed`, puis créer la clé MPS limitée au selling wallet (commande `key`).
 
 #### B5. Déploiement complet
@@ -475,11 +475,11 @@ Prérequis : Node 24 (`export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`)
    - `npm run golden` exit 0.
 2. **Intake via Sokosumi (coéquipier, M1)** :
    - `PAID_TASKS_ENABLED=false node src/main.ts` dans `apps/worker` ;
-   - `sokosumi --preprod tasks create --personal --coworker-id $COWORKER_ID --name "Reach test" --description "Trouve-moi des partenaires." --status READY --json` ;
+   - `sokosumi --preprod tasks create --personal --coworker-id $COWORKER_ID --name "Richard test" --description "Trouve-moi des partenaires." --status READY --json` ;
    - attendu : la Task passe en `INPUT_REQUIRED` avec le commentaire 1️⃣ / 2️⃣
      (`sokosumi --preprod tasks events <TASK_ID> --json`) ;
    - `sokosumi --preprod tasks comment <TASK_ID> --comment "1" --json` : la Task repasse en `RUNNING`, puis une deuxième
-     question ou `COMPLETED` avec un rapport qui commence par `# Reach` ;
+     question ou `COMPLETED` avec un rapport qui commence par `# Richard` ;
    - tuer le worker pendant `awaiting-human`, le relancer : pas de question en double.
 3. **Paiement (coéquipier, M2)** :
    - `PAID_TASKS_ENABLED=true`, Task avec une description complète (cas 1) ;

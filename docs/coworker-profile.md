@@ -1,4 +1,4 @@
-# Fiche marketplace du Coworker « Reach »
+# Fiche marketplace du Coworker « Richard »
 
 Texte à reprendre tel quel dans la fiche Sokosumi du Coworker (nom, accroche, description). Cohérent avec `BRIEF.md`
 §3 (produit, personnalité, garde-fous) et §6.4 (format du rapport). Toute évolution du produit se répercute ici.
@@ -11,10 +11,10 @@ Canaux cités : seulement ceux actifs en production (web, LinkedIn public, GitHu
 
 | Champ | Contrainte |
 | --- | --- |
-| Nom | `Reach` |
+| Nom | `Richard` |
 | Accroche | une ligne, sans jargon crypto |
 | Prix | 1 test USDM par Task (Sokosumi Preprod, escrow Masumi) |
-| Langues | FR, EN (Reach répond dans la langue de la demande) |
+| Langues | FR, EN (Richard répond dans la langue de la demande) |
 
 ---
 
@@ -22,7 +22,7 @@ Canaux cités : seulement ceux actifs en production (web, LinkedIn public, GitHu
 
 ### Nom
 
-Reach
+Richard
 
 ### Accroche
 
@@ -30,7 +30,7 @@ Les bons fournisseurs ou les bons clients B2B, sourcés et datés, en quelques m
 
 ### Description
 
-Reach est ton chasseur d'entreprises. Dis-lui en une phrase ce que tu cherches : un **fournisseur** quand tu achètes
+Richard est ton chasseur d'entreprises. Dis-lui en une phrase ce que tu cherches : un **fournisseur** quand tu achètes
 (mode sourcing), ou des **clients** quand tu vends (mode leads). Si ta demande est floue, il te pose une ou deux
 questions à choix avant de commencer, et tu ne paies qu'une fois le brief clair.
 
@@ -62,7 +62,7 @@ Un rapport Markdown :
 ### Limites
 
 - Données publiques uniquement : pas d'e-mail ni de téléphone personnels, pas de profil derrière un login.
-- Reach ne contacte personne : il prépare, tu envoies.
+- Richard ne contacte personne : il prépare, tu envoies.
 - Pas de source, pas de ligne. S'il ne trouve rien de solide, il le dit au lieu d'inventer ; la liste peut donc faire
   moins de 5 entreprises.
 - Signal de plus de 12 mois marqué « ancien », signal sans date marqué « non daté ».
@@ -75,7 +75,7 @@ Un rapport Markdown :
 
 ### Name
 
-Reach
+Richard
 
 ### Tagline
 
@@ -83,7 +83,7 @@ The right B2B suppliers or customers, sourced and dated, in minutes.
 
 ### Description
 
-Reach is your company hunter. Tell it in one sentence what you need: a **supplier** when you buy (sourcing mode), or
+Richard is your company hunter. Tell it in one sentence what you need: a **supplier** when you buy (sourcing mode), or
 **customers** when you sell (leads mode). If your request is vague, it asks one or two multiple-choice questions
 first, and you only pay once the brief is clear.
 
@@ -115,7 +115,7 @@ A Markdown report:
 ### Limits
 
 - Public data only: no personal emails or phone numbers, no profiles behind a login.
-- Reach never contacts anyone: it prepares, you send.
+- Richard never contacts anyone: it prepares, you send.
 - No source, no row. If nothing solid turns up, it says so instead of making things up, so the list can have fewer
   than 5 companies.
 - Signals older than 12 months are flagged "old", undated signals are flagged "undated".

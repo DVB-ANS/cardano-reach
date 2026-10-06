@@ -50,7 +50,7 @@ function fakes() {
       answers.push(answer);
       return { kind: "brief", session, brief };
     },
-    research: async () => ({ session: { sessionId: "s2", streamIndex: 3 }, report: "# 🎯 Reach — 5 fournisseurs" }),
+    research: async () => ({ session: { sessionId: "s2", streamIndex: 3 }, report: "# 🎯 Richard — 5 fournisseurs" }),
     followUp: async () => "Commence par le premier.",
   } as unknown as Agent;
   const config = { dataDir: mkdtempSync(join(tmpdir(), "reach-runner-")), intakeTimeoutMs: 60_000 } as Config;
@@ -65,7 +65,7 @@ test("parcours gratuit : question, reprise sans doublon, réponse chiffrée, rap
   assert.equal(f.status(), "INPUT_REQUIRED");
   const questions = () => f.events.filter((e) => e.status === "INPUT_REQUIRED").length;
   assert.equal(questions(), 1);
-  assert.match(f.events.at(-1)?.comment ?? "", /^\*\*🎯 Reach\*\* — Tu achètes ou tu vends \?/);
+  assert.match(f.events.at(-1)?.comment ?? "", /^\*\*🎯 Richard\*\* — Tu achètes ou tu vends \?/);
 
   // Redémarrage du worker : même journal, aucune question reposée tant que l'humain n'a pas répondu.
   runner = new Runner(f.config, f.soko, f.agent);
@@ -77,7 +77,7 @@ test("parcours gratuit : question, reprise sans doublon, réponse chiffrée, rap
   await runner.advance("t1");
   assert.deepEqual(f.answers, [{ optionId: "sell" }]);
   assert.equal(f.status(), "COMPLETED");
-  assert.equal(f.events.at(-1)?.comment, "# 🎯 Reach — 5 fournisseurs");
+  assert.equal(f.events.at(-1)?.comment, "# 🎯 Richard — 5 fournisseurs");
   const reply = f.events.findIndex((e) => e.comment === "2");
   assert.ok(f.events.slice(reply).some((e) => e.actorType === "coworker" && e.status === "RUNNING"), "RUNNING reposté après la réponse");
 

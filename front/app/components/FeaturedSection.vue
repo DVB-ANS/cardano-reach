@@ -20,7 +20,7 @@ useScrollProgress(root, 'enter')
           <span class="chip-outline">sourcing</span>
           <span class="chip">aerospace</span>
           <span class="chip">europe</span>
-          <span class="label ml-1">by reach</span>
+          <span class="label ml-1">by richard</span>
         </div>
       </div>
 
@@ -28,7 +28,7 @@ useScrollProgress(root, 'enter')
       <p class="label absolute bottom-5 left-4 max-w-xs text-cream sm:left-6">
         “I need a titanium fastener supplier, EN 9100 certified, small batches, Europe.”
       </p>
-      <span class="chip absolute bottom-5 right-4 sm:right-6">7 suppliers · verified</span>
+      <span class="chip absolute bottom-5 right-4 sm:right-6">7 suppliers · sourced &amp; dated</span>
     </div>
   </section>
 </template>

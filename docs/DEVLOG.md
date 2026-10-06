@@ -233,3 +233,18 @@ qui fait gagner des heures. Le socle livré pour la démo reste la shortlist sou
 - Recherche payée en échec relancée à chaque poll : plafonnée à 3 tentatives, puis `FAILED` (escrow remboursé).
 - Échéance MPS illisible : `Number(undefined)` donnait `NaN`, et toute comparaison avec `NaN` est fausse, ce qui
   désactivait les contrôles de délai. Erreur explicite désormais.
+
+## 2026-10-07 — L'agent s'appelle Richard
+
+**Quoi** : le produit et l'agent passent de « Reach » à « Richard » : Coworker Sokosumi (nom + description), personnalité
+et titre du rapport de l'agent, questions et messages du worker, nom d'enregistrement Masumi, front, docs. Front :
+promesses alignées (« sourced & dated » au lieu de « verified », « 1 test USDM » sur Cardano Preprod). Demande de
+connexion du Coworker au Workspace TOKEN2049 envoyée (`PENDING`).
+
+**Pourquoi** : décision d'équipe sur le nom.
+
+**Cheminement** :
+- Gardés tels quels : noms techniques (repo `cardano-reach`, `apps/reach-agent`, variables `REACH_*`, outil
+  `reach_search`, évènement `reach:loaded`), Vendor « Cardano Reach » (le CLI ne sait pas renommer un Vendor), slug du
+  Coworker `reach`, et les entrées passées de ce DEVLOG.
+- Footer du front : logo passé de 15,5 vw à 12,5 vw, sinon « RICHARD // » déborde.

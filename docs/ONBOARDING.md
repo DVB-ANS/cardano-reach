@@ -5,7 +5,7 @@ Contrat worker ↔ agent : `docs/CONTRACT.md`. Historique des décisions : `docs
 
 ## 1. Le projet
 
-**Reach** est un Coworker payant sur Sokosumi Preprod (1 test USDM par Task, paiement Masumi sur Cardano Preprod).
+**Richard** est un Coworker payant sur Sokosumi Preprod (1 test USDM par Task, paiement Masumi sur Cardano Preprod).
 Il trouve les bonnes entreprises à contacter : des **fournisseurs** (mode `sourcing`) ou des **clients**
 (mode `leads`), par niche (aéro/spatial, automobile, crypto/DeFi, SaaS B2B). Chaque ligne du rapport a un lien source
 et une date.
@@ -13,7 +13,7 @@ et une date.
 Parcours d'une Task :
 
 1. L'utilisateur écrit sa demande sur Sokosumi.
-2. Si elle est floue, Reach pose 1 ou 2 questions à choix (`INPUT_REQUIRED`).
+2. Si elle est floue, Richard pose 1 ou 2 questions à choix (`INPUT_REQUIRED`).
 3. Brief clair → paiement Masumi (escrow) **avant** la recherche.
 4. Recherche parallèle (web, LinkedIn, GitHub, YouTube) + lecture des pages.
 5. Rapport Markdown : verdict, tableau sourcé et daté, vigilance, premier message à copier.

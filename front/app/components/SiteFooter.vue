@@ -32,14 +32,14 @@ const links = [
         </div>
         <div class="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-cream/20 py-3">
           <span class="label w-24 shrink-0">// links</span>
-          <ChipLink href="https://preprod.sokosumi.com" label="hire reach" external />
+          <ChipLink href="https://preprod.sokosumi.com" label="hire richard" external />
           <ChipLink href="https://github.com/DVB-ANS/cardano-reach" label="source code" external />
         </div>
       </div>
     </div>
 
-    <div class="wide mt-20 flex items-end justify-between text-[15.5vw] leading-[.74]" aria-hidden="true">
-      <span v-chars="1200">Reach</span><span class="text-accent">//</span>
+    <div class="wide mt-20 flex items-end justify-between text-[12.5vw] leading-[.74]" aria-hidden="true">
+      <span v-chars="1200">Richard</span><span class="text-accent">//</span>
     </div>
   </footer>
 </template>

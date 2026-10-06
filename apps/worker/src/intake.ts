@@ -18,7 +18,7 @@ export function formatQuestion(prompt: string, options: readonly QuestionOption[
   const numbers = options.slice(0, KEYCAPS.length).map((_, i) => `\`${i + 1}\``);
   const choices = numbers.length > 1 ? `${numbers.slice(0, -1).join(", ")}, ${numbers.at(-1)}` : (numbers[0] ?? "");
   const hint = choices ? `_Réponds juste ${choices} ou en texte libre._` : "_Réponds en texte libre._";
-  return [`**🎯 Reach** — ${prompt.trim()}`, lines.join("\n"), hint].filter(Boolean).join("\n\n");
+  return [`**🎯 Richard** — ${prompt.trim()}`, lines.join("\n"), hint].filter(Boolean).join("\n\n");
 }
 
 export type HumanAnswer = { optionId: string } | { text: string };

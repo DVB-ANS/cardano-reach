@@ -30,7 +30,7 @@ Jina retiré (quota gratuit journalier atteint). `freshnessDays` reste filtré a
 
 ## Checkpoints prouvés
 
-- M0 : `research.ts --text "Je cherche un usineur titane" --answer 1` → 1 question, `Brief` valide, rapport `# 🎯 Reach — …`.
+- M0 : `research.ts --text "Je cherche un usineur titane" --answer 1` → 1 question, `Brief` valide, rapport `# 🎯 Richard — …`.
 - Cas 1 (luna) : 0 question, intake 6 s, recherche 57 s, 4 lignes sourcées (liens vérifiés par l'agent via `read_pages`).
 - `eve build` OK ; `eve start` : 401 sans / avec mauvais identifiants Basic, 200 avec les bons.
 - Golden `gpt-6-luna`, après audit (garde de phase, relance Brief) : tous les cas passent l'intake. Premier passage
