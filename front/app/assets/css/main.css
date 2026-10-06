@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme {
+  --color-night: #020718;
+  --color-panel: #06102f;
+  --color-ultra: #0b34a6;
+  --color-ultra-deep: #061f6e;
+  --color-cream: #ece3cf;
+  --color-accent: #ffffff;
+
+  --font-wide: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+
+  --radius-notch: 8px;
+  --radius-notch-lg: 40px;
+
+  --animate-blink: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink { to { visibility: hidden; } }
+
+@keyframes flicker-in {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  35% { opacity: 0; }
+  55% { opacity: .8; }
+  70% { opacity: .2; }
+  100% { opacity: 1; }
+}
+
+@utility wide {
+  font-family: var(--font-wide);
+  font-stretch: 125%;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: .9;
+  letter-spacing: -.005em;
+}
+
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 300;
+  text-transform: lowercase;
+  letter-spacing: .01em;
+}
+
+/* Bottom-right only radius: the signature corner of the layout */
+@utility corner { border-radius: 0 0 var(--radius-notch) 0; }
+@utility corner-lg { border-radius: 0 0 var(--radius-notch-lg) 0; }
+
+@layer base {
+  html { overflow-x: clip; }
+  body {
+    @apply bg-night font-sans text-cream antialiased;
+  }
+  ::selection { @apply bg-accent text-night; }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    pointer-events: none;
+    z-index: 90;
+    opacity: .09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  main { transition: filter .6s cubic-bezier(.215, .61, .355, 1); }
+  html.has-menu main { filter: blur(.45rem); }
+}
+
+@layer components {
+  .chip {
+    @apply label inline-flex h-6 items-center bg-cream px-2 text-night corner transition-colors duration-200;
+  }
+  .chip-outline {
+    @apply label inline-flex h-6 items-center border border-cream px-2 text-cream corner;
+  }
+  .chip-icon {
+    @apply inline-grid size-6 place-items-center bg-cream text-night corner transition-colors duration-200;
+  }
+  .chip-group { @apply inline-flex items-center gap-px; }
+  .chip-group:hover .chip, .chip-group:hover .chip-icon, a.chip:hover, button.chip:hover { @apply bg-accent text-night; }
+
+  .cursor::after {
+    content: "_";
+    animation: var(--animate-blink);
+  }
+
+  /* Concave corner: a night-coloured piece that makes a block look carved out of the image behind it.
+     Position it with inline styles and set --c to the circle centre (e.g. "0 0", "100% 100%"). */
+  .notch {
+    position: absolute;
+    width: var(--radius-notch);
+    height: var(--radius-notch);
+    pointer-events: none;
+    background: radial-gradient(circle at var(--c, 0 0), transparent calc(var(--radius-notch) - .5px), var(--color-night) var(--radius-notch));
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+    transition: opacity .9s cubic-bezier(.215, .61, .355, 1) var(--d, 0ms), transform .9s cubic-bezier(.215, .61, .355, 1) var(--d, 0ms);
+  }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  .chars .ch { opacity: 0; }
+  .chars.is-in .ch { animation: flicker-in .45s steps(1, end) forwards; animation-delay: var(--cd); }
+  .chars .w { display: inline-block; white-space: nowrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .reveal, .chars .ch { opacity: 1 !important; transform: none !important; }
+}

@@ -79,3 +79,22 @@ unique pour aligner les sessions parallèles et le pitch.
   `${EXA_API_KEY}`) utilisé dès que la clé existe. Clé à créer.
 - `web_search` n'est pas exposé avec `chatgpt()` : le secours n'existe qu'avec `openai()`.
 - `.gitignore` `tests/golden/out/` était ancré à la racine : sorties golden versionnées par erreur, motif corrigé.
+
+## 2026-10-06 — Front vitrine
+
+**Quoi** : `front/` (Nuxt 4 + Tailwind 4, statique via `npm run generate`), page unique en anglais : hero animé,
+problème, deux modes, pipeline, démo de Task animée, niches, garde-fous, paiement Masumi.
+
+**Pourquoi** : ~20 % de la note sur l'UI/UX ; la vitrine reste hors du chemin de paiement.
+
+**Cheminement** :
+- DA reprise des illustrations (bleu outremer, crème, rouge, pointillé) ; le phare sert de métaphore à Reach.
+- Hero : canvas superposé à l'image (vortex, ondes, lampe) recalé avec le calcul `object-fit: cover`.
+- Démo : rapport illustratif aux noms anonymisés, pour ne présenter aucune entreprise réelle comme vérifiée.
+- Refonte inspirée de lvcidia.xyz : cadre sombre à encoches concaves, typo extra-large (Archivo 125 %),
+  labels mono `// …`, puces, caractères qui scintillent, révélations au scroll, Lenis, menu plein écran.
+  6 images seulement, la DA bleu/crème reste celle des illustrations.
+- Recentrée en landing page (retour de Noé) : hero statique sans canvas, exemple de Task réduit, deux modes,
+  « how it works » en 3 étapes, paiement, footer. Retirés : manifeste, carrousel d'étapes, démo de Task, niches, garde-fous.
+- Slogan « Leads with receipts. » (receipts = preuves + reçu de paiement), accent orange remplacé par un bleu,
+  image rouge du mode leads remplacée (cabine sous la galaxie), flux de paiement réduit à une ligne.
