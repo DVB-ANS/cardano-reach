@@ -14,14 +14,28 @@ RUN apt-get update \
 ENV PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin
 RUN pipx install yt-dlp \
   && pipx install https://github.com/Panniantong/agent-reach/archive/main.zip \
-  && pipx install twitter-cli \
+  && pipx install twitter-cli==0.8.5 \
   && pipx install 'git+https://github.com/public-clis/rdt-cli.git@5e4fb3720d5c174e976cd425ccc3b879d52cac66' \
   && mkdir -p /app /packages \
   && chown node:node /app /packages
 
+# twitter-cli 0.8.5 initialise x-client-transaction-id sur x.com sans cookies : X sert désormais une page
+# déconnectée sans `ondemand.s`, l'init échoue et `search` répond 404 (public-clis/twitter-cli#78, non corrigé).
+# Avec les cookies du compte, x.com sert encore l'ancienne page. Le build échoue si la ligne patchée disparaît.
+RUN python3 - <<'PY'
+import pathlib
+path = pathlib.Path("/opt/pipx/venvs/twitter-cli/lib/python3.11/site-packages/twitter_cli/client.py")
+source = path.read_text()
+target = "ct_headers = _gen_ct_headers()\n"
+assert source.count(target) == 1, "twitter-cli patch target not found"
+cookie = '            ct_headers["Cookie"] = self._cookie_string or "auth_token=%s; ct0=%s" % (self._auth_token, self._ct0)\n'
+path.write_text(source.replace(target, target + cookie))
+PY
+
 USER node
 
 WORKDIR /app
+COPY --chown=node:node tsconfig.base.json /tsconfig.base.json
 COPY --chown=node:node packages/contract /packages/contract
 COPY --chown=node:node apps/reach-agent/package.json apps/reach-agent/package-lock.json ./
 RUN npm ci

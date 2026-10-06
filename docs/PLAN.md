@@ -276,7 +276,7 @@ l'outil, `inputSchema` est en zod.
 
 - `scripts/bench-search.ts "<requête>"` exécute `searchBatch` sur tous les canaux actifs et affiche pour chacun la durée,
   le nombre de hits, la part de hits datés et les erreurs.
-- `tests/golden/cases.json` : les 9 cas de la section 4 de `BRIEF.md`, au format
+- `tests/golden/cases.json` : les cas de la section 4 de `BRIEF.md` sauf le cas 6 (retiré, voir DEVLOG), au format
   `{ id, text, answers: string[], expect: { mode, niche, minRows: 5 } }`.
   Pour les cas 8 et 9, `minRows: 0` et `expect.mustAsk: true` pour le cas 8.
 - `scripts/golden.ts` joue chaque cas via la logique de `research.ts` et écrit `tests/golden/out/<id>.md` et `tests/golden/out/timings.json`.

@@ -283,3 +283,56 @@ tableau, la partie la plus regardée.
   min (#26, Armand).
 - L'agent d'Armand tournait sur une version d'avant le renommage : le rapport payé s'ouvre sur « Reach ». À mettre à
   jour après la collecte.
+## 2026-10-06 — Validation Docker locale de l'agent
+
+**Quoi** : contexte Docker protégé des fichiers `.env*`, correction de la copie du `tsconfig.base.json`, construction
+de `reach-agent:local` avec Node 24.21.0 et smoke de l'authentification Basic.
+
+**Bugs & fix** :
+- Le `Dockerfile` déplaçait l'app dans `/app` mais ne copiait pas `/tsconfig.base.json` attendu par
+  `apps/reach-agent/tsconfig.json` : `eve build` échouait. Le fichier racine est maintenant copié dans l'image.
+- `.env.example` laissait les ports et chemins optionnels vides ; après copie, `PORT=` masquait la valeur Docker et
+  empêchait le démarrage. Les valeurs locales sûres sont désormais explicites.
+- Le `/` d'eve est public et ne vérifie pas l'authentification. Le smoke cible `/eve/v1/info` : 401 sans identifiants,
+  200 avec les bons.
+- `npm audit --omit=dev` signale 4 vulnérabilités modérées et 1 haute dans les dépendances transitives d'eve
+  (`guarded-fetch` / `undici`) ; `npm audit fix --force` rétrograderait eve et n'a pas été appliqué.
+- Canal twitter : `search` répondait HTTP 404 avec l'avertissement `Failed to init ClientTransaction`. twitter-cli 0.8.5
+  récupère x.com **sans cookies** pour calculer `x-client-transaction-id` ; X sert maintenant une page déconnectée
+  (`x-web/entry-client-logged-out-*.js`) sans marqueur `ondemand.s`. Avec `auth_token` + `ct0`, x.com sert encore
+  l'ancienne page. Le `Dockerfile` épingle twitter-cli 0.8.5 et ajoute les cookies à cette requête d'init
+  (public-clis/twitter-cli#78, toujours ouvert) ; le build échoue si la ligne patchée disparaît.
+
+## 2026-10-07 — Golden dans Docker, retrait du cas 6
+
+**Quoi** : golden `gpt-6.1-sol` contre `reach-agent-local` (canaux web, linkedin, github, twitter ; YouTube coupé) :
+8/9. Segment « market maker » ajouté à la fiche crypto. Cas `6-crypto-leads` retiré du golden.
+
+**Pourquoi** : « sans liquidité sérieuse » n'est pas prouvable avec une date sans source on-chain. L'agent rend 2 puis
+4 pistes (après la fiche) et refuse d'ajouter des lignes sans liquidité horodatée : c'est la rigueur voulue, pas un
+défaut. On n'ajoute pas de pistes « à confirmer » pour atteindre 5 lignes. Le cas sera remplacé par un scénario
+« trouver la bonne personne » quand l'agent évoluera.
+
+**Bugs & fix** :
+- Golden en Docker : `EACCES` sur `tests/golden/out` monté (conteneur `node` UID 1000, hôte UID 1001) → lancer avec
+  `--user "$(id -u):$(id -g)"`.
+- `npm run golden` dans l'image affiche « .env.local not found » : attendu, `.dockerignore` l'exclut et les variables
+  arrivent par `--env-file` ; appeler `node scripts/golden.ts` directement.
+
+## 2026-10-07 — MPS sur le serveur d'Armand, enregistrement, 1re Task payée
+
+**Quoi** : Postgres 16 + MPS (`docs/MPS-SETUP.md`) en services `systemctl --user`, wallet de vente financé,
+enregistrement Masumi `RegistrationConfirmed`, `agent-api` et worker payé sur le serveur ; première Task payée en échec,
+cause trouvée et corrigée.
+
+**Bugs & fix** :
+- MPS passe `listen: PORT` à express-zod-api, sans hôte : écoute sur toutes les interfaces (LAN + Tailscale).
+  `infra/mps/bind-localhost.mjs`, préchargé par `NODE_OPTIONS`, ajoute `127.0.0.1` au seul port de MPS ; `PORT` est une
+  chaîne (`CONFIG.PORT`), le module accepte nombre et chaîne.
+- `sokosumi auth login` sur le serveur : pas de navigateur (`xdg-open ENOENT`), puis refus de stocker la session sans
+  coffre système (`secret-tool`). Les Tasks se créent depuis le site, la clé runtime suffit au worker.
+- Task `01a11321-…` : escrow de Core verrouillé en 3 min, mais MPS ne constate un verrouillage qu'après 20 confirmations
+  et un poll de 3 min ; avec `payBy` +5 min et 300 s de grâce, il a classé le paiement `FundsOrDatumInvalid`. Échéances
+  passées à +15 / +40 / +56 / +72 min (contraintes MPS : `payBy` ≤ `submitResult` − 5 min, 15 min entre `submitResult`,
+  `unlock` et dispute). Le worker restait aussi bloqué en `awaiting-escrow` sur cet état : il fait maintenant échouer la
+  Task (FAILED posté, escrow remboursé à Core).

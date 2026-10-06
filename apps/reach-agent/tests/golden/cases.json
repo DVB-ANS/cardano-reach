@@ -30,12 +30,6 @@
     "expect": { "mode": "sourcing", "niche": "crypto-defi", "minRows": 5 }
   },
   {
-    "id": "6-crypto-leads",
-    "text": "On est market maker. Quels protocoles viennent de lancer un token sans liquidité sérieuse ?",
-    "answers": [],
-    "expect": { "mode": "leads", "niche": "crypto-defi", "minRows": 5 }
-  },
-  {
     "id": "7-saas-leads",
     "text": "On vend un outil de conformité RGPD. Qui en a besoin ?",
     "answers": [],

@@ -7,7 +7,7 @@ S'applique quand `niche` = `crypto-defi`.
 - Termes : audit de smart contract (*smart contract audit*, *security review*), teneur de marché (*market maker*), fournisseur RPC / nœud (*RPC provider*), oracle (*price feed*), indexeur (*indexer*), studio de dev (*Web3 dev studio*), TVL, TGE (*token generation event*), mainnet, bridge, DEX, lending, grant.
 - Cardano : Plutus, Aiken, Plutarch, eUTxO, Catalyst (fonds communautaire), Cardano Foundation, Intersect.
 - Segments **sourcing** : auditeurs (EVM, Solana, Cardano Plutus/Aiken), market makers (CEX/DEX), infra (RPC, oracles, indexeurs), studios de dev.
-- Segments **leads** : protocoles avant TGE ou mainnet (audit, liquidité), protocoles en croissance de TVL (intégrations, infra), projets financés (Catalyst, levée), protocoles post-exploit (ré-audit).
+- Segments **leads** : protocoles avant TGE ou mainnet (audit, liquidité), tokens lancés depuis moins de 90 jours avec une liquidité faible (market maker), protocoles en croissance de TVL (intégrations, infra), projets financés (Catalyst, levée), protocoles post-exploit (ré-audit).
 
 ## Requêtes par canal
 
@@ -26,6 +26,12 @@ Leads (`freshnessDays: 365` pour tout signal « why now ») :
 - `youtube` : « <chaîne> project mainnet announcement », « Catalyst funded project demo ».
 - `twitter` : « TGE <chaîne> », « mainnet live <chaîne> », « post-mortem exploit ».
 - `reddit` : « <chaîne> new DeFi launch ».
+
+Leads pour un **market maker** (tokens récents peu liquides, `freshnessDays: 90`) :
+- `web` : « token generation event completed this month <chaîne> », « new token listing announcement <exchange> », « token now live on Uniswap / Raydium / Minswap », « airdrop and TGE of <type de protocole> token ».
+- `twitter` : « TGE live », « now live on Uniswap », « listing <exchange> », « liquidity pool live ».
+- `linkedin` : « DeFi protocol token launch ».
+- Lis ensuite les pages de marché des candidats (CoinGecko, GeckoTerminal, DexScreener, DexPaprika) pour qualifier la liquidité : profondeur ±2 %, liquidité des pools, volume. Un chiffre non horodaté reste `non daté`.
 
 ## Critères de score (/100)
 
@@ -47,6 +53,7 @@ Leads :
 ## Signaux « why now »
 
 - TGE ou token annoncé → audit, market maker, listing (X, blog du projet).
+- Token lancé depuis moins de 90 jours avec un pool ou un carnet peu profond → market maker (annonce de TGE ou de listing, page de marché).
 - Mainnet ou testnet → audit, RPC, oracles, indexeurs (blog, X, GitHub release).
 - Levée de fonds → budget prestataires (communiqués, presse crypto, X).
 - Exploit ou hack → post-mortem, ré-audit, monitoring (blog, X, Rekt News).

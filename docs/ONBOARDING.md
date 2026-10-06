@@ -95,7 +95,7 @@ Pièges vérifiés :
 | `src/search/` | moteur : canaux, cache disque, limiteur, échéances, garde SSRF |
 | `src/phase.ts` | interdit la recherche en `PHASE: INTAKE` (avant paiement) |
 | `scripts/research.ts` | simulateur de worker (sans Sokosumi) |
-| `scripts/golden.ts`, `tests/golden/cases.json` | 9 scénarios du brief, exit 1 si un cas échoue |
+| `scripts/golden.ts`, `tests/golden/cases.json` | 8 scénarios du brief (cas 6 retiré), exit 1 si un cas échoue |
 | `scripts/bench-search.ts` | latence et taux de hits datés par canal |
 | `Dockerfile` | image de prod (contexte de build = racine du repo), port 3000 |
 
@@ -107,7 +107,7 @@ cd apps/reach-agent && npm ci
 npm run dev                         # eve sur http://127.0.0.1:21949 (EVE_URL)
 node scripts/research.ts --text "Trouve-moi des partenaires." --answer 1 --answer "aéronautique, Europe"
 npm test                            # 15 tests
-npm run golden                      # 9 scénarios bout en bout
+npm run golden                      # 8 scénarios bout en bout
 ```
 
 Prod (sur le VPS, à brancher dans `infra/docker-compose.yml`) :
