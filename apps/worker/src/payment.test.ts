@@ -185,6 +185,7 @@ test("escrow jugé invalide par MPS après payByTime : Task en échec au lieu d'
   assert.equal(j.phase, "failed");
   assert.equal(h.researches(), 0);
   assert.equal(h.posts.at(-1)?.body.status, "FAILED");
+  assert.match(String(h.posts.at(-1)?.body.comment), /non confirmé par le nœud/);
 });
 
 test("des conditions expirées avant l'achat sont renégociées", async () => {

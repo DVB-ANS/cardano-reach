@@ -18,6 +18,7 @@ export const MIN_RESEARCH_MS = 8 * MINUTE;
 const ESCROW_GRACE_MS = 10 * MINUTE;
 const DEADLINE_COMMENT = "Délai de paiement dépassé : aucun résultat n'est soumis, l'escrow sera remboursé.";
 const ESCROW_COMMENT = "Paiement non reçu dans les délais : la Task est abandonnée sans frais.";
+const ESCROW_UNCONFIRMED_COMMENT = "Paiement non confirmé par le nœud dans les délais : la Task est abandonnée, l'escrow sera remboursé.";
 
 export type PaidStage =
   | "terms-pending"
@@ -202,7 +203,10 @@ export function createPaidFlow(options: {
         const next = hooks.save({ ...j, paid: { ...p, observed } });
         if (observed.onChainState !== "FundsLocked" || !confirmedState(observed, "FundsLocked")) {
           const neverLocked = !observed.onChainState || observed.onChainState === "FundsOrDatumInvalid";
-          if (now() > time(p.payment?.payByTime) + ESCROW_GRACE_MS && neverLocked) return fail(next, hooks, ESCROW_COMMENT, `escrow not locked: ${observed.onChainState ?? "none"}`);
+          if (now() > time(p.payment?.payByTime) + ESCROW_GRACE_MS && neverLocked) {
+            const comment = observed.onChainState ? ESCROW_UNCONFIRMED_COMMENT : ESCROW_COMMENT;
+            return fail(next, hooks, comment, `escrow not locked: ${observed.onChainState ?? "none"}`);
+          }
           return next;
         }
         return research(next, { ...p, observed }, hooks);
