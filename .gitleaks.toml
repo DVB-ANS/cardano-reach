@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+# Faux positif de la règle twitter-api-key sur un identifiant TypeScript.
+[[allowlists]]
+description = "Identifiants de code, pas des secrets"
+regexTarget = "match"
+regexes = ['''twitterCredentialsPresent''']
