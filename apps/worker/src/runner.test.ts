@@ -7,7 +7,8 @@ import type { Brief } from "../../../packages/contract/src/index.ts";
 import type { Config } from "./config.ts";
 import type { Agent, IntakeOutcome } from "./eve.ts";
 import type { HumanAnswer } from "./intake.ts";
-import { Runner } from "./runner.ts";
+import { type PaidFlow, Runner } from "./runner.ts";
+import { writeJson } from "./store.ts";
 import type { Sokosumi, Task, TaskEvent } from "./sokosumi.ts";
 
 const brief: Brief = { mode: "sourcing", niche: "aero-spatial", need: "titane", zone: "Europe", volume: null, constraints: [], language: "fr", assumptions: [] };
@@ -95,4 +96,40 @@ test("pas de réponse humaine dans le délai : hypothèses explicites", async ()
   await runner.advance("t1");
   assert.deepEqual(f.answers, [{ text: "Pas de réponse : continue avec des hypothèses explicites." }]);
   assert.equal(f.status(), "COMPLETED");
+});
+
+test("une Task déjà payée n'est jamais recherchée en mode gratuit", async () => {
+  const f = fakes();
+  let researched = false;
+  const agent = { ...(f.agent as object), research: async () => ((researched = true), { session, report: "# x" }) } as unknown as Agent;
+  writeJson(join(f.config.dataDir, "tasks", "t1.json"), {
+    taskId: "t1",
+    phase: "brief-ready",
+    input: "x",
+    brief,
+    questions: 0,
+    attempts: 0,
+    comments: {},
+    paid: { stage: "awaiting-escrow" },
+  });
+  await new Runner(f.config, f.soko, agent).advance("t1");
+  assert.equal(researched, false);
+});
+
+test("une recherche payée qui échoue est plafonnée à 3 tentatives", async () => {
+  const f = fakes();
+  const journal = { taskId: "t1", phase: "brief-ready", input: "x", brief, questions: 0, attempts: 0, comments: {}, paid: { stage: "model-pending" } };
+  writeJson(join(f.config.dataDir, "tasks", "t1.json"), journal);
+  let calls = 0;
+  const paid: PaidFlow = {
+    advance: async () => {
+      calls++;
+      throw new Error("research failed");
+    },
+  };
+  const runner = new Runner(f.config, f.soko, f.agent, paid);
+  for (let i = 0; i < 5; i++) await runner.advance("t1");
+  assert.equal(calls, 3);
+  assert.equal(f.status(), "FAILED");
+  assert.deepEqual(runner.activeTaskIds(), []);
 });

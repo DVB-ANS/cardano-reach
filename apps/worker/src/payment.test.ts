@@ -190,3 +190,10 @@ test("un devis valide survit au refus du payload", async () => {
   await assert.rejects(() => h.flow.advance(first, h.hooks), /cannot preserve/);
   assert.equal(h.posts.length, 0);
 });
+
+test("une échéance MPS illisible bloque au lieu de désactiver les contrôles", async () => {
+  const h = harness({ observed: () => locked({ submitResultTime: "pas-une-date" }) });
+  const bad = h.journal({ stage: "awaiting-escrow", nonce: "n", payment: payment({ submitResultTime: "pas-une-date" }) });
+  await assert.rejects(() => h.flow.advance(bad, h.hooks), /Invalid MPS deadline/);
+  assert.equal(h.researches(), 0);
+});
