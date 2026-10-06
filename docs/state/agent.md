@@ -22,13 +22,13 @@
 Exa n'expose pas `web_search_advanced_exa` (pas de filtre de date côté Exa) : `freshnessDays` est filtré après coup.
 
 ## Checkpoints prouvés
-- Golden avec `gpt-6-luna` (`chatgpt()`), dernier passage par cas : 8/9 verts. `6-crypto-leads` rend 4 lignes sourcées
-  sur 5 attendues (l'agent refuse honnêtement d'en inventer) ; à rejouer avec `gpt-6.1-sol` pour M5.
-  Intake parfois trop prudent avec luna (question inutile) : rattrapé par la relance unique « bloc JSON Brief ».
 
 - M0 : `research.ts --text "Je cherche un usineur titane" --answer 1` → 1 question, `Brief` valide, rapport `# 🎯 Reach — …`.
 - Cas 1 (luna) : 0 question, intake 6 s, recherche 57 s, 4 lignes sourcées (liens vérifiés par l'agent via `read_pages`).
 - `eve build` OK ; `eve start` : 401 sans / avec mauvais identifiants Basic, 200 avec les bons.
+- Golden avec `gpt-6-luna` (`chatgpt()`), dernier passage par cas : 8/9 verts. `6-crypto-leads` rend 4 lignes sourcées
+  sur 5 attendues (l'agent refuse honnêtement d'en inventer) ; à rejouer avec `gpt-6.1-sol` pour M5.
+  Intake parfois trop prudent avec luna (question inutile) : rattrapé par la relance unique « bloc JSON Brief ».
 
 ## Notes contrat
 
