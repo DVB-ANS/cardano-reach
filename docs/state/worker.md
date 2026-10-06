@@ -33,6 +33,30 @@ Référence Masumi clonée à côté du repo (`../demo-agent-token2049`) (branch
   achat posté sur la Task, recherche seulement après `FundsLocked` confirmé et ≥ 8 min avant `submitResultTime`, hash
   du résultat exact soumis, complétion au même texte, retrait vérifié (reçu Core + transaction MPS + Blockfrost).
   Jamais testé contre un vrai MPS : attend le MPS d'Armand.
+- **MPS + enregistrement (2026-10-07, serveur d'Armand)** : MPS révision `d569a338`, source Preprod V2
+  `cmux5qdhg00041p15x4fdp05a`, wallet de vente `cmux5qdhk00091p154eefbh50` financé (105 tADA + 100 tUSDM), clé MPS
+  limitée `cmux6ecsk0000g3158ojql6ef` (`canAdmin: false`, un wallet), enregistrement `cmux6f1kq0002g315levtzn4x`
+  → `RegistrationConfirmed` en ~5 min, `agentIdentifier`
+  `67ab0c92c4ac1610895a1c965ee50aba41a8f1513b15240723b3bd0b1035a0555d8fdee9547e2c5a72e1587a17a81a2a0584874521a1547b0a000000`.
+  `apiBaseUrl` = `http://127.0.0.1:21950` (pas encore de domaine : réenregistrer avec l'URL définitive change l'identifiant).
+- Serveur : services `systemctl --user` `masumi-payment-service`, `reach-agent-api` (127.0.0.1:21950) et
+  `reach-worker` (`PAID_TASKS_ENABLED=true`, `MPS_ADMIN_KEY` retirée) ; agent eve dans Docker (`reach-agent-local`,
+  127.0.0.1:3000). **Seul exécuteur du Coworker** : ne pas relancer le worker local de Noé.
+- **1re Task payée échouée (2026-10-07)**, `01a11321-b63c-746b-9b6a-a8331cfad5c5` : demande de paiement 21:32:29Z,
+  escrow de Core verrouillé à 21:35:31Z (tx `4e5d9e7fa53b05b2203ef468848e3813b4af96877d609f147d2b8a637ebb89ac`, 1 tUSDM,
+  datum lié à notre vendeur et à la Task), mais MPS l'a classé `FundsOrDatumInvalid` : « payByTime passed without on-chain
+  lock; no FundsLocked tx observed within 300s grace ». Cause : `payBy` +5 min alors que MPS ne voit un verrouillage
+  qu'après 20 confirmations + poll de 3 min (~10 min). Le worker restait en plus bloqué en `awaiting-escrow` sur cet
+  état. Corrigé : échéances +15 / +40 / +56 / +72 min et échec propre de la Task sur `FundsOrDatumInvalid` (tests).
+  Les fonds de Core restent au contrat jusqu'à son remboursement.
+- **M2 prouvé (2026-10-07)**, Task `01a1133e-6407-707b-8753-34abd515c437` (cas 1, Personal, échéances +15/+40/+56/+72) :
+  demande de paiement 22:03:46Z → escrow vu `FundsLocked` 22:14:56Z → recherche → résultat soumis (`resultHash`
+  `99dfdceaf1254cbfd483df551430ae5063536476477ea7d7a5f8b2faa16b00b2`) → Task `COMPLETED` 22:26Z → `unlockTime`
+  22:59:46Z → retrait automatique MPS, tx de collecte
+  [`b888b4a851fe3da9c4e9b5eb1c11813d4b85cba95679d7a70968b95f9a458a80`](https://preprod.cardanoscan.io/transaction/b888b4a851fe3da9c4e9b5eb1c11813d4b85cba95679d7a70968b95f9a458a80)
+  (bloc 5262253, 23:12:34Z) → `settled` 23:20:59Z, `verified: true`, net mesuré 1 000 000 unités (1 tUSDM), wallet de vente
+  100 → 101 tUSDM. MPS avait d'abord marqué cette tx `FailedViaTimeout` (attente de confirmation dépassée) puis l'a
+  rapprochée en `Withdrawn` après 20 confirmations : pas d'action requise.
 
 ## Procédure M2 (sur la machine d'Armand)
 

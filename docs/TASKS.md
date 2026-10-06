@@ -6,8 +6,8 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 ## Armand — agent, VPS, Docker, déploiement
 
 1. **Agent prêt pour la démo**
-   - [ ] `OPENAI_API_KEY` et `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
-   - [ ] Golden 9/9 avec `gpt-6.1-sol` (`npm run golden`).
+   - [x] `OPENAI_API_KEY` et `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
+   - [x] Golden 8/8 avec `gpt-6.1-sol` (image Docker, `node scripts/golden.ts`).
    - [ ] Plafond de coût par session (`limits.maxTokenCostUsdPerSession` dans `agent/agent.ts`).
    - [ ] Vérification codée des liens avant de rendre le rapport (« no link, no line » garanti par le code).
 1 bis. **Golden et robustesse de l'agent** (relecture du 2026-10-07)
@@ -32,7 +32,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
      dispenser.masumi.network.
    - [ ] Faire tourner le worker sur ta machine pour M2 (clé runtime du Coworker reçue de Noé), `npm run doctor -- --paid`.
    - [ ] Sauvegarde `pg_dump` quotidienne hors du VPS dès que les wallets existent.
-   - [ ] Tester le port 25 sortant (`nc -vz gmail-smtp-in.l.google.com 25`) pour la vérification d'e-mails plus tard.
+   - [x] Tester le port 25 sortant : **bloqué** chez Free (timeout ; 587 ouvert), voir `MPS-SETUP.md` §5.
    - [ ] Domaine `REACH_DOMAIN` + Caddy (seule `https://REACH_DOMAIN/agent-api/` est publique).
 4. **Déploiement final (M4)**
    - [ ] Compose complet : postgres, mps, reach-agent, worker, agent-api, caddy ; `restart: unless-stopped`.

@@ -1,0 +1,9 @@
+.git
+**/.env
+**/.env.*
+**/node_modules
+**/.eve
+**/.local
+**/dist
+**/.output
+**/tests/golden/out
