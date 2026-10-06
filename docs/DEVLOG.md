@@ -263,3 +263,23 @@ en une commande si tout est prêt, sans aller-retour.
   Armand par canal privé, l'`ADMIN_KEY` ne quitte pas la machine d'Armand.
 - Pouls tolérant (10 min) : une recherche occupe la boucle quelques minutes, un seuil court ferait redémarrer Docker
   en pleine Task.
+
+## 2026-10-07 — M2 : première Task payée livrée, réparation des tableaux
+
+**Quoi** : deuxième Task payée (`01a1133e-6407-707b-8753-34abd515c437`) : paiement verrouillé, résultat soumis on-chain,
+Task `COMPLETED` avec un rapport de 7 fournisseurs réels ; collecte en attente du déverrouillage. Le worker répare
+maintenant la ligne de séparation des tableaux Markdown avant hachage et livraison.
+
+**Pourquoi** : le rapport livré avait un en-tête à 7 colonnes et une séparation à 8, ce qui casse l'affichage du
+tableau, la partie la plus regardée.
+
+**Cheminement** :
+- Réparation dans `Agent.research` (avant `fitReport`, donc avant le hash en mode payé) : texte livré et hash restent
+  identiques octet pour octet. Seule la ligne de séparation change ; l'alignement des colonnes existantes est gardé.
+
+**Bugs & fix** :
+- Première Task payée (`01a11321…`) en échec : le MPS ne constate l'escrow qu'après 20 confirmations et un poll de 3 min
+  (~10 min), le devis ne laissait que 5 min pour payer → `FundsOrDatumInvalid`. Échéances passées à +15 / +40 / +56 / +72
+  min (#26, Armand).
+- L'agent d'Armand tournait sur une version d'avant le renommage : le rapport payé s'ouvre sur « Reach ». À mettre à
+  jour après la collecte.
