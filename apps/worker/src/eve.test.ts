@@ -43,3 +43,9 @@ test("stripCitations retire les citations automatiques et le suivi, garde les li
   const clean = "[Certificat](https://sffactory.eu/cert.pdf) (valide jusqu'en 2028)";
   assert.equal(stripCitations(clean), clean);
 });
+
+test("stripCitations retire les marqueurs internes de citation (cas réel BNB)", () => {
+  const raw = "Son titre exact est rôle non confirmé. \uE200cite\uE202turn0search0\uE201\n\nPour la contacter : profil citeturn0search0turn1news2.";
+  assert.equal(stripCitations(raw), "Son titre exact est rôle non confirmé.\n\nPour la contacter : profil.");
+  assert.equal(stripCitations("Une citation de Cicéron, pas un marqueur."), "Une citation de Cicéron, pas un marqueur.");
+});
