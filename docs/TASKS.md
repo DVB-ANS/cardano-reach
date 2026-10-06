@@ -17,6 +17,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 3. **VPS et Docker** (`infra/`)
    - [ ] Construire l'image agent sur le VPS (`docker build -f apps/reach-agent/Dockerfile -t reach-agent .`), la lancer
      sur `127.0.0.1:3000` uniquement, tester avec `research.ts` via `EVE_URL`.
+   - [ ] **Postgres + MPS : suivre `docs/MPS-SETUP.md`** (installation, vérifications, financement, valeurs à transmettre).
    - [ ] `infra/docker-compose.yml` : Postgres 16 (base `mps_hackathon`) + Masumi Payment Service (port 3012 sur
      127.0.0.1), clé Blockfrost Preprod, migrations, seed **avec sortie supprimée**, selling wallet financé via
      dispenser.masumi.network.

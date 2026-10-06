@@ -9,6 +9,7 @@ datée d'entreprises, mode `sourcing` (fournisseurs) ou `leads` (clients, style 
 Brief complet : `BRIEF.md`. Plan d'implémentation (lots, contrat, jalons M0-M6) : `docs/PLAN.md`.
 Pour reprendre le projet (coéquipier, nouvelle session) : `docs/ONBOARDING.md`.
 Roadmap (démo → e-mail entreprise → envoi validé) : `docs/ROADMAP.md`. Qui fait quoi : `docs/TASKS.md`.
+Nœud de paiement Masumi (Postgres + MPS sur le VPS) : `docs/MPS-SETUP.md`.
 
 ## Structure
 
