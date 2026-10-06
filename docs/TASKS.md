@@ -10,6 +10,15 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [ ] Golden 9/9 avec `gpt-6.1-sol` (`npm run golden`).
    - [ ] Plafond de coût par session (`limits.maxTokenCostUsdPerSession` dans `agent/agent.ts`).
    - [ ] Vérification codée des liens avant de rendre le rapport (« no link, no line » garanti par le code).
+1 bis. **Golden et robustesse de l'agent** (relecture du 2026-10-07)
+   - [ ] Golden : retirer le cas 6 (market maker), passer le 5 à `minRows: 3`, exiger 0 ligne au 9, préciser le 7 ;
+     plus tard ajouter les cas « personne » 6, 10, 11 du `BRIEF.md` §4 et un cas EN, hors périmètre, hors niche.
+   - [ ] `golden.ts` : vérifier que les liens répondent, une date ou « non daté » par ligne, verdict et premier message
+     présents, « why now » en mode leads, temps maximum.
+   - [ ] `??` → `||` dans `scripts/launch.ts` (`EVE_PORT`) et `src/search/cache.ts` (`REACH_CACHE_DIR`).
+   - [ ] Refuser de démarrer sans `OPENAI_API_KEY` en `start` ; vérifier au premier `docker build` que `eve build` ne
+     fige pas `chatgpt()` dans l'image.
+   - [ ] Modèle de démo forcé (`REACH_MODEL=gpt-6.1-sol`) et plafond de coût par session.
 2. **Canaux sociaux**
    - [ ] Comptes X et Reddit dédiés au projet, identifiants configurés (`TWITTER_AUTH_TOKEN`, `TWITTER_CT0`,
      `credential.json` de rdt-cli).
@@ -56,10 +65,19 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [ ] Biome pour `apps/worker/` (et `apps/reach-agent/` si Armand le veut).
    - [ ] Logs JSON avec `taskId` / `sessionId`, healthchecks.
    - [ ] Protection de `main` quand le repo passe public.
-5. **Plus tard : lot « personne / e-mail / hook »** (`ROADMAP.md` phase 5)
+5. **Juste après M2 : « le bon humain » (personne / e-mail / hook)** (`ROADMAP.md` phase 5, décision produit du 2026-10-07)
    - [ ] Lot 1 gratuit : Exa people, LinkedIn public, pages équipe, plateformes freelance, theHarvester, variantes,
      MX / catch-all, actus + ATS, `gh api`, règle du hook et sa vérification codée.
    - [ ] Préalables avec Armand : PR contrat, réécriture du garde-fou e-mails, conservation des données personnelles.
+
+## Avant de passer le repo en public (ensemble)
+
+- [ ] Plus d'e-mail perso, de chemin `/Users/...` ni d'ID privé dans les docs (fait pour `docs/state/worker.md` et
+  `docs/PLAN.md` le 2026-10-07 ; relire le reste).
+- [ ] Pitch, script vidéo, schéma du README et front alignés sur les canaux réellement actifs (web, LinkedIn public,
+  GitHub) ; front : « 1 test USDM » au lieu de « 1 USDM », pas de « verified » tant que la vérification des liens
+  n'est pas codée, liens « Open Sokosumi » vers le Coworker.
+- [ ] Protection de `main` une fois public.
 
 ## Armand, ou le premier qui n'a plus rien à faire
 
