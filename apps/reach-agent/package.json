@@ -1,0 +1,27 @@
+{
+  "name": "reach-agent",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local scripts/dev.ts",
+    "build": "eve build",
+    "start": "eve start",
+    "typecheck": "tsc -p tsconfig.json",
+    "research": "node --env-file-if-exists=.env.local scripts/research.ts",
+    "bench": "node --env-file-if-exists=.env.local scripts/bench-search.ts",
+    "golden": "node --env-file-if-exists=.env.local scripts/golden.ts",
+    "test": "node --test 'src/**/*.test.ts'"
+  },
+  "dependencies": {
+    "ai": "7.0.127",
+    "eve": "0.71.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1",
+    "typescript": "7.0.2"
+  }
+}

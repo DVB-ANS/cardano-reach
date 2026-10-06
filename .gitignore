@@ -6,3 +6,6 @@ node_modules/
 .postgres.env
 *.log
 .DS_Store
+.eve/
+tests/golden/out/
+dist/
