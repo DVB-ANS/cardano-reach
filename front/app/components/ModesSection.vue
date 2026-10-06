@@ -1,66 +1,46 @@
 <script setup lang="ts">
 const modes = [
   {
-    n: '01',
-    name: 'Sourcing',
-    who: 'You buy.',
+    id: 'sourcing',
     img: '/images/key.webp',
     alt: 'A giant key lying in a starry field',
-    ask: 'I need a titanium fastener supplier, EN 9100 certified, small batches, in Europe.',
-    gets: ['Capacity & certifications, each with a proof link', 'Country and delivery zone', 'Red flags worth checking', 'A first RFQ message, ready to copy'],
+    title: 'Suppliers when you buy',
+    text: 'Machining, certified parts, auditors, integrators. Reach checks capacity and certifications, links the proof, flags what to verify and drafts your RFQ.',
+    chips: ['capacity', 'certifications', 'red flags', 'rfq draft'],
   },
   {
-    n: '02',
-    name: 'Leads',
-    who: 'You sell.',
-    img: '/images/portal-red.webp',
-    alt: 'A glowing doorway opening onto red light',
-    ask: 'We build battery test benches. Who needs one right now?',
-    gets: ['Target accounts that fit your offer', 'A dated “why now” signal per account', 'An approach angle for each one', 'A first outreach message, ready to copy'],
+    id: 'leads',
+    img: '/images/booth.webp',
+    alt: 'A lone phone booth under a spiral galaxy',
+    title: 'Clients when you sell',
+    text: 'Accounts that need what you sell, right now. Each one comes with a dated “why now” signal, an approach angle and a first message.',
+    chips: ['fit', 'why now', 'angle', 'first message'],
   },
 ]
 </script>
 
 <template>
-  <section id="modes" class="relative py-28 sm:py-36">
-    <div class="pointer-events-none absolute inset-0 stipple opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-8">
-      <div class="max-w-2xl">
-        <p v-reveal class="eyebrow">Two modes, one engine</p>
-        <h2 v-reveal="100" class="mt-4 font-display text-5xl leading-[.95] sm:text-6xl">
-          Suppliers when you buy.<br><em class="text-ember">Clients</em> when you sell.
-        </h2>
+  <section id="modes" class="space-y-24 px-3 py-28 sm:space-y-32 sm:px-5 sm:py-40">
+    <article
+      v-for="(m, i) in modes" :key="m.id"
+      class="grid items-start gap-6 md:grid-cols-2 md:gap-5"
+    >
+      <div :class="i % 2 && 'md:order-2'">
+        <div v-reveal class="group relative aspect-[4/3] overflow-hidden corner-lg">
+          <img :src="m.img" :alt="m.alt" loading="lazy" class="size-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-105">
+          <span class="chip absolute left-4 top-4">mode 0{{ i + 1 }}</span>
+        </div>
+        <h2 v-chars class="wide mt-4 text-[clamp(1.6rem,3.2vw,3rem)]">{{ m.title }}</h2>
+        <div class="mt-3"><ChipLink href="#how" :label="`${m.id} mode`" icon="right" /></div>
       </div>
 
-      <div class="mt-16 grid gap-8 md:grid-cols-2">
-        <article
-          v-for="(m, i) in modes" :key="m.n" v-reveal="i * 160"
-          class="group frame bg-ultra-deep/50 transition duration-500 hover:-translate-y-2"
-        >
-          <div class="relative aspect-[16/9] overflow-hidden">
-            <img :src="m.img" :alt="m.alt" loading="lazy" class="size-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-110">
-            <div class="absolute inset-0 bg-gradient-to-t from-ultra-deep via-transparent" />
-            <span class="absolute left-5 top-5 font-mono text-xs text-cream/80">MODE {{ m.n }}</span>
-          </div>
-
-          <div class="p-6 sm:p-8">
-            <div class="flex items-baseline justify-between gap-4">
-              <h3 class="font-display text-4xl">{{ m.name }}</h3>
-              <span class="font-display text-2xl italic text-ember">{{ m.who }}</span>
-            </div>
-
-            <blockquote class="mt-5 border-l-2 border-ember pl-4 text-cream/85">“{{ m.ask }}”</blockquote>
-
-            <ul class="mt-6 grid gap-2.5 text-sm text-cream/75">
-              <li v-for="g in m.gets" :key="g" class="flex gap-3">
-                <span class="mt-2 size-1 shrink-0 rounded-full bg-cream/60 transition-colors group-hover:bg-ember" />
-                {{ g }}
-              </li>
-            </ul>
-          </div>
-        </article>
+      <div class="md:px-[8%] md:pt-4" :class="i % 2 && 'md:order-1'">
+        <span class="label">// {{ m.id }}</span>
+        <p v-reveal="150" class="mt-3 max-w-sm text-[15px] leading-relaxed text-cream/80">{{ m.text }}</p>
+        <ul v-reveal="250" class="mt-5 flex max-w-sm flex-wrap gap-2">
+          <li v-for="c in m.chips" :key="c" class="chip-outline">{{ c }}</li>
+        </ul>
       </div>
-    </div>
+    </article>
   </section>
 </template>

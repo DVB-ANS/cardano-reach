@@ -1,17 +1,14 @@
 <template>
   <div>
-    <SiteNav />
+    <SitePreloader />
+    <SiteHeader />
     <main>
       <HeroSection />
-      <ProblemSection />
+      <FeaturedSection />
       <ModesSection />
-      <PipelineSection />
-      <DemoSection />
-      <KeywordMarquee />
-      <NichesSection />
-      <GuardrailsSection />
+      <HowSection />
       <PaymentSection />
-      <FinalSection />
+      <SiteFooter />
     </main>
   </div>
 </template>
