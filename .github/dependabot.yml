@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /apps/reach-agent
+    schedule:
+      interval: weekly
+    groups:
+      reach-agent:
+        patterns: ["*"]
+
+  # L'écosystème npm de Dependabot gère aussi pnpm (pnpm-lock.yaml).
+  - package-ecosystem: npm
+    directory: /front
+    schedule:
+      interval: weekly
+    groups:
+      front:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

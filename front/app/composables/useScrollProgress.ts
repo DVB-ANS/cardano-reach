@@ -16,14 +16,17 @@ export function useScrollProgress(el: Ref<HTMLElement | undefined>, mode: Mode =
       raf = 0
       const r = node.getBoundingClientRect()
       const vh = window.innerHeight
-      const v = mode === 'enter'
-        ? (vh - r.top) / (vh * 0.9)
-        : mode === 'pin'
-          ? -r.top / Math.max(1, r.height - vh)
-          : (vh - r.top) / (vh + r.height)
+      const v =
+        mode === 'enter'
+          ? (vh - r.top) / (vh * 0.9)
+          : mode === 'pin'
+            ? -r.top / Math.max(1, r.height - vh)
+            : (vh - r.top) / (vh + r.height)
       node.style.setProperty('--p', Math.min(1, Math.max(0, v)).toFixed(4))
     }
-    const schedule = () => { raf ||= requestAnimationFrame(update) }
+    const schedule = () => {
+      raf ||= requestAnimationFrame(update)
+    }
 
     update()
     window.addEventListener('scroll', schedule, { passive: true })

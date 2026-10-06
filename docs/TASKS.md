@@ -47,8 +47,9 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [ ] Image worker + agent-api (Dockerfile dans `apps/worker/`) pour le compose d'Armand.
 4. **Tooling restant** (dans les temps morts)
    - [ ] Job worker dans la CI (typecheck + tests) dès que `apps/worker/` existe.
-   - [ ] README racine (quoi, schéma, lancer en local, déployer).
-   - [ ] Biome (lint + format) par app, Dependabot.
+   - [x] README racine (quoi, schéma, lancer en local, déployer).
+   - [x] Biome (lint + format) sur `front/`, en CI ; Dependabot (agent, front, actions).
+   - [ ] Biome pour `apps/worker/` (et `apps/reach-agent/` si Armand le veut).
    - [ ] Logs JSON avec `taskId` / `sessionId`, healthchecks.
    - [ ] Protection de `main` quand le repo passe public.
 5. **Plus tard : lot « personne / e-mail / hook »** (`ROADMAP.md` phase 5)

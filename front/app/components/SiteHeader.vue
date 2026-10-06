@@ -30,7 +30,7 @@ onMounted(() => {
       </a>
       <div class="flex items-center gap-6 sm:gap-8">
         <span class="label cursor">your b2b scout</span>
-        <button class="chip" :aria-expanded="open" @click="open = !open">
+        <button type="button" class="chip" :aria-expanded="open" @click="open = !open">
           <span v-scramble>{{ open ? 'close' : 'menu' }}</span>
         </button>
       </div>

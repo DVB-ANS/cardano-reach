@@ -6,23 +6,27 @@
  */
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/_#*<>'
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(nuxtApp => {
   let observer: IntersectionObserver | undefined
   let loaded: Promise<void> | undefined
 
-  const whenLoaded = () => loaded ??= new Promise<void>((resolve) => {
-    if (document.documentElement.classList.contains('is-loaded')) return resolve()
-    window.addEventListener('reach:loaded', () => resolve(), { once: true })
-  })
+  const whenLoaded = () =>
+    (loaded ??= new Promise<void>(resolve => {
+      if (document.documentElement.classList.contains('is-loaded')) return resolve()
+      window.addEventListener('reach:loaded', () => resolve(), { once: true })
+    }))
 
   const observe = (el: HTMLElement) => {
-    observer ??= new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-        observer!.unobserve(entry.target)
-        whenLoaded().then(() => entry.target.classList.add('is-in'))
-      }
-    }, { threshold: 0.01 })
+    observer ??= new IntersectionObserver(
+      (entries, obs) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          obs.unobserve(entry.target)
+          whenLoaded().then(() => entry.target.classList.add('is-in'))
+        }
+      },
+      { threshold: 0.01 },
+    )
     observer.observe(el)
   }
 
@@ -71,9 +75,11 @@ export default defineNuxtPlugin((nuxtApp) => {
         const start = performance.now()
         const step = (now: number) => {
           const done = Math.floor(((now - start) / 380) * original.length)
-          el.textContent = [...original].map((c, i) =>
-            i < done || c === ' ' ? c : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]!.toLowerCase(),
-          ).join('')
+          el.textContent = [...original]
+            .map((c, i) =>
+              i < done || c === ' ' ? c : GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length)).toLowerCase(),
+            )
+            .join('')
           if (done < original.length) el._scr = requestAnimationFrame(step)
         }
         el._scr = requestAnimationFrame(step)
