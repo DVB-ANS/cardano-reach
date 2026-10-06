@@ -248,3 +248,18 @@ connexion du Coworker au Workspace TOKEN2049 envoyée (`PENDING`).
   `reach_search`, évènement `reach:loaded`), Vendor « Cardano Reach » (le CLI ne sait pas renommer un Vendor), slug du
   Coworker `reach`, et les entrées passées de ce DEVLOG.
 - Footer du front : logo passé de 15,5 vw à 12,5 vw, sinon « RICHARD // » déborde.
+
+## 2026-10-07 — Pré-vol, logs JSON et pouls du worker ; M2 chez Armand
+
+**Quoi** : `npm run doctor` (pré-vol en lecture seule : config, CLI, clé runtime, Tasks, agent, exécuteur unique, et
+avec `--paid` : MPS, enregistrement, clé MPS limitée, Blockfrost), logs JSON d'une ligne par évènement (`taskId`,
+`phase`, `stage`), pouls `.local/health.json` et `npm run health` pour le `HEALTHCHECK` Docker.
+
+**Pourquoi** : Noé n'a pas d'accès SSH à la machine d'Armand ; M2 se lance donc chez Armand, et il faut qu'il sache
+en une commande si tout est prêt, sans aller-retour.
+
+**Cheminement** :
+- Le tunnel SSH du plan disparaît : le worker tourne sur la machine du MPS, la clé runtime du Coworker passe de Noé à
+  Armand par canal privé, l'`ADMIN_KEY` ne quitte pas la machine d'Armand.
+- Pouls tolérant (10 min) : une recherche occupe la boucle quelques minutes, un seuil court ferait redémarrer Docker
+  en pleine Task.

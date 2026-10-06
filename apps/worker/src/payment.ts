@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { taskHash } from "./hash.ts";
+import { log } from "./log.ts";
 import type { Mps } from "./mps.ts";
 import type { Registration } from "./registration.ts";
 import type { Journal, PaidFlow, PaidHooks } from "./runner.ts";
@@ -227,7 +228,7 @@ export function createPaidFlow(options: {
         const pending = hooks.save({ ...j, paid: { ...p, stage: "complete-pending" } });
         const response = await options.core.post(`/v1/tasks/${encodeURIComponent(j.taskId)}/events`, { status: "COMPLETED", comment: p.result });
         const eventId = (response as { data?: { id?: unknown } } | undefined)?.data?.id;
-        console.log(`Completed paid ${j.taskId}`);
+        log.info("paid task completed", { taskId: j.taskId, blockchainIdentifier: p.payment?.blockchainIdentifier ?? null });
         return hooks.save({
           ...pending,
           phase: "completed",
@@ -246,14 +247,14 @@ export function createPaidFlow(options: {
           unit: USDM,
           blockfrostKey: options.blockfrostKey,
         });
-        if (settlement.verified) console.log(`Settled ${j.taskId}: ${settlement.txHash} (${settlement.netAtomicUnits} units)`);
+        if (settlement.verified) log.info("payment settled", { taskId: j.taskId, txHash: settlement.txHash ?? null, netAtomicUnits: settlement.netAtomicUnits ?? null });
         return hooks.save({ ...j, paid: { ...p, observed, settlement, stage: settlement.verified ? "settled" : "awaiting-withdrawal" } });
       }
       case "settled":
         return j;
       default:
         // terms-pending, purchase-pending, submit-pending, complete-pending : issue inconnue, jamais rejouée.
-        console.error(`Task ${j.taskId} requires inspection at ${p.stage}`);
+        log.warn("task requires inspection", { taskId: j.taskId, stage: p.stage });
         return hooks.save({ ...j, phase: "inspection-required", note: `payment ${p.stage}` });
     }
   }

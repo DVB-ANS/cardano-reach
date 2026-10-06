@@ -30,7 +30,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [ ] `infra/docker-compose.yml` : Postgres 16 (base `mps_hackathon`) + Masumi Payment Service (port 3012 sur
      127.0.0.1), clé Blockfrost Preprod, migrations, seed **avec sortie supprimée**, selling wallet financé via
      dispenser.masumi.network.
-   - [ ] Donner à Noé l'accès au MPS (tunnel `ssh -N -L 3012:127.0.0.1:3012 <vps>`) et la clé MPS du worker.
+   - [ ] Faire tourner le worker sur ta machine pour M2 (clé runtime du Coworker reçue de Noé), `npm run doctor -- --paid`.
    - [ ] Sauvegarde `pg_dump` quotidienne hors du VPS dès que les wallets existent.
    - [ ] Tester le port 25 sortant (`nc -vz gmail-smtp-in.l.google.com 25`) pour la vérification d'e-mails plus tard.
    - [ ] Domaine `REACH_DOMAIN` + Caddy (seule `https://REACH_DOMAIN/agent-api/` est publique).
@@ -54,7 +54,8 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] M1 : Task gratuite avec question → réponse → rapport (preuves : `docs/state/worker.md`).
 3. **Paiement** → **M2**
    - [x] Porter `payment.ts`, `settlement.ts`, `registration.ts`, `agent-api.ts` (testés avec un faux MPS).
-   - [ ] Brancher le worker sur le MPS d'Armand (tunnel SSH), enregistrement Masumi (B4).
+   - [ ] M2 sur la machine d'Armand (pas d'accès SSH pour Noé) : transmettre la clé runtime du Coworker par canal
+     privé, puis procédure de `docs/state/worker.md` (`npm run doctor -- --paid` avant la Task payée).
    - [ ] M2 : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
    - [ ] Image worker + agent-api (Dockerfile dans `apps/worker/`) pour le compose d'Armand.
 4. **Tooling restant** (dans les temps morts)
@@ -63,7 +64,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] Biome (lint + format) sur `front/`, en CI ; Dependabot (agent, worker, front, actions ; majeures de
      `@types/node` ignorées).
    - [ ] Biome pour `apps/worker/` (et `apps/reach-agent/` si Armand le veut).
-   - [ ] Logs JSON avec `taskId` / `sessionId`, healthchecks.
+   - [x] Logs JSON du worker (`taskId`, `phase`, `stage`), pouls `npm run health`, pré-vol `npm run doctor`.
    - [ ] Protection de `main` quand le repo passe public.
 5. **Juste après M2 : « le bon humain » (personne / e-mail / hook)** (`ROADMAP.md` phase 5, décision produit du 2026-10-07)
    - [ ] Lot 1 gratuit : Exa people, LinkedIn public, pages équipe, plateformes freelance, theHarvester, variantes,

@@ -1,6 +1,8 @@
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { loadConfig } from "./config.ts";
+import { beat } from "./health.ts";
+import { errorMessage, log } from "./log.ts";
 import { Agent } from "./eve.ts";
 import { acquireWorkerLock } from "./lock.ts";
 import { createMps, requireSavedRuntimeToken } from "./mps.ts";
@@ -39,20 +41,22 @@ if (config.paidEnabled) {
 }
 const runner = new Runner(config, soko, agent, paid);
 runner.markUncertain();
-console.log(`Worker ${process.pid} polling Coworker ${config.coworkerId} (${config.scope.kind}, ${paid ? "paid" : "free"}), every ${config.pollMs} ms`);
-
-const short = (error: unknown) => (error instanceof Error ? error.message : String(error)).slice(0, 300);
+log.info("worker started", { pid: process.pid, coworkerId: config.coworkerId, scope: config.scope.kind, mode: paid ? "paid" : "free", pollMs: config.pollMs });
 
 for (;;) {
+  let error: string | undefined;
   try {
     for (const task of await soko.readyTasks()) {
       if (runner.known(task.id)) continue;
-      console.log(`Starting ${task.id}`);
-      await runner.begin(task).catch((error: unknown) => console.error(`Task ${task.id} could not start: ${short(error)}`));
+      log.info("task received", { taskId: task.id });
+      await runner.begin(task).catch((cause: unknown) => log.error("task could not start", { taskId: task.id, error: errorMessage(cause) }));
     }
-  } catch (error) {
-    console.error(`Polling failed: ${short(error)}`);
+  } catch (cause) {
+    error = errorMessage(cause);
+    log.error("polling failed", { error });
   }
-  for (const id of runner.activeTaskIds()) await runner.advance(id);
+  const active = runner.activeTaskIds();
+  for (const id of active) await runner.advance(id);
+  beat(config.dataDir, { ok: !error, activeTasks: active.length, ...(error ? { error } : {}) });
   await sleep(config.pollMs);
 }
