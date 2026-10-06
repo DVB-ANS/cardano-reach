@@ -2,6 +2,7 @@
   "name": "reach-front",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.8.1",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
