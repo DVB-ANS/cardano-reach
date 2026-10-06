@@ -69,6 +69,14 @@ export function repairTables(report: string): string {
   return lines.join("\n");
 }
 
+// La recherche web d'OpenAI ajoute ses propres citations `([domaine](url?utm_source=openai))` à côté des liens
+// sources : on les retire (le lien source reste) et on enlève le paramètre de suivi des liens restants.
+export function stripCitations(report: string): string {
+  return report
+    .replace(/[ \t]*\(\[[^\]\n]*\]\([^)\s]*[?&]utm_source=openai[^)\s]*\)\)/g, "")
+    .replace(/([?&])utm_source=openai(&?)/g, (_, sep: string, next: string) => (next ? sep : ""));
+}
+
 // Tronque à la dernière ligne complète sous MAX_REPORT_BYTES (contrat), avec une mention explicite.
 export function fitReport(report: string): string {
   const encoder = new TextEncoder();
@@ -148,7 +156,7 @@ export class Agent {
     assertTurn(result, "Research");
     const report = result.message?.trim();
     if (!report) throw new Error("Research returned no report");
-    return { session: ref(session), report: fitReport(repairTables(report)) };
+    return { session: ref(session), report: fitReport(repairTables(stripCitations(report))) };
   }
 
   // API standard Masumi : pas d'humain pour répondre, l'intake avance avec des hypothèses explicites.

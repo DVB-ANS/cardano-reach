@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MAX_REPORT_BYTES } from "../../../packages/contract/src/index.ts";
-import { fitReport, repairTables } from "./eve.ts";
+import { fitReport, repairTables, stripCitations } from "./eve.ts";
 
 test("fitReport laisse un rapport court intact", () => {
   assert.equal(fitReport("# Richard\n\nok"), "# Richard\n\nok");
@@ -31,4 +31,15 @@ test("repairTables ne touche pas un tableau correct ni un texte sans tableau", (
   assert.equal(repairTables(text), text);
   const escaped = "| a \\| b | c |\n|---|---|---|";
   assert.equal(repairTables(escaped), "| a \\| b | c |\n|---|---|");
+});
+
+test("stripCitations retire les citations automatiques et le suivi, garde les liens sources (cas réel)", () => {
+  const row =
+    "| 1 | [Capacités](https://poggipolini.it/en/centreofexcellence.html) ([poggipolini.it](https://poggipolini.it/en/aerospace.html?utm_source=openai)) · rôle non confirmé ([it.linkedin.com](https://it.linkedin.com/in/x?utm_source=openai)) | [Activité](https://www.lls.it/en/?utm_source=openai) | [B](https://b.fr/p?id=3&utm_source=openai&x=1) |";
+  assert.equal(
+    stripCitations(row),
+    "| 1 | [Capacités](https://poggipolini.it/en/centreofexcellence.html) · rôle non confirmé | [Activité](https://www.lls.it/en/) | [B](https://b.fr/p?id=3&x=1) |",
+  );
+  const clean = "[Certificat](https://sffactory.eu/cert.pdf) (valide jusqu'en 2028)";
+  assert.equal(stripCitations(clean), clean);
 });
