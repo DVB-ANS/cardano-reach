@@ -7,7 +7,8 @@ Ordre : tooling minimum → chemin payé (éliminatoire) → démo → reste du 
 
 Propriétaires : **A** = Armand (agent, VPS, Docker, déploiement), **N** = Noé (Sokosumi, worker, paiement, tooling).
 Liste de tâches par personne : `docs/TASKS.md`.
-Ce qui n'est pas vérifié est marqué **[À VÉRIFIER]**. Plan détaillé des lots A/B : `docs/PLAN.md`.
+Ce qui n'est pas vérifié est marqué **[À VÉRIFIER]**. Plan détaillé des lots A/B : `docs/PLAN.md`. Vérifications
+sourcées de la phase 5 : `docs/research/phase5.md`.
 
 ## État au 2026-10-07
 
@@ -15,10 +16,11 @@ Ce qui n'est pas vérifié est marqué **[À VÉRIFIER]**. Plan détaillé des l
 | --- | --- |
 | Contrat worker ↔ agent | fait, gelé (`packages/contract`) |
 | Agent eve (`apps/reach-agent`) | fait : moteur multi-canaux, 4 niches, garde de phase, SSRF, 22 tests verts |
-| Canaux | web / LinkedIn / lecture de pages attendent `EXA_API_KEY` ; X et Reddit attendent des comptes dédiés ; YouTube bloqué en local |
+| Canaux | web / LinkedIn / lecture de pages via l'API Exa ; X et Reddit attendent des comptes dédiés ; YouTube bloqué en local |
 | Front (`front/`) | landing statique faite, pas déployée |
-| Worker, paiement, infra | **rien** (`apps/worker/`, `infra/` absents) |
-| Coworker Sokosumi, MPS, wallets | **rien** |
+| Coworker Sokosumi | Vendor « Cardano Reach », Coworker « Reach » (fiche remplie), clé runtime |
+| Worker (`apps/worker`) | **M1 prouvé** sur Sokosumi Preprod ; paiement Masumi porté et testé hors ligne (26 tests) |
+| MPS, wallets, infra | **rien** : attend Postgres + MPS sur le VPS d'Armand (seul blocage de M2) |
 
 ---
 
@@ -27,13 +29,13 @@ Ce qui n'est pas vérifié est marqué **[À VÉRIFIER]**. Plan détaillé des l
 Ce qui protège la démo plutôt que de la retarder : repo public à la soumission, clés et mnémoniques manipulés, deux
 développeurs qui mergent en parallèle.
 
-- [x] **CI GitHub Actions** (`.github/workflows/ci.yml`) : gitleaks sur tout l'historique, agent (`npm ci`, typecheck,
-  tests), front (`pnpm install --frozen-lockfile`, `pnpm generate`). PR #9.
+- [x] **CI GitHub Actions** (`.github/workflows/ci.yml`) : gitleaks sur tout l'historique, agent et worker (`npm ci`,
+  typecheck, tests), front (Biome, `pnpm generate`). PR #9, #10, #17.
 - [x] **gitleaks** : `.gitleaks.toml` (règles par défaut + faux positifs) et hook `.githooks/pre-commit` sur le staged.
   Activation par clone : `git config core.hooksPath .githooks` + `brew install gitleaks`.
 - [x] **Template de PR** (quoi, pourquoi, comment tester, aucun secret).
 - [x] **Suppression auto** des branches mergées (réglage GitHub activé).
-- [ ] **Protection de `main`** (PR + checks `secrets`, `agent`, `front` obligatoires) : refusée sur un repo privé
+- [ ] **Protection de `main`** (PR + checks `secrets`, `agent`, `worker`, `front` obligatoires) : refusée sur un repo privé
   d'organisation gratuite (HTTP 403) ; à activer dès que le repo passe public pour la soumission.
 - [ ] **Plafond de coût eve** (A) : `limits.maxTokenCostUsdPerSession` dans `apps/reach-agent/agent/agent.ts`.
 - [ ] **Sauvegarde MPS** (A) : `pg_dump` quotidien hors du VPS, **dès que les wallets existent**.
@@ -45,13 +47,13 @@ développeurs qui mergent en parallèle.
 Sans ça, rien d'autre ne compte.
 
 - [ ] **Clés** (A) : `OPENAI_API_KEY`, `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
-- [ ] **B1 Compte** (N) : `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal`, clé runtime.
+- [x] **B1 Compte** (N) : `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal`, clé runtime.
 - [ ] **B1 Serveur** (A) : SSH au VPS, Postgres + MPS en Docker (port 3012 sur 127.0.0.1), clé
   Blockfrost Preprod, seed (sortie supprimée), selling wallet financé.
-- [ ] **B2 Worker** (N) : cloner `masumi-network/demo-agent-token2049` (branche `live-demo-name-finder`), porter en
-  TS strict dans `apps/worker/src/` (tableau de correspondance dans `PLAN.md` §B2).
-- [ ] **B3 Intake** (N) : questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon.
-- [ ] **M1** : Task gratuite avec question → réponse → rapport.
+- [x] **B2 Worker** (N) : cloner `masumi-network/demo-agent-token2049` (branche `live-demo-name-finder`), porter en
+  TS strict dans `apps/worker/src/` (tableau de correspondance dans `PLAN.md` §B2). Paiement compris (#18).
+- [x] **B3 Intake** (N) : questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon.
+- [x] **M1** : Task gratuite avec question → réponse → rapport (#17, preuves dans `docs/state/worker.md`).
 - [ ] **M2** : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
 
 **Sortie** : un Task ID payé + un hash de collecte confirmé, notés dans `docs/state/worker.md`.
@@ -117,16 +119,17 @@ fixtures réelles + tests comme les canaux existants. **Après M2.**
 
 | # | Outil | Rôle | Effort |
 | --- | --- | --- | --- |
-| 1 | Exa `category: "people"` **[À VÉRIFIER : nom exact de la catégorie dans l'API]** | recherche sémantique de profils (« Head of Procurement, usinage aéro, France ») | très faible, attend `EXA_API_KEY` |
+| 1 | Exa `category: "people"` (vérifié ; ne jamais passer de filtre de date ni `excludeDomains` : erreur 400) | recherche sémantique de profils (« Head of Procurement, usinage aéro, France ») | très faible, attend `EXA_API_KEY` |
 | 2 | Requêtes `site:linkedin.com/in "<rôle>" "<entreprise>"` (Exa / `web_search`) ou `m8sec/CrossLinked` | nom + poste sans compte LinkedIn | faible |
 | 3 | Pages équipe / about / presse via `read_pages` (déjà là ; pas de crawl4ai, inutile) | confirme le rôle avec une URL officielle = preuve | faible |
-| F | Plateformes freelance via Exa `includeDomains` : Malt, Codeur.com, Comet, Crème de la Crème, Upwork, Fiverr, Toptal, Freelancer.com ; Behance / Dribbble pour le design | le cas « trouve-moi quelqu'un dans tel domaine » | faible |
+| F | Plateformes freelance (Malt, Codeur.com, Comet, Crème de la Crème, Upwork, Fiverr, Toptal, Freelancer.com) : seulement le titre et l'URL renvoyés par Exa, **sans lire la page** ; Behance / Dribbble pour le design | le cas « trouve-moi quelqu'un dans tel domaine », contact **sur** la plateforme | faible |
 | 14 | `gh api` (repos, PR, commits récents) | devs, crypto, SaaS : qui fait vraiment le travail | très faible (canal github existant) |
 | 4 | `stickerdaniel/linkedin-mcp-server` | profil complet, ancienneté, posts | moyen ; **compte dédié, risque de ban, contraire aux CGU : jamais sur le chemin de la démo** |
 
-Garde-fous plateformes **[À VÉRIFIER : CGU de chaque plateforme]** : Upwork interdit de contourner la plateforme pour
-le contrat et le paiement ; Malt et Upwork interdisent le scraping. On lit des pages publiques indexées, on renvoie
-vers le profil, et le contact hors plateforme n'utilise qu'une adresse publiée par la personne elle-même.
+Garde-fous plateformes (vérifiés, `docs/research/phase5.md` §2) : Malt, Upwork, Fiverr et Codeur.com interdisent la
+collecte automatisée et le contournement. Liste de blocage de lecture (`read_pages`, Exa `/contents`) pour ces domaines ;
+la ligne du rapport donne l'URL du profil et « contact via la plateforme », sans e-mail ni accroche hors plateforme.
+Les CGU de Malt sont à relire à la main (lecture automatique bloquée).
 
 ### 5.2 Trouver et vérifier l'e-mail (outil eve `find_contact`)
 
@@ -136,7 +139,7 @@ vers le profil, et le contact hors plateforme n'utilise qu'une adresse publiée 
 | 5 | `laramies/theHarvester` (Python, dans le conteneur agent) | vrais e-mails publics du domaine → format (`p.nom@`, `prenom@`…) | faible |
 | 6 | Générateur de variantes (~20 lignes de TS, sans dépendance) | `prenom.nom`, `pnom`, `prenom`… à partir du nom et du domaine | très faible |
 | — | MX + détection catch-all (`node:dns`, adresse aléatoire) | élimine les domaines morts, repère les catch-all | très faible |
-| 7 | `reacherhq/check-if-email-exists` (Docker, API HTTP) ; alternative `AfterShip/email-verifier` | vérification SMTP sans envoi | moyen ; **d'abord tester le port 25 sortant du VPS** (`nc -vz gmail-smtp-in.l.google.com 25`) ; une IP qui vérifie en série finit en liste noire |
+| 7 | `reacherhq/check-if-email-exists` (Docker, API HTTP) ; alternative `AfterShip/email-verifier` | vérification SMTP sans envoi | moyen ; port 25 sortant bloqué par défaut chez presque tous les hébergeurs (sauf OVHcloud) : tester le VPS (`nc -vz gmail-smtp-in.l.google.com 25`) ; une IP qui vérifie en série finit en liste noire |
 | 8 | API Hunter.io (offre gratuite ~25 recherches / mois) | format du domaine + score quand 5 à 7 échouent | faible |
 
 Statut affiché dans le rapport, avec la source de chaque adresse :
@@ -157,7 +160,7 @@ Une adresse 🟡 n'est **jamais** envoyée automatiquement (les rebonds abîment
 | 9 | GDELT / Google News RSS + trafilatura | levée, nouvelle usine, contrat, nomination | faible |
 | 10 | API ATS (Greenhouse, Lever, Ashby), JobSpy en secours | « vous recrutez 3 ingénieurs qualité » : excellent déclencheur | faible |
 | 14 | `gh api` | repos et PR récents | très faible |
-| 12 | `youtube-transcript-api` | citation d'un talk, podcast, salon **[À VÉRIFIER : IP de VPS souvent bloquées par YouTube]** | faible |
+| 12 | `youtube-transcript-api` | citation d'un talk, podcast, salon ; IP cloud souvent bloquées : blocage traité comme « pas de transcript » | faible |
 | — | twitter-cli (déjà intégré, #6) | tweets récents, surtout crypto ; **pas twscrape**, doublon | compte dédié |
 | 11 | posts LinkedIn de la personne (via n°4) | l'accroche la plus personnelle | hors démo, comme n°4 |
 
@@ -178,8 +181,9 @@ Vérifié **en code** avant de rendre le rapport (même principe que « no link,
   que `packages/contract/**` et `docs/CONTRACT.md`.
 - **Garde-fous** : réécrire la règle « pas d'e-mail ni de téléphone personnels » (`instructions.md`, `BRIEF.md` §3.4)
   en : adresses publiées par la personne ou génériques ; adresses devinées affichées 🟡 ; jamais de téléphone.
-  **[À VÉRIFIER juridiquement : la prospection B2B par e-mail est tolérée en France si elle concerne la fonction de
-  la personne ; l'Allemagne exige le consentement]**.
+  Vérifié (`docs/research/phase5.md` §5) : en France, prospection B2B par e-mail possible si elle concerne la fonction
+  de la personne, avec information et opposition dès le premier message ; en **Allemagne (§7 UWG), consentement
+  préalable exprès même entre entreprises** → aucun envoi à froid vers l'Allemagne.
 - **Données personnelles** : durée de conservation des noms et adresses dans le cache disque et les logs.
 - **Golden** : ajouter 3 scénarios « personne / freelance » (ex. dev Aiken freelance, responsable achats aéro,
   designer Web3).
@@ -204,7 +208,8 @@ Vérifié **en code** avant de rendre le rapport (même principe que « no link,
   après validation explicite (une question `INPUT_REQUIRED` « J'envoie ces 7 messages ? »), lien de désinscription,
   liste d'opposition, plafond d'envois par jour, journal de chaque envoi.
 - **Hors périmètre** : DM LinkedIn automatisés (interdits par les CGU, risque de bannissement) ; envoi depuis un
-  domaine à nous sans SPF / DKIM / DMARC et préchauffage (délivrabilité).
+  domaine à nous sans SPF / DKIM / DMARC et préchauffage (délivrabilité) ; envoi à froid vers l'Allemagne.
+- L'envoi ne dépend jamais du port 25 : fournisseur d'e-mail (API HTTP ou SMTP authentifié 587/465).
 
 Le principe du brief « l'agent prépare, l'humain envoie » reste vrai jusqu'à la v3, où l'humain **valide** chaque envoi.
 

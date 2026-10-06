@@ -30,8 +30,8 @@ Contrôle avant publication (guide Masumi §6) :
 | Livrable | Preuve | Valeur |
 | --- | --- | --- |
 | URL de l'agent déployé | `https://REACH_DOMAIN/agent-api/` | ⬜ à remplir |
-| Coworker ID | sortie de `coworkers` (Sokosumi) | ⬜ à remplir |
-| Vendor ID | idem | ⬜ à remplir |
+| Coworker ID | sortie de `coworkers` (Sokosumi) | ✅ `01a11272-c015-748f-9f1a-cfd1e504c497` |
+| Vendor ID | idem | ✅ `01a11272-9017-740c-9f1b-cd446384ccb4` |
 | Task d'exemple (texte de la demande) | cas 1 de `BRIEF.md` §4 | ⬜ à remplir |
 | Date de disponibilité de l'agent | déclaration | ⬜ à remplir |
 | Entrée, fonctionnement, résultat réel | captures / extrait du rapport | ⬜ à remplir |
@@ -43,7 +43,7 @@ Contrôle avant publication (guide Masumi §6) :
 
 | Livrable | Preuve | Valeur |
 | --- | --- | --- |
-| Task ID de répétition (gratuite, M1) | ID Sokosumi | ⬜ à remplir |
+| Task ID de répétition (gratuite, M1) | ID Sokosumi | ✅ `01a11285-4080-7548-ba2b-7f000402340b` (Personal Workspace) |
 | Task ID payée (M2) | ID Sokosumi | ⬜ à remplir |
 | Résultat complété | lien ou extrait du rapport | ⬜ à remplir |
 | IDs d'événements de la Task (questions, paiement, résultat) | événements Sokosumi | ⬜ à remplir |

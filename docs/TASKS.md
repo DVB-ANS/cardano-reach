@@ -35,6 +35,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 1. **Compte Sokosumi** (B1)
    - [x] `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal` (IDs : `docs/state/worker.md`).
    - [x] Clé runtime dans `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`) et dans le coffre du CLI.
+   - [x] Fiche marketplace du Coworker (accroche + description EN, `docs/coworker-profile.md`).
    - [ ] Demander tôt l'accès au Workspace TOKEN2049 (validation humaine chez Masumi).
 2. **Worker** (B2, B3) → **M1**
    - [x] Cloner la référence à côté du repo : `git clone -b live-demo-name-finder https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
@@ -49,7 +50,8 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 4. **Tooling restant** (dans les temps morts)
    - [x] Job worker dans la CI (typecheck + tests).
    - [x] README racine (quoi, schéma, lancer en local, déployer).
-   - [x] Biome (lint + format) sur `front/`, en CI ; Dependabot (agent, front, actions).
+   - [x] Biome (lint + format) sur `front/`, en CI ; Dependabot (agent, worker, front, actions ; majeures de
+     `@types/node` ignorées).
    - [ ] Biome pour `apps/worker/` (et `apps/reach-agent/` si Armand le veut).
    - [ ] Logs JSON avec `taskId` / `sessionId`, healthchecks.
    - [ ] Protection de `main` quand le repo passe public.

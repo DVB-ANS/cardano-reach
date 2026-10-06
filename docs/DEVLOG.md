@@ -188,3 +188,23 @@ branchés dans la machine de phases entre le brief et la recherche (`PAID_TASKS_
   (sauf la recherche) passe en `inspection-required`, jamais rejouée.
 - Après la complétion, le worker suit le retrait jusqu'à `settled` (reçu Core + transaction MPS confirmée + montant net
   mesuré via Blockfrost).
+
+## 2026-10-07 — Docs, recherche phase 5, Dependabot, fiche du Coworker
+
+**Quoi** : PR #13 (fiche marketplace), #14 (checklist de soumission, slides, script vidéo), #15 (recherche sourcée de
+la phase 5), #16 (Dependabot suit `apps/worker`, ignore les majeures de `@types/node`), #11 (actions GitHub v7) ;
+fiche du Coworker appliquée sur Sokosumi ; README, ROADMAP, TASKS, ONBOARDING, CLAUDE et BRIEF §13 remis à jour.
+
+**Pourquoi** : la doc décrivait encore le worker comme « à venir » et la roadmap des points tranchés par la recherche.
+
+**Cheminement** :
+- Fiche : seuls les canaux actifs sont cités (web, LinkedIn public, GitHub) ; X, Reddit et YouTube viendront quand ils
+  tourneront sur le VPS.
+- Recherche phase 5 intégrée à la roadmap : Exa `category: "people"` sans filtre de date ; pas de lecture des pages
+  Malt / Upwork / Fiverr / Codeur.com (CGU), lien seulement ; Allemagne : consentement préalable même en B2B ; envoi
+  d'e-mails par un fournisseur, jamais par le port 25.
+- `@types/node` 26 proposé par Dependabot (#12) refusé : les types doivent suivre le runtime Node 24.
+
+**Bugs & fix** :
+- `coworkers update --company` : l'API répond 422 « Unrecognized key: company » ; seuls `caption` et `description` ont
+  été appliqués.
