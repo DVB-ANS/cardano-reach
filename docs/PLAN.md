@@ -506,7 +506,6 @@ Prérequis : Node 24 (`export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`)
   Sans domaine, `apiBaseUrl` vaut `http://<IP du VPS>:21950`, exposé directement, et Caddy est retiré.
 - **Modèle** : `gpt-6-luna` pendant le développement, `gpt-6.1-sol` pour les golden finaux et la démo.
   Si un rapport dépasse 300 s avec sol, on passe à `reasoning: "low"` avant de toucher au reste.
-- **Rejet de l'INPUT_REQUIRED** : si Core refuse `status: "INPUT_REQUIRED"` posté par le Coworker, on poste la question
-  en commentaire seul (sans changer le statut) et on garde la même détection de réponse.
+- **Rejet de l'INPUT_REQUIRED** : sans objet, Core accepte le statut posté par le Coworker (vérifié en M1, 2026-10-07).
 - **Front** : fait (PR #7) — Nuxt 4 + Tailwind 4 statique dans `front/`, DA tirée des illustrations fournies.
   Reste : déploiement statique et lien vers le Coworker.

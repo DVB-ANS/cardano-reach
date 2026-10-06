@@ -380,6 +380,10 @@ Répartition en sessions parallèles : `docs/WORKSTREAMS.md`.
 ## 13. Questions ouvertes pour les devrels Masumi
 
 1. Une Task peut-elle passer en `INPUT_REQUIRED` **avant** la demande de paiement, sans gêner le financement de l'escrow par Core ?
+   **Réponse vérifiée (2026-10-07)** : oui pour la question elle-même (Core accepte le statut posté par le Coworker,
+   M1 prouvé) ; l'interaction avec le financement de l'escrow reste à observer en M2.
 2. Pour des boutons dans la Task, existe-t-il (ou existera-t-il) un schéma d'entrée sur les événements de Task, ou faut-il passer par un Job MIP-003 ?
 3. Quel `submitResultTime` recommandent-ils pour une Task de recherche de 5 à 15 minutes ?
 4. Un Coworker peut-il afficher une description riche (Markdown, exemples de demandes) sur sa fiche marketplace ?
+   **Constaté** : `caption` et `description` (texte multiligne) sont acceptés par `coworkers update` ; `company` est
+   refusé par l'API (HTTP 422) malgré l'option du CLI 1.0.4.

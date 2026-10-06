@@ -28,7 +28,7 @@ parallèle multi-canaux → rapport Markdown sourcé → collecte du paiement on
 | Chemin | Contenu |
 | --- | --- |
 | `apps/reach-agent/` | agent eve 0.71.0 : instructions, fiches de niche, outils, moteur de recherche (`src/search/`), scripts |
-| `apps/worker/` | worker Sokosumi + paiement Masumi (à venir) |
+| `apps/worker/` | worker Sokosumi (questions avant paiement, M1 prouvé) + paiement Masumi, API standard MIP-003 |
 | `packages/contract/` | protocole worker ↔ agent, gelé (voir `docs/CONTRACT.md`) |
 | `front/` | landing statique Nuxt 4 + Tailwind 4 |
 | `docs/` | plan, roadmap, tâches, onboarding, devlog, état de chaque app |
@@ -70,7 +70,20 @@ pnpm generate   # site statique dans .output/public
 
 ### Worker
 
-À venir dans `apps/worker/` (portage TS du worker de référence Masumi, voir `docs/PLAN.md` §B2).
+```bash
+cd apps/worker
+npm ci
+cp .env.example .env.local   # COWORKER_ID, SOKOSUMI_COWORKER_API_KEY (clé runtime du Coworker)
+npm start                    # mode gratuit ; agent requis sur EVE_URL (http://127.0.0.1:21949)
+npm run typecheck
+npm test
+```
+
+Le worker liste les Tasks du Coworker avec sa clé runtime, pose les questions de cadrage en `INPUT_REQUIRED` avant tout
+paiement, puis lance la recherche et livre le rapport ; un journal par Task (`.local/tasks/`) permet la reprise après
+crash sans doublon. Mode payé (`PAID_TASKS_ENABLED=true`) : escrow Masumi entre le brief et la recherche, preuve de
+collecte via Blockfrost ; `npm run registration -- key|register|status` et `npm run agent-api` (MIP-003).
+Procédure M2 et preuves : `docs/state/worker.md`.
 
 ## Déployer
 
@@ -84,10 +97,11 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) tourne sur chaque PR et sur `m
 
 - `secrets` : gitleaks sur tout l'historique (règles dans `.gitleaks.toml`) ;
 - `agent` : `npm run typecheck` + `npm test` ;
-- `front` : `pnpm lint` (Biome) + `pnpm generate`.
+- `front` : `pnpm lint` (Biome) + `pnpm generate` ;
+- `worker` : `npm run typecheck` + `npm test`.
 
-Dependabot (`.github/dependabot.yml`) ouvre chaque semaine une PR groupée par app (agent, front) et pour les actions
-GitHub.
+Dependabot (`.github/dependabot.yml`) ouvre chaque semaine une PR groupée par app (agent, worker, front) et pour les
+actions GitHub ; les majeures de `@types/node` sont ignorées (le runtime est Node 24).
 
 Hook local, à activer une fois par clone :
 

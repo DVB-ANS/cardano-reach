@@ -34,7 +34,7 @@ flowchart LR
 | --- | --- | --- |
 | `apps/reach-agent/` | Armand | **fait** (étape 0 + lot A, mergé) |
 | `packages/contract/`, `docs/CONTRACT.md` | partagé, gelé | **fait** |
-| `apps/worker/` | toi | à faire (lot B) |
+| `apps/worker/` | toi | **M1 prouvé**, paiement porté (M2 attend le MPS) |
 | `infra/` | Armand | à faire (VPS, Docker, Postgres + MPS) |
 | `front/` | toi (déploiement : Armand) | **fait** (landing statique, PR #7), pas encore déployée |
 
@@ -134,13 +134,13 @@ docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 
 ## 6. Ce qui te revient (lot B, détail dans `docs/PLAN.md`)
 
-1. **B1** : compte Sokosumi Preprod, Vendor, Coworker ; MPS + Postgres sur le VPS ; wallet vendeur financé.
-2. **B2** : porter le worker de référence (`../demo-agent-token2049/live-team-names-20261006/` (cloné à côté du repo)) en TS strict
-   dans `apps/worker/src/`. À cloner d'abord : `git clone -b live-demo-name-finder
-   https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
-3. **B3** : intake `INPUT_REQUIRED` avant paiement (machine de phases du plan, section 3 ci-dessus pour le code eve).
-4. **M1** Task gratuite avec question → **M2** Task payée, collecte confirmée on-chain (**éliminatoire**) →
-   **M4** déploiement serveur.
+1. **B1** : compte Sokosumi Preprod, Vendor, Coworker, clé runtime : **fait** (IDs dans `docs/state/worker.md`).
+   MPS + Postgres + wallet financé : chez Armand (VPS).
+2. **B2 / B3** : worker TS strict dans `apps/worker/src/` (Sokosumi, questions `INPUT_REQUIRED` avant paiement,
+   paiement Masumi, API MIP-003) : **fait** (#17, #18). Référence Masumi clonée à côté du repo
+   (`../demo-agent-token2049`, branche `live-demo-name-finder`).
+3. **M1** Task gratuite avec question : **prouvé**. **M2** Task payée, collecte confirmée on-chain (**éliminatoire**) :
+   procédure prête dans `docs/state/worker.md`, attend le MPS → **M4** déploiement serveur.
 
 Un seul exécuteur de Tasks à la fois : ton worker. Armand ne lance jamais de worker, il teste avec `research.ts`.
 

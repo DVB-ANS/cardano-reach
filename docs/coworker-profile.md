@@ -3,6 +3,9 @@
 Texte à reprendre tel quel dans la fiche Sokosumi du Coworker (nom, accroche, description). Cohérent avec `BRIEF.md`
 §3 (produit, personnalité, garde-fous) et §6.4 (format du rapport). Toute évolution du produit se répercute ici.
 
+**Appliqué sur Sokosumi le 2026-10-07** (version anglaise : `caption` = tagline, `description` = description +
+exemples + rendu + limites, via `sokosumi coworkers update`). Le champ `company` est refusé par l'API (HTTP 422).
+
 Canaux cités : seulement ceux actifs en production (web, LinkedIn public, GitHub). Ajouter X, Reddit ou YouTube
 à la description quand ils sont activés sur le VPS (`REACH_CHANNELS`, bench réussi).
 

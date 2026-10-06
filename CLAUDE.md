@@ -28,6 +28,8 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
 - Node 24 : `export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`
 - Agent (dans `apps/reach-agent`) : `npm run dev` (eve sur 127.0.0.1:21949), `npm test`, `npm run typecheck`,
   `node scripts/research.ts --text "…" [--answer 1]`, `node scripts/bench-search.ts "…"`, `npm run golden`.
+- Worker (dans `apps/worker`) : `npm start` (gratuit), `PAID_TASKS_ENABLED=true npm start` (payé), `npm test`,
+  `npm run typecheck`, `npm run registration -- key|register|status`, `npm run agent-api`.
 - Front (dans `front`) : `pnpm install`, `pnpm dev` (http://localhost:3000), `pnpm generate` (→ `.output/public`).
 - CLI Sokosumi : `sokosumi --preprod auth whoami --json`
 
@@ -42,9 +44,10 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
 
 - Fait : étape 0 (M0 vérifié), moteur de recherche (API Exa, X, Reddit, GitHub, YouTube), outils eve,
   instructions + 4 fiches, golden, Dockerfile agent, 22 tests verts (détails : `docs/state/agent.md`) ;
-  landing `front/` (PR #7, non déployée). Seule branche : `main`.
+  landing `front/` (PR #7, non déployée).
 - À faire (Armand) : golden vert avec `gpt-6.1-sol`, comptes X / Reddit, image Docker + Postgres + MPS sur le VPS,
   déploiement M4 et front (détail : `docs/TASKS.md`).
-- À faire (coéquipier) : compte Sokosumi, worker, paiement, M1 → M2 (éliminatoire), tooling restant, puis phase 5.
-- Bloquants : `EXA_API_KEY`, `OPENAI_API_KEY`, compte Sokosumi / Coworker, Blockfrost, accès VPS, domaine ;
-  worker de référence Masumi à cloner dans `../demo-agent-token2049`.
+- Fait (coéquipier) : compte Sokosumi + Coworker « Reach » (fiche remplie), worker (M1 prouvé), paiement porté.
+- À faire (coéquipier) : M2 dès que le MPS existe, accès Workspace TOKEN2049, Dockerfile worker / agent-api, phase 5.
+- Bloquants : Postgres + MPS sur le VPS (seul blocage de M2), clé Blockfrost Preprod, wallet vendeur financé,
+  accès VPS, domaine ; clés OpenAI / Exa à poser sur le VPS ; comptes X / Reddit dédiés.
