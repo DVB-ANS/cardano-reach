@@ -8,11 +8,6 @@ export interface MailDomainCheck {
   /** `valid` : MX publiés ; `implicit` : pas de MX mais une adresse A/AAAA (livraison possible) ; `null_mx` : refuse tout courrier. */
   mx: MxStatus;
   hosts: string[];
-  /**
-   * Toujours `unknown` : savoir si le serveur accepte une adresse aléatoire demande un dialogue SMTP (RCPT TO),
-   * exclu de ce lot. Une adresse devinée reste donc « guessed ».
-   */
-  catchAll: "unknown";
   error?: string;
 }
 
@@ -42,7 +37,7 @@ function dnsCode(error: unknown): string {
 }
 
 export async function checkMailDomain(domain: string, dns: MailDns): Promise<MailDomainCheck> {
-  const result = (mx: MxStatus, hosts: string[] = [], error?: string): MailDomainCheck => ({ domain, mx, hosts, catchAll: "unknown", ...(error ? { error } : {}) });
+  const result = (mx: MxStatus, hosts: string[] = [], error?: string): MailDomainCheck => ({ domain, mx, hosts, ...(error ? { error } : {}) });
   let records: Array<{ exchange: string; priority: number }>;
   try {
     records = await dns.resolveMx(domain);

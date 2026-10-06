@@ -27,6 +27,8 @@ export type EmailFinding =
       pattern: EmailPattern;
       /** `published_format` : format d'adresses publiées nommées ; `published_shape` : forme seule ; `default_pattern` : aucun indice. */
       basis: "published_format" | "published_shape" | "default_pattern";
+      /** `low` : aucune adresse publiée du domaine, simple variante la plus courante. */
+      confidence: "low" | "medium";
       evidence: FoundEmail[];
       alternatives: string[];
     }
@@ -39,6 +41,8 @@ export interface ContactPerson {
   proofUrl: string;
   proofKind: "official_page" | "public_profile";
   profileUrl: string;
+  /** « rôle non confirmé » : le titre du profil ne correspond pas au rôle cherché. */
+  roleStatus: "rôle confirmé" | "rôle non confirmé";
 }
 
 export interface ContactFailure {
@@ -108,6 +112,7 @@ export function decideEmail(params: {
     address: `${buildLocal(pattern, person)}@${domain}`,
     pattern,
     basis: !format ? "default_pattern" : format.basis === "name_match" ? "published_format" : "published_shape",
+    confidence: format ? "medium" : "low",
     evidence,
     alternatives: emailVariants(person)
       .filter((variant) => variant.pattern !== pattern)
@@ -142,6 +147,7 @@ function choosePerson(candidates: readonly PersonCandidate[], pages: readonly Pa
       proofUrl: officialUrl ?? candidate.profileUrl,
       proofKind: officialUrl ? "official_page" : "public_profile",
       profileUrl: candidate.profileUrl,
+      roleStatus: candidate.roleMatch ? "rôle confirmé" : "rôle non confirmé",
     },
     others: scored.slice(1, MAX_OTHER_CANDIDATES + 1).map((entry) => entry.candidate),
   };
@@ -155,7 +161,8 @@ export async function findContact(
   const deadlineMs = options.deadlineMs ?? FIND_CONTACT_DEADLINE_MS;
   const deps = options.deps ?? defaultDeps;
   const deadline = AbortSignal.any([options.signal, AbortSignal.timeout(deadlineMs)]);
-  const remaining = () => Math.max(0, deadlineMs - (performance.now() - startedAt));
+  // Entier : `AbortSignal.timeout` (dans `readPages`) rejette un délai fractionnaire.
+  const remaining = () => Math.max(0, Math.floor(deadlineMs - (performance.now() - startedAt)));
   const domain = bareDomain(input.domain);
   const failures: ContactFailure[] = [];
   const result = (fields: Pick<FindContactResult, "person" | "otherCandidates" | "email" | "genericEmails" | "mailDomain" | "platformProfiles" | "pagesRead">): FindContactResult => ({

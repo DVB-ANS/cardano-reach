@@ -11,7 +11,7 @@ import { isReadBlocked } from "./platforms.ts";
 import { emailVariants, inferFormat, splitName, type NameParts } from "./variants.ts";
 
 const JANE: NameParts = { first: "jane", last: "doe" };
-const VALID_MX: MailDomainCheck = { domain: "acme.fr", mx: "valid", hosts: ["mx.acme.fr"], catchAll: "unknown" };
+const VALID_MX: MailDomainCheck = { domain: "acme.fr", mx: "valid", hosts: ["mx.acme.fr"] };
 
 const exaResult = (url: string, title: string, highlights: string[] = []): ExaResult => ({ url, title, publishedDate: null, highlights, text: null });
 const page = (url: string, text: string): PageResult => ({ url, ok: true, title: null, publishedAt: null, text });
@@ -78,6 +78,7 @@ describe("email status", () => {
     if (finding.status !== "guessed") return;
     assert.equal(finding.address, "jdoe@acme.fr");
     assert.equal(finding.basis, "published_format");
+    assert.equal(finding.confidence, "medium");
     assert.deepEqual(finding.evidence, emails("psmith@acme.fr"));
     assert.ok(!finding.alternatives.includes("jdoe@acme.fr"));
   });
@@ -85,6 +86,7 @@ describe("email status", () => {
   it("guessed with the default pattern when nothing is published", () => {
     const finding = decideEmail({ person: JANE, domain: "acme.fr", emails: [], knownNames: [], mail: null });
     assert.equal(finding.status === "guessed" && finding.basis, "default_pattern");
+    assert.equal(finding.status === "guessed" && finding.confidence, "low");
     assert.equal(finding.status === "guessed" && finding.address, "jane.doe@acme.fr");
   });
 
@@ -100,7 +102,8 @@ describe("mail domain (DNS mocked, no SMTP)", () => {
   it("sorts MX by priority", async () => {
     const dns = mockDns({ resolveMx: async () => [{ exchange: "b.acme.fr", priority: 20 }, { exchange: "a.acme.fr.", priority: 5 }] });
     const check = await checkMailDomain("acme.fr", dns);
-    assert.deepEqual([check.mx, check.hosts, check.catchAll], ["valid", ["a.acme.fr", "b.acme.fr"], "unknown"]);
+    assert.deepEqual([check.mx, check.hosts], ["valid", ["a.acme.fr", "b.acme.fr"]]);
+    assert.ok(!("catchAll" in check));
   });
 
   it("detects null MX, implicit MX, missing domain and DNS errors", async () => {
@@ -178,13 +181,39 @@ describe("findContact (mocked Exa, pages and DNS)", () => {
     const mocks = deps();
     const result = await findContact({ company: "Acme", domain: "https://www.acme.fr/", role: "Head of Procurement" }, { signal: new AbortController().signal, deps: mocks });
     assert.equal(result.domain, "acme.fr");
-    assert.deepEqual(result.person && [result.person.name, result.person.proofKind, result.person.proofUrl], ["Jane Doe", "official_page", "https://www.acme.fr/presse/nomination"]);
+    assert.deepEqual(result.person && [result.person.name, result.person.proofKind, result.person.proofUrl, result.person.roleStatus], [
+      "Jane Doe",
+      "official_page",
+      "https://www.acme.fr/presse/nomination",
+      "rôle confirmé",
+    ]);
     assert.equal(result.email.status, "guessed");
     assert.equal(result.email.status === "guessed" && result.email.address, "j.doe@acme.fr");
     assert.deepEqual(result.genericEmails, [{ address: "achats@acme.fr", sourceUrl: "https://acme.fr/contact" }]);
     assert.ok(mocks.readUrls.every((url) => !isReadBlocked(url) && !url.includes("linkedin.com")));
     assert.deepEqual(result.platformProfiles.map((profile) => profile.url), ["https://www.malt.fr/profile/jdupont"]);
     assert.deepEqual(result.failures, []);
+  });
+
+  it("passes readPages an integer deadline (AbortSignal.timeout rejects fractions)", async () => {
+    const deadlines: number[] = [];
+    const base = deps();
+    const strict: ContactDeps["readPages"] = async (urls, options) => {
+      deadlines.push(options.deadlineMs);
+      AbortSignal.timeout(options.deadlineMs);
+      return base.readPages(urls, options);
+    };
+    const result = await findContact({ company: "Acme", domain: "acme.fr", role: "Head of Procurement" }, { signal: new AbortController().signal, deps: { ...base, readPages: strict } });
+    assert.equal(deadlines.length, 2);
+    assert.ok(deadlines.every(Number.isInteger), String(deadlines));
+    assert.ok(result.pagesRead.length > 0);
+    assert.ok(!result.failures.some((failure) => failure.step === "read_pages"));
+  });
+
+  it("marks a person whose profile title does not match the role", async () => {
+    const result = await findContact({ company: "Acme", domain: "acme.fr", role: "Directeur technique" }, { signal: new AbortController().signal, deps: deps() });
+    assert.equal(result.person?.name, "Jane Doe");
+    assert.equal(result.person?.roleStatus, "rôle non confirmé");
   });
 
   it("lists failures instead of throwing, and respects the deadline", async () => {

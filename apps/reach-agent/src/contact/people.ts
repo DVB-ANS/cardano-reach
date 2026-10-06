@@ -10,7 +10,7 @@ export interface PersonCandidate {
   profileUrl: string;
   /** L'entreprise apparaît dans le titre ou les extraits du profil. */
   companyMatch: boolean;
-  /** Au moins la moitié des mots du rôle cherché apparaissent dans le titre ou les extraits. */
+  /** Au moins la moitié des mots du rôle cherché apparaissent dans le titre du profil (pas dans les extraits). */
   roleMatch: boolean;
 }
 
@@ -82,7 +82,7 @@ export function toCandidates(results: readonly ExaResult[], company: string, rol
       headline: parsed.headline,
       profileUrl: result.url,
       companyMatch: key.length > 0 && haystack.includes(key),
-      roleMatch: roleMatches(role, haystack),
+      roleMatch: roleMatches(role, fold(result.title ?? "")),
     };
     const existing = people.get(fold(parsed.name));
     if (!existing || (candidate.companyMatch && !existing.companyMatch)) people.set(fold(parsed.name), candidate);
