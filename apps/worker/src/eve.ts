@@ -127,6 +127,17 @@ export class Agent {
     return { session: ref(session), report: fitReport(report) };
   }
 
+  // API standard Masumi : pas d'humain pour répondre, l'intake avance avec des hypothèses explicites.
+  async autoReport(prompt: string): Promise<string> {
+    let outcome = await this.startIntake(phaseMessage("INTAKE", prompt));
+    for (let round = 0; outcome.kind === "question"; round++) {
+      if (round >= MAX_AUTO_ANSWERS) throw new Error("Intake kept asking questions");
+      outcome = await this.answer(outcome.session, outcome.question.requestId, { text: NO_ANSWER_TEXT });
+    }
+    if (outcome.kind === "invalid") throw new Error("No valid brief");
+    return (await this.research(outcome.brief)).report.trim();
+  }
+
   async followUp(at: SessionRef, comment: string): Promise<string | undefined> {
     const session = this.#client.sessions.attach(at.sessionId, { streamIndex: at.streamIndex });
     const result = await (await session.send(phaseMessage("FOLLOWUP", comment))).result();

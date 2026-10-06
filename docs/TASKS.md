@@ -42,7 +42,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] Questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon (`PLAN.md` §B3).
    - [x] M1 : Task gratuite avec question → réponse → rapport (preuves : `docs/state/worker.md`).
 3. **Paiement** → **M2**
-   - [ ] Porter `payment.ts`, `settlement.ts`, `registration.ts`, `agent-api.ts` (testés avec un faux MPS).
+   - [x] Porter `payment.ts`, `settlement.ts`, `registration.ts`, `agent-api.ts` (testés avec un faux MPS).
    - [ ] Brancher le worker sur le MPS d'Armand (tunnel SSH), enregistrement Masumi (B4).
    - [ ] M2 : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
    - [ ] Image worker + agent-api (Dockerfile dans `apps/worker/`) pour le compose d'Armand.

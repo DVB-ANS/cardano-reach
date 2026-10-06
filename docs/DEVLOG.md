@@ -170,3 +170,21 @@ questions `INPUT_REQUIRED` avant paiement, réponses aux commentaires. M1 prouv�
   de l'app (`??` au lieu de `||`). Contourné en les passant en variables d'environnement ; correctif côté agent.
 - La commande `coworkers register` renvoie déjà une clé dans sa réponse ; seule celle de `coworkers api-key`, récupérée
   par le script du guide, est stockée.
+
+## 2026-10-07 — Paiement Masumi porté (M2 prêt à brancher)
+
+**Quoi** : `apps/worker/src/` : `payment.ts` (escrow Masumi sur la Task), `settlement.ts` (preuve de collecte),
+`registration.ts` (clé MPS limitée, enregistrement, statut), `agent-api.ts` (API standard MIP-003), `hash.ts` ;
+branchés dans la machine de phases entre le brief et la recherche (`PAID_TASKS_ENABLED=true`).
+
+**Pourquoi** : M2 est éliminatoire ; tout ce qui ne dépend pas du MPS d'Armand est prêt et testé.
+
+**Cheminement** :
+- Échéances +5 / +30 / +46 / +62 min (au lieu de +20 dans la référence) : une recherche dure plusieurs minutes ; la
+  recherche n'est lancée qu'avec au moins 8 min de marge avant `submitResultTime`, sinon Task `FAILED` et remboursement.
+- Le rapport est `trim()` avant hachage, et la complétion poste ce texte exact sur Core sans passer par le CLI ni par
+  `postEvent` (qui retaille le commentaire) : le hash soumis et le texte livré restent identiques octet pour octet.
+- Conditions expirées avant l'achat : renégociées (rien n'a été posté) ; toute étape `*-pending` d'issue inconnue
+  (sauf la recherche) passe en `inspection-required`, jamais rejouée.
+- Après la complétion, le worker suit le retrait jusqu'à `settled` (reçu Core + transaction MPS confirmée + montant net
+  mesuré via Blockfrost).
