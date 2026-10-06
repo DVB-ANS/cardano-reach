@@ -11,12 +11,14 @@ import type { CoreClient } from "./sokosumi.ts";
 export const USDM = "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d";
 export const PRICE = "1000000";
 const MINUTE = 60_000;
-// Écarts de 15 min minimum imposés par MPS ; +30 min laissent la place à une recherche de quelques minutes.
-export const DEADLINES_MIN = { payBy: 5, submitResult: 30, unlock: 46, externalDisputeUnlock: 62 } as const;
+// MPS ne constate l'escrow qu'après 20 confirmations et un poll de 3 min (~10 min) : payBy +15. submitResult garde
+// grâce (10 min) + recherche (8 min) après un verrouillage tardif ; MPS impose 15 min entre submitResult, unlock et dispute.
+export const DEADLINES_MIN = { payBy: 15, submitResult: 40, unlock: 56, externalDisputeUnlock: 72 } as const;
 export const MIN_RESEARCH_MS = 8 * MINUTE;
 const ESCROW_GRACE_MS = 10 * MINUTE;
 const DEADLINE_COMMENT = "Délai de paiement dépassé : aucun résultat n'est soumis, l'escrow sera remboursé.";
 const ESCROW_COMMENT = "Paiement non reçu dans les délais : la Task est abandonnée sans frais.";
+const ESCROW_UNCONFIRMED_COMMENT = "Paiement non confirmé par le nœud dans les délais : la Task est abandonnée, l'escrow sera remboursé.";
 
 export type PaidStage =
   | "terms-pending"
@@ -200,7 +202,11 @@ export function createPaidFlow(options: {
         const observed = await observe(p);
         const next = hooks.save({ ...j, paid: { ...p, observed } });
         if (observed.onChainState !== "FundsLocked" || !confirmedState(observed, "FundsLocked")) {
-          if (now() > time(p.payment?.payByTime) + ESCROW_GRACE_MS && !observed.onChainState) return fail(next, hooks, ESCROW_COMMENT, "escrow never locked");
+          const neverLocked = !observed.onChainState || observed.onChainState === "FundsOrDatumInvalid";
+          if (now() > time(p.payment?.payByTime) + ESCROW_GRACE_MS && neverLocked) {
+            const comment = observed.onChainState ? ESCROW_UNCONFIRMED_COMMENT : ESCROW_COMMENT;
+            return fail(next, hooks, comment, `escrow not locked: ${observed.onChainState ?? "none"}`);
+          }
           return next;
         }
         return research(next, { ...p, observed }, hooks);
