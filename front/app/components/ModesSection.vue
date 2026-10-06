@@ -5,7 +5,7 @@ const modes = [
     img: '/images/key.webp',
     alt: 'A giant key lying in a starry field',
     title: 'Suppliers when you buy',
-    text: 'Machining, certified parts, auditors, integrators. Reach checks capacity and certifications, links the proof, flags what to verify and drafts your RFQ.',
+    text: 'Machining, certified parts, auditors, integrators. Richard finds the announced capacity and certifications, links the proof, flags what to confirm and drafts your RFQ.',
     chips: ['capacity', 'certifications', 'red flags', 'rfq draft'],
   },
   {

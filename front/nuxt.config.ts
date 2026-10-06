@@ -7,13 +7,13 @@ export default defineNuxtConfig({
   vite: { plugins: [tailwindcss()] },
   app: {
     head: {
-      title: 'Reach — sourced B2B shortlists, paid on Cardano',
+      title: 'Richard — sourced B2B shortlists, paid on Cardano',
       htmlAttrs: { lang: 'en' },
       meta: [
         {
           name: 'description',
           content:
-            'Reach is a Sokosumi Coworker that finds the right suppliers or clients and returns a sourced, dated shortlist. Paid per Task through Masumi escrow on Cardano.',
+            'Richard is a Sokosumi Coworker that finds the right suppliers or clients and returns a sourced, dated shortlist. Paid per Task through Masumi escrow on Cardano.',
         },
         { name: 'theme-color', content: '#020718' },
       ],

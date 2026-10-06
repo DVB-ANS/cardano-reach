@@ -46,7 +46,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal` (IDs : `docs/state/worker.md`).
    - [x] Clé runtime dans `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`) et dans le coffre du CLI.
    - [x] Fiche marketplace du Coworker (accroche + description EN, `docs/coworker-profile.md`).
-   - [ ] Demander tôt l'accès au Workspace TOKEN2049 (validation humaine chez Masumi).
+   - [x] Demander tôt l'accès au Workspace TOKEN2049 : envoyée le 2026-10-07, `PENDING` (validation humaine chez Masumi).
 2. **Worker** (B2, B3) → **M1**
    - [x] Cloner la référence à côté du repo : `git clone -b live-demo-name-finder https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
    - [x] Portage TS strict dans `apps/worker/src/` : partie Sokosumi + intake (paiement : à faire, voir 3).

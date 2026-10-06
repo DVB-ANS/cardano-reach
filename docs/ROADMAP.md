@@ -1,6 +1,6 @@
-# Roadmap — Reach
+# Roadmap — Richard
 
-Objectif final : **« trouve-moi quelqu'un dans tel domaine »** → Reach trouve la bonne personne ou entreprise (y compris
+Objectif final : **« trouve-moi quelqu'un dans tel domaine »** → Richard trouve la bonne personne ou entreprise (y compris
 sur les plateformes de freelance), trouve son e-mail professionnel, puis écrit un premier message avec un vrai hook,
 accroché à un élément daté et sourcé. Tout se joue sur l'exécution : chaque phase a une condition de sortie vérifiable.
 Ordre : tooling minimum → chemin payé (éliminatoire) → démo → reste du tooling → personnes, e-mails, hooks.
@@ -18,7 +18,7 @@ sourcées de la phase 5 : `docs/research/phase5.md`.
 | Agent eve (`apps/reach-agent`) | fait : moteur multi-canaux, 4 niches, garde de phase, SSRF, 22 tests verts |
 | Canaux | web / LinkedIn / lecture de pages via l'API Exa ; X et Reddit attendent des comptes dédiés ; YouTube bloqué en local |
 | Front (`front/`) | landing statique faite, pas déployée |
-| Coworker Sokosumi | Vendor « Cardano Reach », Coworker « Reach » (fiche remplie), clé runtime |
+| Coworker Sokosumi | Vendor « Cardano Reach », Coworker « Richard » (fiche remplie), clé runtime |
 | Worker (`apps/worker`) | **M1 prouvé** sur Sokosumi Preprod ; paiement Masumi porté et testé hors ligne (26 tests) |
 | MPS, wallets, infra | **rien** : attend Postgres + MPS sur le VPS d'Armand (seul blocage de M2) |
 
@@ -219,8 +219,8 @@ Le principe du brief « l'agent prépare, l'humain envoie » reste vrai jusqu'à
 
 ## Phase 7 — Produit après le hack
 
-- **Mode veille** : Reach relance la recherche chaque semaine et ne remonte que les nouveaux signaux.
-- **Agent-à-agent** : Reach achète des sous-tâches à d'autres agents Masumi, et d'autres agents l'embauchent
+- **Mode veille** : Richard relance la recherche chaque semaine et ne remonte que les nouveaux signaux.
+- **Agent-à-agent** : Richard achète des sous-tâches à d'autres agents Masumi, et d'autres agents l'embauchent
   (API MIP-003 déjà prévue).
 - **Formulaires MIP-003** (`radio`, `option`) pour les questions de départ au lieu du texte numéroté.
 - **Tarification** : prix par Task selon la profondeur (5 lignes rapides, 10 lignes + contacts + messages).

@@ -26,7 +26,7 @@ onMounted(() => {
         href="#top" class="block overflow-hidden transition-[max-height,opacity,margin] duration-500"
         :class="scrolled && !open ? 'mb-0 max-h-0 opacity-0' : 'mb-3 max-h-24 opacity-100'"
       >
-        <span class="wide block text-[2.6rem] leading-[.8] sm:text-[3.6rem]">Reach</span>
+        <span class="wide block text-[2.6rem] leading-[.8] sm:text-[3.6rem]">Richard</span>
       </a>
       <div class="flex items-center gap-6 sm:gap-8">
         <span class="label cursor">your b2b scout</span>

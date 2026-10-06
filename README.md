@@ -1,9 +1,9 @@
-# Reach — shortlists B2B sourcées, payées sur Cardano
+# Richard — shortlists B2B sourcées, payées sur Cardano
 
-**Reach** est un Coworker payant sur [Sokosumi](https://sokosumi.com) Preprod (standard Masumi, 1 test USDM par Task)
+**Richard** est un Coworker payant sur [Sokosumi](https://sokosumi.com) Preprod (standard Masumi, 1 test USDM par Task)
 qui trouve les bonnes entreprises à contacter : des **fournisseurs** quand on achète (mode `sourcing`) ou des
 **clients** quand on vend (mode `leads`), par niche (aéro/spatial, automobile, crypto/DeFi, SaaS B2B). Si la demande
-est floue, Reach pose une ou deux questions à choix, encaisse le paiement Masumi en escrow **avant** la recherche, puis
+est floue, Richard pose une ou deux questions à choix, encaisse le paiement Masumi en escrow **avant** la recherche, puis
 rend une shortlist de 5 à 10 entreprises où chaque ligne a un lien source et une date. Projet du hackathon TOKEN2049
 Origins, track Agentic Payments on Cardano.
 

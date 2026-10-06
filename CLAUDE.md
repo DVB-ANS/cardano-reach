@@ -1,10 +1,10 @@
-# cardano-reach — Coworker Sokosumi « Reach » (TOKEN2049 Origins, track Cardano / Masumi)
+# cardano-reach — Coworker Sokosumi « Richard » (TOKEN2049 Origins, track Cardano / Masumi)
 
 Historique et décisions : `docs/DEVLOG.md`.
 
 ## Objectif
 
-Coworker payant sur Sokosumi Preprod (standard Masumi, 1 test USDM par Task) : « Reach », shortlist sourcée et
+Coworker payant sur Sokosumi Preprod (standard Masumi, 1 test USDM par Task) : « Richard », shortlist sourcée et
 datée d'entreprises, mode `sourcing` (fournisseurs) ou `leads` (clients, style TamTam), par niche.
 Brief complet : `BRIEF.md`. Plan d'implémentation (lots, contrat, jalons M0-M6) : `docs/PLAN.md`.
 Pour reprendre le projet (coéquipier, nouvelle session) : `docs/ONBOARDING.md`.
@@ -48,7 +48,7 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
   landing `front/` (PR #7, non déployée).
 - À faire (Armand) : golden vert avec `gpt-6.1-sol`, comptes X / Reddit, image Docker + Postgres + MPS sur le VPS,
   déploiement M4 et front (détail : `docs/TASKS.md`).
-- Fait (coéquipier) : compte Sokosumi + Coworker « Reach » (fiche remplie), worker (M1 prouvé), paiement porté.
+- Fait (coéquipier) : compte Sokosumi + Coworker « Richard » (fiche remplie), worker (M1 prouvé), paiement porté.
 - À faire (coéquipier) : M2 dès que le MPS existe, accès Workspace TOKEN2049, Dockerfile worker / agent-api, phase 5.
 - Bloquants : Postgres + MPS sur le VPS (seul blocage de M2), clé Blockfrost Preprod, wallet vendeur financé,
   accès VPS, domaine ; clés OpenAI / Exa à poser sur le VPS ; comptes X / Reddit dédiés.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const TEXT = 'welcome to reach'
+const TEXT = 'welcome to richard'
 const delays = [...TEXT].map(() => Math.round(Math.random() * 600))
 const gone = ref(false)
 

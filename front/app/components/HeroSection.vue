@@ -12,7 +12,7 @@
         <h1 v-chars class="wide text-[clamp(1.7rem,2.8vw,2.7rem)]">Leads with receipts.</h1>
         <div v-reveal="400">
           <p class="mt-4 max-w-md text-sm text-cream/70">
-            Suppliers when you buy, clients when you sell. Reach brings back 5 to 10 companies — each one with a source and a date.
+            Suppliers when you buy, clients when you sell. Richard brings back 5 to 10 companies — each one with a source and a date.
           </p>
           <div class="mt-4 flex flex-wrap gap-3">
             <ChipLink href="#how" label="how it works" icon="down" />

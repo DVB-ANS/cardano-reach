@@ -82,7 +82,7 @@ La clé Blockfrost du worker (vérification de la collecte) : Noé crée son pro
 Procédure détaillée : `docs/state/worker.md` § « Procédure M2 ».
 
 1. Tunnel SSH, puis `npm run registration -- key` : clé MPS **limitée au wallet de vente** (`canPay`, pas `canAdmin`).
-2. `npm run agent-api`, puis `npm run registration -- register` (agent « Reach », tarif `Dynamic`, source Preprod V2) et
+2. `npm run agent-api`, puis `npm run registration -- register` (agent « Richard », tarif `Dynamic`, source Preprod V2) et
    `status` jusqu'à `RegistrationConfirmed`.
 3. Crédits de test du Personal Workspace (Stripe test, carte `4242 4242 4242 4242`).
 4. `PAID_TASKS_ENABLED=true npm start`, Task complète, suivi jusqu'à `settled` et hash de collecte sur l'explorateur

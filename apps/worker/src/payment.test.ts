@@ -73,7 +73,7 @@ function harness(options: { observed?: () => MpsPayment; now?: number; corePost?
     },
     research: async () => {
       researches++;
-      return { session: { sessionId: "s", streamIndex: 1 }, report: "\n# 🎯 Reach — rapport\n\n| ok |\n" };
+      return { session: { sessionId: "s", streamIndex: 1 }, report: "\n# 🎯 Richard — rapport\n\n| ok |\n" };
     },
     resultPath: (taskId) => join(dir, `${taskId}.md`),
   };
@@ -132,8 +132,8 @@ test("parcours complet : devis → achat → escrow → recherche → hash soumi
   j = await h.flow.advance(j, h.hooks);
   assert.equal(stage(j), "result-saved");
   const paid = j.paid as PaidState;
-  assert.equal(paid.result, "# 🎯 Reach — rapport\n\n| ok |");
-  assert.equal(paid.resultHash, taskHash("# 🎯 Reach — rapport\n\n| ok |"));
+  assert.equal(paid.result, "# 🎯 Richard — rapport\n\n| ok |");
+  assert.equal(paid.resultHash, taskHash("# 🎯 Richard — rapport\n\n| ok |"));
   assert.deepEqual(j.researchSession, { sessionId: "s", streamIndex: 1 });
 
   j = await h.flow.advance(j, h.hooks);

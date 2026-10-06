@@ -19,12 +19,12 @@ const event = (id: string, actorType: string, comment: string | null, status: st
 test("formatQuestion suit le format du plan", () => {
   assert.equal(
     formatQuestion("Tu cherches quoi ?", options),
-    "**🎯 Reach** — Tu cherches quoi ?\n\n1️⃣ **Sourcing** — je cherche un fournisseur\n2️⃣ **Leads**\n\n_Réponds juste `1`, `2` ou en texte libre._",
+    "**🎯 Richard** — Tu cherches quoi ?\n\n1️⃣ **Sourcing** — je cherche un fournisseur\n2️⃣ **Leads**\n\n_Réponds juste `1`, `2` ou en texte libre._",
   );
 });
 
 test("formatQuestion sans options demande du texte libre", () => {
-  assert.equal(formatQuestion("Quelle zone ?", []), "**🎯 Reach** — Quelle zone ?\n\n_Réponds en texte libre._");
+  assert.equal(formatQuestion("Quelle zone ?", []), "**🎯 Richard** — Quelle zone ?\n\n_Réponds en texte libre._");
 });
 
 test("parseAnswer : numéro d'option ou texte libre", () => {

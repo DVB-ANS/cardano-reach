@@ -52,7 +52,7 @@ const schema = {
       id: "prompt",
       type: "string",
       name: "Brief",
-      data: { description: "What you buy or sell, the niche and the zone. Reach returns a sourced, dated shortlist of companies." },
+      data: { description: "What you buy or sell, the niche and the zone. Richard returns a sourced, dated shortlist of companies." },
       validations: [
         { validation: "min", value: "1" },
         { validation: "max", value: String(MAX_PROMPT) },

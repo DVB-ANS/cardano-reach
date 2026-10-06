@@ -135,10 +135,10 @@ async function main(command: string | undefined): Promise<void> {
       ],
       ExampleOutputs: [],
       Tags: ["sourcing", "leads", "b2b", "research"],
-      name: "Reach",
+      name: "Richard",
       description: "Finds the right suppliers or clients and returns a sourced, dated B2B shortlist.",
       Capability: { name: process.env.REACH_MODEL?.trim() || "gpt-6.1-sol", version: "1" },
-      Author: { name: "Cardano Reach" },
+      Author: { name: "Richard" },
       apiBaseUrl: registrationUrl(process.env.AGENT_API_PUBLIC_URL?.trim(), process.env.AGENT_API_PORT?.trim() || undefined),
     };
     state = { ...state, registrationWritePending: true, request: body, sellerVkey: wallet.walletVkey, sellerAddress: wallet.walletAddress };
