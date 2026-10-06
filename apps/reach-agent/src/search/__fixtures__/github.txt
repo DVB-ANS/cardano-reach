@@ -1,0 +1,1 @@
+[{"description":"AI-powered security audit toolkit for Plutus smart contracts on Cardano.","fullName":"quex-tech/plutus-auditor","stargazersCount":0,"updatedAt":"2026-05-15T11:26:41Z","url":"https://github.com/quex-tech/plutus-auditor"}]

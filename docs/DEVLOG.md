@@ -36,3 +36,27 @@ unique pour aligner les sessions parallèles et le pitch.
   le rapport doit tenir sans eux. OpenCLI écarté (Chrome de bureau requis).
 - Hébergement sur le serveur d'Armand : Docker permet de lancer Agent-Reach (Python) depuis eve, ce que
   just-bash (sandbox eve sans Docker) ne permet pas.
+
+## 2026-10-06 — Socle commun et moteur de recherche de l'agent
+
+**Quoi** : contrat worker ↔ agent (`packages/contract`, `docs/CONTRACT.md`), app eve `apps/reach-agent`, simulateur
+`scripts/research.ts`, moteur `src/search/` (Exa web + LinkedIn, GitHub, YouTube, lecture de pages), outils
+`reach_search` / `read_pages` / `web_search`, instructions finales + 4 fiches de niche, golden, Dockerfile.
+
+**Pourquoi** : le modèle planifie un lot de requêtes, le code les exécute en parallèle sous budget (25 s recherche,
+20 s pages) ; un rapport tient en 3 à 5 allers-retours modèle, sans sous-agents.
+
+**Cheminement** :
+- Fiches de niche dans `agent/instructions/` (toujours chargées) plutôt que `load_skill` : un aller-retour de moins.
+- Plafonds de concurrence par canal au niveau du processus (partagés entre sessions) pour ménager les quotas.
+- Garde SSRF sur la lecture de pages : schéma, noms locaux, IP privées après résolution DNS, et redirections suivies
+  à la main pour revérifier chaque saut.
+- Sans clé OpenAI en local : `chatgpt()` (abonnement via Codex), `openai()` dès que `OPENAI_API_KEY` existe.
+
+**Bugs & fix** :
+- `result.status === "waiting"` vaut aussi pour une session au repos après une réponse finale : le simulateur
+  (et le worker) doivent tester `inputRequests`, pas le statut. Ajouté au contrat.
+- `eve build` évalue `agent/channels/eve.ts` : une vérification d'env au chargement cassait le build ; les identifiants
+  Basic sont lus par requête et vérifiés au démarrage par `scripts/launch.ts start`.
+- `eve build` cherchait microsandbox sur macOS sans Docker : sandbox fixé sur just-bash (`agent/sandbox.ts`).
+- `gh search repos` fait un ET sur les mots : les requêtes longues rendent 0 résultat ; consigne « 1 à 3 mots-clés ».

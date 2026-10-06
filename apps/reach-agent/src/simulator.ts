@@ -3,6 +3,7 @@ import { Client, type MessageResult } from "eve/client";
 import { extractBrief, phaseMessage, type Brief } from "../../../packages/contract/src/index.ts";
 
 export const NO_ANSWER_TEXT = "Pas de réponse : continue avec des hypothèses explicites.";
+export const BRIEF_RETRY_TEXT = "Réponds uniquement avec le bloc JSON Brief.";
 const MAX_INTAKE_ROUNDS = 5;
 const DEFAULT_EVE_URL = "http://127.0.0.1:21949";
 
@@ -51,7 +52,15 @@ export async function simulateTask(client: Client, task: SimulatedTask): Promise
     result = await (await session.respond([reply])).result();
   }
   assertNotFailed(result, "Intake");
-  const brief = extractBrief(result.message ?? "");
+  // Comme le worker (plan B3) : une seule relance si le dernier message n'a pas de Brief valide.
+  let brief: Brief;
+  try {
+    brief = extractBrief(result.message ?? "");
+  } catch {
+    result = await (await session.send(BRIEF_RETRY_TEXT)).result();
+    assertNotFailed(result, "Intake retry");
+    brief = extractBrief(result.message ?? "");
+  }
   const intakeMs = Math.round(performance.now() - intakeStart);
 
   const researchStart = performance.now();
