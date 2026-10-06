@@ -7,6 +7,8 @@
   },
   "scripts": {
     "start": "node --env-file-if-exists=.env.local src/main.ts",
+    "doctor": "node --env-file-if-exists=.env.local src/doctor.ts",
+    "health": "node --env-file-if-exists=.env.local src/health.ts",
     "agent-api": "node --env-file-if-exists=.env.local src/agent-api.ts",
     "registration": "node --env-file-if-exists=.env.local src/registration.ts",
     "test": "node --test \"src/**/*.test.ts\"",

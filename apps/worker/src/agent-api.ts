@@ -6,6 +6,7 @@ import { setInterval } from "node:timers";
 import { loadConfig } from "./config.ts";
 import { Agent } from "./eve.ts";
 import { sha256, standardInputHash, standardResultHash } from "./hash.ts";
+import { log } from "./log.ts";
 import { createMps, requireSavedRuntimeToken } from "./mps.ts";
 import { DEADLINES_MIN, PRICE, USDM, asPayment, confirmedState } from "./payment.ts";
 import { loadRegistration, runtimeTokenPath } from "./registration.ts";
@@ -156,7 +157,7 @@ createServer(async (req, res) => {
   } catch {
     return respond(res, 500, { error: "Request failed. Inspect the saved job state before retrying." });
   }
-}).listen(port, "127.0.0.1", () => console.log(`Agent API listening on 127.0.0.1:${port}`));
+}).listen(port, "127.0.0.1", () => log.info("agent api listening", { port }));
 
 let busy = false;
 setInterval(async () => {
@@ -192,7 +193,7 @@ setInterval(async () => {
         await mps.post("/payment/submit-result", { network: "Preprod", blockchainIdentifier: payment.blockchainIdentifier, submitResultHash: resultHash });
         save({ ...job, phase: "awaiting-result", status: "running", result, resultHash });
       } catch {
-        console.error(`Standard job needs inspection ${job.id}`);
+        log.error("standard job needs inspection", { jobId: job.id });
       }
     }
   } finally {

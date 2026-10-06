@@ -34,26 +34,41 @@ Référence Masumi clonée à côté du repo (`../demo-agent-token2049`) (branch
   du résultat exact soumis, complétion au même texte, retrait vérifié (reçu Core + transaction MPS + Blockfrost).
   Jamais testé contre un vrai MPS : attend le MPS d'Armand.
 
-## Procédure M2 (dès que le MPS est prêt)
+## Procédure M2 (sur la machine d'Armand)
 
-1. Tunnel : `ssh -N -L 3012:127.0.0.1:3012 <vps>` ; dans `apps/worker/.env.local` (valeurs fournies par Armand) :
-   `MPS_URL`, `MPS_ADMIN_KEY`, `MPS_SELLING_WALLET_ID`, `MPS_PAYMENT_SOURCE_ID`, `BLOCKFROST_API_KEY_PREPROD`.
-2. `npm run registration -- key` : clé MPS limitée au wallet vendeur dans `.local/mps-runtime.env` (0600).
-3. `npm run agent-api` (port 21950) puis `npm run registration -- register` (URL publique : `AGENT_API_PUBLIC_URL`,
-   sinon loopback) ; `npm run registration -- status` jusqu'à `RegistrationConfirmed`.
-4. Retirer `MPS_ADMIN_KEY` du `.env.local`, puis `PAID_TASKS_ENABLED=true npm start`.
-5. Task complète (cas 1 du brief) ; suivre `.local/tasks/<id>.json` (`paid.stage`) jusqu'à `settled` ;
-   `sokosumi --preprod runtime receipt <id> --coworker-id … --json` doit donner `settled: true` + `txHash`.
+Le MPS n'écoute qu'en local sur la machine d'Armand et Noé n'y a pas d'accès SSH : **le worker tourne chez Armand**,
+comme en M4. Noé ne lance plus de worker local à partir de là (un seul exécuteur de Tasks).
+
+1. Noé transmet à Armand, par canal privé, la clé runtime du Coworker (`SOKOSUMI_COWORKER_API_KEY`) ; Armand crée
+   `apps/worker/.env.local` sur sa machine (`COWORKER_ID`, la clé, `MPS_URL=http://127.0.0.1:3012`,
+   `BLOCKFROST_API_KEY_PREPROD`, `EVE_URL`, et pour l'enregistrement seulement `MPS_ADMIN_KEY`,
+   `MPS_SELLING_WALLET_ID`, `MPS_PAYMENT_SOURCE_ID`).
+2. `npm ci && npm run doctor` : tout doit être ✅ sauf la partie payée.
+3. `npm run registration -- key` (clé MPS limitée au wallet de vente, `.local/mps-runtime.env`, 0600), puis
+   `npm run agent-api` et `npm run registration -- register`, puis `npm run registration -- status` jusqu'à
+   `RegistrationConfirmed`. Retirer ensuite `MPS_ADMIN_KEY` du `.env.local`.
+4. `npm run doctor -- --paid` : tout ✅.
+5. Crédits de test sur le Personal Workspace de Noé (Stripe test `4242 4242 4242 4242`).
+6. `PAID_TASKS_ENABLED=true npm start` ; Noé crée la Task complète (cas 1 du brief) depuis Sokosumi. Suivi :
+   `docker compose logs` / sortie JSON (`task advanced`, `stage`), `.local/tasks/<id>.json` jusqu'à `settled` ;
+   compter plus d'une heure (déverrouillage à +46 min, collecte ensuite). Lancer une deuxième Task payée en secours.
+7. `sokosumi --preprod runtime receipt <id> --coworker-id … --json` → `settled: true` + `txHash` ; ouvrir le hash sur
+   l'explorateur Preprod.
+
+`npm run health` lit le pouls du worker (`.local/health.json`, écrit à chaque tour de boucle) : code 0 si le dernier
+tour date de moins de `HEALTH_MAX_AGE_MS` (10 min par défaut, une recherche occupe la boucle quelques minutes). À
+utiliser comme `HEALTHCHECK` Docker.
 
 ## Lancer (local)
 
 - Agent : `cd apps/reach-agent && EVE_PORT=21949 REACH_CACHE_DIR=.local/cache npm run dev` (les lignes vides
   `EVE_PORT=` / `REACH_CACHE_DIR=` du `.env.local` ne retombent pas sur les défauts : `??` dans `launch.ts` et
   `cache.ts`, à corriger côté agent).
-- Worker : `cd apps/worker && npm ci && npm start` (`.env.local` : `COWORKER_ID`, `SOKOSUMI_COWORKER_API_KEY`) ;
-  `npm test`, `npm run typecheck`. Journaux par Task dans `apps/worker/.local/tasks/`.
+- Worker : `cd apps/worker && npm ci && npm run doctor && npm start` (`.env.local` : `COWORKER_ID`,
+  `SOKOSUMI_COWORKER_API_KEY`) ; `npm test`, `npm run typecheck`. Journaux par Task dans `apps/worker/.local/tasks/`,
+  logs en JSON (une ligne par évènement, `taskId`, `phase`, `stage`).
 - Front : landing mergée (PR #7, #8), `pnpm generate` OK ; pas déployée.
 
 ## Blocages
 
-- Accès SSH au VPS, clé Blockfrost Preprod, financement du selling wallet.
+- MPS sur la machine d'Armand (clé Blockfrost, seed, wallet de vente financé) ; M2 se lance chez lui.

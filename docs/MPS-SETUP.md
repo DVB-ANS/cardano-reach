@@ -14,8 +14,8 @@ tableau du §5 ; les secrets passent par un canal privé (gestionnaire de mots d
 | PostgreSQL 16 | base dédiée `mps_hackathon`, utilisateur `mps`, volume persistant, **pas exposé** (127.0.0.1 ou réseau Docker) |
 | Masumi Payment Service | clone de `masumi-network/masumi-payment-service`, `PORT=3012`, écoute sur **127.0.0.1 uniquement** |
 
-Le worker y accède par tunnel SSH en local (`ssh -N -L 3012:127.0.0.1:3012 <vps>`), puis par le réseau Docker une
-fois déployé (M4). MPS n'est jamais public ; seule l'API agent passera par Caddy.
+Le worker tourne sur la même machine (Noé n'a pas d'accès SSH) et y accède en `http://127.0.0.1:3012`, puis par le
+réseau Docker une fois déployé (M4). MPS n'est jamais public ; seule l'API agent passera par Caddy.
 
 ## 2. Installation (guide §4, dans l'ordre)
 
@@ -41,7 +41,7 @@ fois déployé (M4). MPS n'est jamais public ; seule l'API agent passera par Cad
 ## 3. Vérifications
 
 - [ ] `curl --fail http://127.0.0.1:3012/api/v1/health` → `status: "success"`, `data.status: "ok"`.
-- [ ] Dashboard `http://127.0.0.1:3012/admin/` (par tunnel, connexion avec l'`ADMIN_KEY`) : source de paiement
+- [ ] Dashboard `http://127.0.0.1:3012/admin/` (depuis ta machine, connexion avec l'`ADMIN_KEY`) : source de paiement
   **Preprod `Web3CardanoV2`**, wallet d'achat, wallet de vente.
 - [ ] Wallet de vente : `collectionAddress` doit valoir `null` (paiement versé au vendeur par défaut).
 - [ ] `pg_dump` de `mps_hackathon` testé une fois, et sauvegarde quotidienne hors du VPS (avec l'`ENCRYPTION_KEY`).
@@ -59,8 +59,7 @@ Valeurs **publiques** : les écrire directement ici (dans une PR `docs/mps-setup
 
 | Valeur | Où la trouver | Valeur |
 | --- | --- | --- |
-| Hébergeur du VPS | (décide si le port 25 sortant est ouvert, voir `docs/research/phase5.md` §4) | |
-| Hôte SSH pour le tunnel | `user@host` | |
+| Hébergeur de la machine (FAI si machine perso) | décide si le port 25 sortant est ouvert, voir `docs/research/phase5.md` §4 | |
 | Révision MPS | `git rev-parse HEAD` | |
 | ID du wallet de vente (`MPS_SELLING_WALLET_ID`) | dashboard ou `GET /api/v1/wallet` | |
 | ID de la source de paiement Preprod V2 (`MPS_PAYMENT_SOURCE_ID`) | dashboard ou `GET /api/v1/payment-source` | |
@@ -72,20 +71,18 @@ Valeurs **secrètes** : par canal privé, **jamais** dans ce fichier.
 
 | Secret | Pour quoi | Durée |
 | --- | --- | --- |
-| Accès SSH au VPS (clé publique de Noé ajoutée à `authorized_keys`) | tunnel vers MPS | permanent |
-| `ADMIN_KEY` de MPS | une seule fois, pour créer la clé MPS limitée et enregistrer l'agent | Noé la retire de son `.env.local` juste après |
+| Clé runtime du Coworker (`SOKOSUMI_COWORKER_API_KEY`), de Noé vers Armand | le worker tourne sur ta machine | permanent |
+| `ADMIN_KEY` de MPS | reste chez toi : `npm run registration -- key` et `register` se lancent sur ta machine | retirée du `.env.local` du worker juste après |
 
-La clé Blockfrost du worker (vérification de la collecte) : Noé crée son propre projet gratuit, pas besoin de la tienne.
+La clé Blockfrost du worker (vérification de la collecte) : celle du MPS convient, le worker tourne sur la même machine.
 
-## 6. Ce que fait Noé ensuite (sans rien te redemander)
+## 6. Ensuite : M2 sur ta machine
 
-Procédure détaillée : `docs/state/worker.md` § « Procédure M2 ».
+Procédure détaillée : `docs/state/worker.md` § « Procédure M2 (sur la machine d'Armand) ». Commence par
+`cd apps/worker && npm ci && npm run doctor -- --paid` : il dit exactement ce qui manque.
 
-1. Tunnel SSH, puis `npm run registration -- key` : clé MPS **limitée au wallet de vente** (`canPay`, pas `canAdmin`).
-2. `npm run agent-api`, puis `npm run registration -- register` (agent « Richard », tarif `Dynamic`, source Preprod V2) et
-   `status` jusqu'à `RegistrationConfirmed`.
-3. Crédits de test du Personal Workspace (Stripe test, carte `4242 4242 4242 4242`).
-4. `PAID_TASKS_ENABLED=true npm start`, Task complète, suivi jusqu'à `settled` et hash de collecte sur l'explorateur
-   Preprod.
+En bref : clé runtime du Coworker reçue de Noé → `npm run doctor` → `npm run registration -- key` →
+`npm run agent-api` + `register` + `status` (jusqu'à `RegistrationConfirmed`) → `npm run doctor -- --paid` tout vert →
+`PAID_TASKS_ENABLED=true npm start` → Noé crée la Task payée → suivi jusqu'à `settled`.
 
-**Un seul exécuteur de Tasks** : ne lance jamais le worker toi-même tant que celui de Noé tourne.
+**Un seul exécuteur de Tasks** : le worker de ta machine. Noé arrête le sien avant.

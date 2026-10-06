@@ -5,6 +5,7 @@ import type { Config } from "./config.ts";
 import { type Agent, type AgentQuestion, type IntakeOutcome, NO_ANSWER_TEXT, type ResearchOutcome, type SessionRef } from "./eve.ts";
 import { findReply, formatQuestion, humanComments, intakeMessage, parseAnswer } from "./intake.ts";
 import type { Sokosumi, Task } from "./sokosumi.ts";
+import { errorMessage, log } from "./log.ts";
 import { readJson, writeJson } from "./store.ts";
 
 export type Phase =
@@ -125,7 +126,9 @@ export class Runner {
       for (let step = 0; step < 20; step++) {
         const before = `${journal.phase}:${paidStage(journal)}`;
         journal = await this.#step(journal);
-        if (`${journal.phase}:${paidStage(journal)}` === before || IDLE.includes(journal.phase)) break;
+        const after = `${journal.phase}:${paidStage(journal)}`;
+        if (after !== before) log.info("task advanced", { taskId, phase: journal.phase, stage: paidStage(journal) ?? null });
+        if (after === before || IDLE.includes(journal.phase)) break;
       }
       if (journal.phase === "completed") await this.#followUps(journal);
     } catch (error) {
@@ -260,7 +263,7 @@ export class Runner {
 
   #complete(j: Journal): Journal {
     this.#soko.runtimeComplete(j.taskId, this.resultPath(j.taskId));
-    console.log(`Completed ${j.taskId}`);
+    log.info("task completed", { taskId: j.taskId });
     return this.#save({ ...j, phase: "completed" });
   }
 
@@ -292,8 +295,8 @@ export class Runner {
   }
 
   async #onError(j: Journal, error: unknown): Promise<void> {
-    const message = (error instanceof Error ? error.message : String(error)).slice(0, 300);
-    console.error(`Task ${j.taskId} blocked at ${j.phase}: ${message}`);
+    const message = errorMessage(error);
+    log.error("task blocked", { taskId: j.taskId, phase: j.phase, stage: paidStage(j) ?? null, error: message });
     const current = this.#load(j.taskId) ?? j;
     // La recherche payée se rejoue elle aussi, avec le même plafond ; au-delà, l'escrow est remboursé à l'échéance.
     if (!REPLAYABLE.includes(current.phase) && paidStage(current) !== "model-pending") return;
@@ -312,7 +315,7 @@ export class Runner {
       const journal = this.#load(id);
       const stage = (journal?.paid as { stage?: unknown } | undefined)?.stage;
       if (journal && typeof stage === "string" && stage.endsWith("-pending") && stage !== "model-pending") {
-        console.error(`Task ${id} requires inspection at ${stage}`);
+        log.warn("task requires inspection", { taskId: id, stage });
         this.#save({ ...journal, phase: "inspection-required", note: `payment ${stage}` });
       }
     }
