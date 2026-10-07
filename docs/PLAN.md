@@ -161,7 +161,7 @@ On n'utilise pas de sous-agents eve : chaque enfant ajoute ses propres allers-re
 
 #### A1. Installer les canaux et capturer leurs sorties réelles (avant tout parseur)
 
-1. En local, installer Agent-Richard :
+1. En local, installer Agent-Reach :
    - `pipx install https://github.com/Panniantong/agent-reach/archive/main.zip`, puis `agent-reach install --env=auto` ;
    - ne jamais installer le paquet PyPI du même nom ;
    - `npm i -g mcporter`, puis `mcporter config add exa https://mcp.exa.ai/mcp` ;
@@ -290,7 +290,7 @@ l'outil, `inputSchema` est en zod.
 #### A6. Image Docker de l'agent (`apps/reach-agent/Dockerfile`, écrit par Armand, branché par le coéquipier dans `infra/`)
 
 - Image `node:24-bookworm`.
-- Paquets : `python3`, `pipx`, `gh`, `yt-dlp` (via pipx), Agent-Richard, `mcporter` (npm global, `mcporter config add exa …` au build).
+- Paquets : `python3`, `pipx`, `gh`, `yt-dlp` (via pipx), Agent-Reach, `mcporter` (npm global, `mcporter config add exa …` au build).
 - Copie de `packages/contract` en `/packages/contract` pour garder l'import relatif.
 - `npm ci`, puis `npx eve build`, puis `CMD ["npx","eve","start","--host","0.0.0.0","--port","3000"]`.
 - Ajouter `agent/channels/eve.ts` :
@@ -442,7 +442,7 @@ brief-ready  → [PAID_TASKS_ENABLED=false] research-sent → result-saved → c
 | M1 | Task gratuite via le worker, avec question | Coéquipier | voir Verification §2 |
 | M2 | Task payée, collecte confirmée | Coéquipier | voir Verification §3 — **éliminatoire, prioritaire sur tout le reste** |
 | M3 | Moteur + outils + 4 fiches | Armand | voir Verification §1, cas 1 à 7 relus |
-| M4 | Déploiement serveur, ordinateurs éteints | Coéquipier | voir Verification §4 |
+| M4 | Déploiement serveur, ordinateurs éteints | Armand | voir Verification §4 |
 | M5 | Twitter / Reddit activés, golden complet vert, rapport poli | Armand | `npm run golden` exit 0 |
 | M6 | Front, vidéo, slides | premier libre | — |
 
@@ -460,7 +460,7 @@ Armand et le coéquipier avancent en parallèle de M0 à M3. M4 attend M2 et M3.
 
 ## Verification
 
-Prérequis : Node 24 (`export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`), `OPENAI_API_KEY` dans
+Prérequis : Node 24 (nvm : `export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH` ; Homebrew : `export PATH=/opt/homebrew/opt/node@24/bin:$PATH`), `OPENAI_API_KEY` dans
 `apps/reach-agent/.env.local`, eve lancé avec `npm run dev` dans `apps/reach-agent`, `EVE_URL=http://127.0.0.1:21949`.
 
 1. **Recherche (Armand, M3)** :

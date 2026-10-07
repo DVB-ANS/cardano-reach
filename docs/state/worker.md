@@ -11,7 +11,7 @@ IDs, ports, checkpoints prouvés, blocages.
 | Vendor | `Cardano Reach` (`cardano-reach`) · `01a11272-9017-740c-9f1b-cd446384ccb4` |
 | Coworker | `Richard` (`reach`) · `01a11272-c015-748f-9f1a-cfd1e504c497`, capability `tasks` |
 | Accès personnel du Coworker | `GRANTED` |
-| Workspace TOKEN2049 | membre ; connexion du Coworker demandée le 2026-10-07 : `PENDING`, `taskSeatEligible: true` |
+| Workspace TOKEN2049 | accès `01a112d0-23c1-769b-a29f-3dfc57945a85` · `GRANTED`, `taskSeatEligible: true` |
 | Fiche marketplace | nom « Richard » (slug technique `reach`, non modifiable par le CLI), accroche + description EN appliquées (`coworkers update`), Coworker encore privé (`isShown: false`) |
 | Clé runtime | `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`, 0600, ignoré) + coffre du CLI : import OK |
 
@@ -57,6 +57,8 @@ Référence Masumi clonée à côté du repo (`../demo-agent-token2049`) (branch
   (bloc 5262253, 23:12:34Z) → `settled` 23:20:59Z, `verified: true`, net mesuré 1 000 000 unités (1 tUSDM), wallet de vente
   100 → 101 tUSDM. MPS avait d'abord marqué cette tx `FailedViaTimeout` (attente de confirmation dépassée) puis l'a
   rapprochée en `Withdrawn` après 20 confirmations : pas d'action requise.
+- **4 autres Tasks payées et collectées** (2026-10-07, dont 4 dans le Workspace TOKEN2049) : IDs et hash de collecte
+  dans `README.md` § On-chain proof.
 
 ## Procédure M2 (sur la machine d'Armand)
 
@@ -95,4 +97,6 @@ utiliser comme `HEALTHCHECK` Docker.
 
 ## Blocages
 
-- MPS sur la machine d'Armand (clé Blockfrost, seed, wallet de vente financé) ; M2 se lance chez lui.
+- Aucun pour M2. Restent pour M4 : test ordinateurs éteints, redémarrage d'un worker en pleine Task payée (aucun second
+  paiement ni seconde collecte), redémarrage auto des services chez Armand.
+- Coworker encore privé (`isShown: false`).

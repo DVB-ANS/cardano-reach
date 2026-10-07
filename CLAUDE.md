@@ -26,7 +26,8 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
 
 ## Commandes
 
-- Node 24 : `export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH`
+- Node 24 : `export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH` (nvm) ou
+  `export PATH=/opt/homebrew/opt/node@24/bin:$PATH` (Homebrew ; le `node` 26 par défaut de Homebrew ne convient pas)
 - Agent (dans `apps/reach-agent`) : `npm run dev` (eve sur 127.0.0.1:21949), `npm test`, `npm run typecheck`,
   `node scripts/research.ts --text "…" [--answer 1]`, `node scripts/bench-search.ts "…"`, `npm run golden`.
 - Worker (dans `apps/worker`) : `npm start` (gratuit), `PAID_TASKS_ENABLED=true npm start` (payé), `npm test`,
@@ -39,16 +40,16 @@ Un `package.json` + lockfile par app, pas de workspaces npm. TS strict (`tsconfi
 - Branches `feat/agent-<sujet>` / `feat/infra-<sujet>` / `feat/worker-<sujet>` / `docs/<sujet>`, PR squash sur `main`,
   CI verte ; personne ne commit ni ne pousse directement sur `main`.
 - **Armand : voir avec Noé avant de merger une PR ou de pousser sur `main`** (rebase sur `main` juste avant le merge).
-- Un seul exécuteur de Tasks Sokosumi à la fois (worker du coéquipier) ; Armand teste avec `research.ts`.
+- Un seul exécuteur de Tasks Sokosumi à la fois : le worker en service chez Armand ; aucun worker local en parallèle.
 
 ## État
 
-- Fait : étape 0 (M0 vérifié), moteur de recherche (API Exa, X, Reddit, GitHub, YouTube), outils eve,
-  instructions + 4 fiches, golden, Dockerfile agent, 22 tests verts (détails : `docs/state/agent.md`) ;
-  landing `front/` (PR #7, non déployée).
-- À faire (Armand) : golden vert avec `gpt-6.1-sol`, comptes X / Reddit, image Docker + Postgres + MPS sur le VPS,
-  déploiement M4 et front (détail : `docs/TASKS.md`).
-- Fait (coéquipier) : compte Sokosumi + Coworker « Richard » (fiche remplie), worker (M1 prouvé), paiement porté.
-- À faire (coéquipier) : M2 dès que le MPS existe, accès Workspace TOKEN2049, Dockerfile worker / agent-api, phase 5.
-- Bloquants : Postgres + MPS sur le VPS (seul blocage de M2), clé Blockfrost Preprod, wallet vendeur financé,
-  accès VPS, domaine ; clés OpenAI / Exa à poser sur le VPS ; comptes X / Reddit dédiés.
+- Fait : agent eve (moteur Exa, LinkedIn, GitHub, YouTube, X ; 4 fiches ; `find_contact`), image Docker, golden 8/8
+  `gpt-6.1-sol` (détails : `docs/state/agent.md`) ; worker Sokosumi + paiement Masumi, **M1 et M2 prouvés**
+  (5 Tasks payées et collectées, `README.md` § On-chain proof) ; Workspace TOKEN2049 `GRANTED` ; landing `front/`.
+- En service chez Armand : Postgres + MPS, agent (Docker), worker et API MIP-003 (`systemctl --user`), sans port public.
+- À faire (Armand) : test ordinateurs éteints (M4), redémarrage auto des services, sauvegarde MPS hors machine,
+  déploiement du front, compte Reddit (détail : `docs/TASKS.md`).
+- À faire (Noé) : preuves manquantes de `docs/SUBMISSION.md`, Coworker visible (`isShown`), décision `find_contact`
+  vs fiche marketplace, Dockerfile worker / agent-api.
+- Ensemble : accès juges au repo (historique avec infos perso), vidéo + slides, soumission BuilderBase.

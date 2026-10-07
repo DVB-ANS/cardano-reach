@@ -1,7 +1,7 @@
 # Répartition des tâches
 
-Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée, collecte confirmée on-chain**
-(éliminatoire). Détails techniques : `docs/PLAN.md` ; vision complète : `docs/ROADMAP.md`.
+Qui fait quoi, par ordre de priorité. **M2 (Task payée, collecte confirmée on-chain) est prouvé.** Le chemin critique
+est maintenant **M4** (test ordinateurs éteints) puis la soumission (`docs/SUBMISSION.md`). Détails techniques : `docs/PLAN.md` ; vision complète : `docs/ROADMAP.md`.
 
 ## Armand — agent, VPS, Docker, déploiement
 
@@ -26,11 +26,11 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
 3. **VPS et Docker** (`infra/`)
    - [ ] Construire l'image agent sur le VPS (`docker build -f apps/reach-agent/Dockerfile -t reach-agent .`), la lancer
      sur `127.0.0.1:3000` uniquement, tester avec `research.ts` via `EVE_URL`.
-   - [ ] **Postgres + MPS : suivre `docs/MPS-SETUP.md`** (installation, vérifications, financement, valeurs à transmettre).
+   - [x] **Postgres + MPS : suivre `docs/MPS-SETUP.md`** (installation, vérifications, financement, valeurs à transmettre).
    - [ ] `infra/docker-compose.yml` : Postgres 16 (base `mps_hackathon`) + Masumi Payment Service (port 3012 sur
      127.0.0.1), clé Blockfrost Preprod, migrations, seed **avec sortie supprimée**, selling wallet financé via
      dispenser.masumi.network.
-   - [ ] Faire tourner le worker sur ta machine pour M2 (clé runtime du Coworker reçue de Noé), `npm run doctor -- --paid`.
+   - [x] Faire tourner le worker sur ta machine pour M2 (clé runtime du Coworker reçue de Noé), `npm run doctor -- --paid`.
    - [ ] Sauvegarde `pg_dump` quotidienne hors du VPS dès que les wallets existent.
    - [x] Tester le port 25 sortant : **bloqué** chez Free (timeout ; 587 ouvert), voir `MPS-SETUP.md` §5.
    - [ ] Domaine `REACH_DOMAIN` + Caddy (seule `https://REACH_DOMAIN/agent-api/` est publique).
@@ -46,7 +46,7 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal` (IDs : `docs/state/worker.md`).
    - [x] Clé runtime dans `apps/worker/.env.local` (`SOKOSUMI_COWORKER_API_KEY`) et dans le coffre du CLI.
    - [x] Fiche marketplace du Coworker (accroche + description EN, `docs/coworker-profile.md`).
-   - [x] Demander tôt l'accès au Workspace TOKEN2049 : envoyée le 2026-10-07, `PENDING` (validation humaine chez Masumi).
+   - [x] Accès au Workspace TOKEN2049 : `GRANTED` (`taskSeatEligible: true`), Tasks payées dans le Workspace.
 2. **Worker** (B2, B3) → **M1**
    - [x] Cloner la référence à côté du repo : `git clone -b live-demo-name-finder https://github.com/masumi-network/demo-agent-token2049 ../demo-agent-token2049`.
    - [x] Portage TS strict dans `apps/worker/src/` : partie Sokosumi + intake (paiement : à faire, voir 3).
@@ -54,9 +54,9 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
    - [x] M1 : Task gratuite avec question → réponse → rapport (preuves : `docs/state/worker.md`).
 3. **Paiement** → **M2**
    - [x] Porter `payment.ts`, `settlement.ts`, `registration.ts`, `agent-api.ts` (testés avec un faux MPS).
-   - [ ] M2 sur la machine d'Armand (pas d'accès SSH pour Noé) : transmettre la clé runtime du Coworker par canal
+   - [x] M2 sur la machine d'Armand (pas d'accès SSH pour Noé) : transmettre la clé runtime du Coworker par canal
      privé, puis procédure de `docs/state/worker.md` (`npm run doctor -- --paid` avant la Task payée).
-   - [ ] M2 : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
+   - [x] M2 : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
    - [ ] Image worker + agent-api (Dockerfile dans `apps/worker/`) pour le compose d'Armand.
 4. **Tooling restant** (dans les temps morts)
    - [x] Job worker dans la CI (typecheck + tests).
@@ -90,5 +90,5 @@ Qui fait quoi, par ordre de priorité. Le chemin critique est **M2 : Task payée
   par une branche (`feat/agent-<sujet>`, `feat/infra-<sujet>`, `docs/<sujet>`), puis une PR avec la CI verte
   (`secrets`, `agent`, `front`). **Voir avec Noé avant de merger ou de pousser sur `main`.** Rebase sur `main` juste
   avant le merge pour ne rien casser.
-- Un seul exécuteur de Tasks à la fois : le worker de Noé, puis celui du serveur.
+- Un seul exécuteur de Tasks à la fois : le worker en service chez Armand ; pas de worker local.
 - Toute modification de `packages/contract/**` passe par une PR dédiée relue par l'autre.

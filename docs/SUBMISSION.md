@@ -14,13 +14,13 @@ Ne jamais coller ici de clé, de mnémonique, de clé runtime ni d'URL d'accès 
 | Livrable | Preuve | Valeur |
 | --- | --- | --- |
 | Repo public (ou accès juges) | lien GitHub | ⬜ à remplir |
-| Instructions de lancement et de configuration | `README.md`, `.env.example` de chaque app | ⬜ à remplir |
-| Guide de mise en place avec commandes réelles, erreurs rencontrées et correctifs | `docs/DEVLOG.md`, runbook `infra/` | ⬜ à remplir |
+| Instructions de lancement et de configuration | `README.md`, `.env.example` de chaque app | ✅ `README.md` (§ Lancer en local, § Déployer), `apps/*/.env.example` |
+| Guide de mise en place avec commandes réelles, erreurs rencontrées et correctifs | `docs/DEVLOG.md`, runbook `infra/` | `docs/DEVLOG.md`, `docs/MPS-SETUP.md`, `docs/state/worker.md` (procédure M2) ; runbook `infra/` à écrire |
 | Projet construit pendant les 36 h officielles | dates des commits | ⬜ à remplir |
 
 Contrôle avant publication (guide Masumi §6) :
 
-- [ ] `gitleaks git --redact` vert sur tout l'historique (job CI `secrets`).
+- [x] `gitleaks git --redact` vert sur tout l'historique (job CI `secrets`) : 0 fuite (2026-10-07).
 - [ ] Fichiers indexés et historique relus : aucun secret, e-mail perso, chemin local, métadonnée de wallet liée à un
   compte, URL d'accès privée.
 - [ ] Notes de setup privées ignorées par Git, exemple assaini publié à la place.
@@ -32,7 +32,7 @@ Contrôle avant publication (guide Masumi §6) :
 | URL de l'agent déployé | `https://REACH_DOMAIN/agent-api/` | ⬜ à remplir |
 | Coworker ID | sortie de `coworkers` (Sokosumi) | ✅ `01a11272-c015-748f-9f1a-cfd1e504c497` |
 | Vendor ID | idem | ✅ `01a11272-9017-740c-9f1b-cd446384ccb4` |
-| Task d'exemple (texte de la demande) | cas 1 de `BRIEF.md` §4 | ⬜ à remplir |
+| Task d'exemple (texte de la demande) | cas 1 de `BRIEF.md` §4 | « Je cherche un fournisseur de fixations titane certifié EN 9100, petites séries, Europe. » (Task M2) |
 | Date de disponibilité de l'agent | déclaration | ⬜ à remplir |
 | Entrée, fonctionnement, résultat réel | captures / extrait du rapport | ⬜ à remplir |
 | Comment la qualité a été vérifiée | grille `BRIEF.md` §9.2, golden | ⬜ à remplir |
@@ -56,7 +56,7 @@ Contrôle avant publication (guide Masumi §6) :
 | Livrable | Preuve | Valeur |
 | --- | --- | --- |
 | Identifiants de paiement | `blockchainIdentifier`, ID de paiement MPS | ⬜ à remplir |
-| Délais signés | `payByTime`, `submitResultTime`, `unlockTime` | ⬜ à remplir |
+| Délais signés | `payByTime`, `submitResultTime`, `unlockTime` | M2 : demande 2026-10-06 22:03:46 UTC → `payByTime` 22:18:46, `submitResultTime` 22:43:46, `unlockTime` 22:59:46, `externalDisputeUnlockTime` 23:15:46 UTC (+15 / +40 / +56 / +72 min) |
 | Reçu vendeur | `runtime receipt` avec `settled: true` | `settled: true`, `onChainState: Withdrawn` pour les 5 Tasks (2026-10-07) |
 | Hash de la transaction de paiement confirmée (Preprod) | hash | ⬜ à remplir |
 | Lien explorateur de cette transaction | lien Cardano Preprod | ⬜ à remplir |
@@ -104,10 +104,10 @@ Découpage de `BRIEF.md` §10. Enregistrement réel sur preprod.sokosumi.com, mo
 | Temps | Écran | Voix off |
 | --- | --- | --- |
 | 0:00 – 0:20 | Annuaires, onglets LinkedIn, tableur vide | « Trouver le bon fournisseur ou le bon client B2B, c'est des jours de recherche dans des annuaires périmés. Les outils vendent des listes de contacts, pas des réponses. » |
-| 0:20 – 0:40 | Landing Richard, fiche du Coworker sur Sokosumi | « Voici Richard. Tu lui parles comme à un collègue : il pose deux questions, part chasser sur le web, GitHub, X, Reddit, LinkedIn et YouTube, et revient avec des entreprises sourcées, datées, et un verdict. » |
+| 0:20 – 0:40 | Landing Richard, fiche du Coworker sur Sokosumi | « Voici Richard. Tu lui parles comme à un collègue : il pose deux questions, part chasser sur le web, LinkedIn, GitHub, X et YouTube, et revient avec des entreprises sourcées, datées, et un verdict. » |
 | 0:40 – 1:20 | Task aéro sourcing : « fixations titane EN 9100, petites séries, Europe » ; Richard annonce sa chasse ; rapport ; clic sur un lien de certification qui confirme | « Côté achat : un fournisseur de fixations titane certifié. Chaque ligne a sa preuve et sa date. Je clique : la certification est bien là. » |
 | 1:20 – 2:10 | Task leads floue : « Je vends des jets d'affaires d'occasion » ; question à choix `INPUT_REQUIRED` ; réponse « 1 » ; rapport avec colonne « Why now » | « Côté vente : la demande est floue, alors Richard pose une question à choix avant de facturer. Une réponse, et il revient avec des acheteurs et un signal daté pour chacun. » |
-| 2:10 – 2:40 | Reçu vendeur `settled: true`, transaction de collecte sur l'explorateur Preprod, montant net | « Richard se fait payer à la Task : 1 USDM en escrow Masumi, résultat haché, collecte prouvée sur Cardano. Un agent qui gagne sa vie, sans abonnement ni clé d'API côté acheteur. » |
+| 2:10 – 2:40 | Reçu vendeur `settled: true`, transaction de collecte sur l'explorateur Preprod, montant net | « Richard se fait payer à la Task : 1 test USDM en escrow Masumi, résultat haché, collecte prouvée sur Cardano. Un agent qui gagne sa vie, sans abonnement ni clé d'API côté acheteur. » |
 | 2:40 – 3:00 | Liste des niches, roadmap, logo | « Nouvelle niche, nouveau fichier. Richard reste en ligne après le hack, et demain d'autres agents peuvent l'embaucher. Pas une liste de contacts : une réponse sourcée. » |
 
 Avant d'enregistrer :

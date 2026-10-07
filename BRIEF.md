@@ -137,9 +137,9 @@ flowchart LR
   A[Task Sokosumi<br/>texte libre] --> B{Brief complet ?}
   B -- non --> C[Questions à choix<br/>INPUT_REQUIRED]
   C --> B
-  B -- oui --> D[Paiement Masumi<br/>escrow 1 USDM]
+  B -- oui --> D[Paiement Masumi<br/>escrow 1 test USDM]
   D --> E[Plan de recherche<br/>fiche de niche]
-  E --> F[Recherche multi-sources<br/>web, GitHub, X, Reddit,<br/>LinkedIn, YouTube]
+  E --> F[Recherche multi-sources<br/>web, LinkedIn, GitHub,<br/>X, YouTube]
   F --> G[Vérification<br/>source + date + fit]
   G --> H[Rapport Markdown<br/>shortlist + verdict]
   H --> I[Résultat + hash<br/>collecte vendeur]
@@ -158,25 +158,25 @@ flowchart LR
 
 | Source | Outil | Sans login sur serveur | Usage |
 | --- | --- | --- | --- |
-| Recherche web | `web_search` d'eve (recherche OpenAI) ou Exa via Agent-Richard | oui | point d'entrée de toutes les niches |
-| Pages web | `web_fetch` d'eve, Jina Reader via Agent-Richard | oui | sites, pages certifs, annuaires (Europages, Thomasnet), registres |
-| GitHub | `gh` via Agent-Richard | oui (public) | crypto, SaaS : activité réelle |
-| YouTube | `yt-dlp` via Agent-Richard | oui (risque bot-check sur IP datacenter) | salons, démos, interviews |
+| Recherche web | `web_search` d'eve (recherche OpenAI) ou Exa via Agent-Reach | oui | point d'entrée de toutes les niches |
+| Pages web | `web_fetch` d'eve, Jina Reader via Agent-Reach | oui | sites, pages certifs, annuaires (Europages, Thomasnet), registres |
+| GitHub | `gh` via Agent-Reach | oui (public) | crypto, SaaS : activité réelle |
+| YouTube | `yt-dlp` via Agent-Reach | oui (risque bot-check sur IP datacenter) | salons, démos, interviews |
 | RSS | feedparser | oui | actus sectorielles |
 | Twitter / X | twitter-cli | **non** : cookies exportés (`TWITTER_AUTH_TOKEN`, `TWITTER_CT0`) | crypto surtout ; recherche marquée instable |
 | Reddit | rdt-cli | **non** : cookie `reddit_session` ; IP serveur souvent en 403 | retours terrain, réputation |
 | LinkedIn | pages publiques via Jina ; complet via `mcp-server-linkedin` | public oui, complet **non** | entreprises, recrutements |
 
-Source : [Agent-Richard](https://github.com/Panniantong/Agent-Richard) (`docs/install.md`, `agent_reach/channels/*.py`).
+Source : [Agent-Reach](https://github.com/Panniantong/Agent-Reach) (`docs/install.md`, `agent_reach/channels/*.py`).
 OpenCLI (Facebook, Instagram, Reddit desktop) exige un Chrome de bureau : **inutilisable sur serveur**.
 
 **Décision** : on branche Twitter, Reddit et LinkedIn avec des **comptes dédiés au projet** (jamais nos comptes perso),
-un proxy résidentiel (~1 $/mois d'après Agent-Richard) et un débit faible. Le web, GitHub et la recherche restent
+un proxy résidentiel (~1 $/mois d'après Agent-Reach) et un débit faible. Le web, GitHub et la recherche restent
 la base : si un canal social tombe pendant la démo, le rapport tient quand même.
 
 ### 5.3 Fraîcheur
 
-Agent-Richard ne normalise pas les dates : elles viennent de chaque outil (`createdAt` côté X, `created_utc` Reddit,
+Agent-Reach ne normalise pas les dates : elles viennent de chaque outil (`createdAt` côté X, `created_utc` Reddit,
 `upload_date` YouTube, « Published Time » Jina) **[À VÉRIFIER par outil]**. Règle dans les instructions : chaque signal
 porte une date lue dans la source ; sinon il est marqué « non daté » et ne compte pas comme signal « why now ».
 
@@ -258,7 +258,7 @@ seul premier message est proposé.
 flowchart LR
   S[Sokosumi Preprod<br/>Tasks] <--> W[Worker Node 24<br/>polling + journal]
   W <--> E[Agent eve<br/>OpenAI + outils]
-  E --> AR[Agent-Richard CLI<br/>Python, Docker]
+  E --> AR[Agent-Reach CLI<br/>Python, Docker]
   W <--> M[Masumi Payment Service]
   M <--> P[(PostgreSQL)]
   M <--> C[Cardano Preprod<br/>Blockfrost]
@@ -272,11 +272,11 @@ flowchart LR
 | Outils | `web_search`, `web_fetch`, `ask_question`, outil custom `agent_reach` | Le `bash` d'eve auto-hébergé sans Docker tombe sur just-bash, qui ne lance pas Python |
 | Worker | Node 24, part de la référence (`worker.mjs`, `paid-task.mjs`, `comments.mjs`, `worker-lock.mjs`) | Déjà vérifiée jusqu'à la Task payée |
 | Paiement | Masumi Payment Service, Blockfrost Preprod | Imposé |
-| Hébergement | **Serveur d'Armand** : PostgreSQL, MPS, worker, eve + Agent-Richard en Docker | Docker disponible = sandbox Python OK ; tout reste en ligne après le hack |
+| Hébergement | **Serveur d'Armand** : PostgreSQL, MPS, worker, eve + Agent-Reach en Docker | Docker disponible = sandbox Python OK ; tout reste en ligne après le hack |
 | Front | Vitrine statique avec notre DA | UX + doc |
 
 Référence vérifiée par Masumi : [demo-agent-token2049, branche `live-demo-name-finder`](https://github.com/masumi-network/demo-agent-token2049/pull/2),
-clonée dans `~/dev/demo-agent-token2049/`.
+clonée à côté du repo (`../demo-agent-token2049/`).
 
 Exigences d'hébergement (guide Masumi) : pas de serverless pour le worker et MPS, redémarrage automatique, journaux de
 Task et de paiement en stockage persistant, **un seul exécuteur par Coworker**, HTTPS entre worker et MPS s'ils sont séparés.
@@ -343,11 +343,11 @@ Après chaque modif de prompt ou de fiche de niche, on rejoue tout et on relit �
 
 1. **Problème** (20 s) : trouver le bon fournisseur ou le bon client B2B, c'est des jours de recherche, d'annuaires
    périmés et de LinkedIn. Les outils existants vendent des listes de contacts, pas des réponses.
-2. **Richard** (20 s) : tu lui parles comme à un collègue. Il pose deux questions, part chasser sur le web, GitHub, X,
-   Reddit, LinkedIn et YouTube, et revient avec 7 entreprises sourcées, datées et un verdict.
+2. **Richard** (20 s) : tu lui parles comme à un collègue. Il pose deux questions, part chasser sur le web, LinkedIn, GitHub,
+   X et YouTube, et revient avec 7 entreprises sourcées, datées et un verdict.
 3. **Démo** (90 s, vidéo intégrée aux slides) : une Task aéro sourcing (fixations titane), une Task leads (vendre des jets).
    On montre la question à choix, le rapport, un lien cliqué qui confirme.
-4. **Pourquoi Masumi / Cardano** (30 s) : Richard se fait payer à la Task, 1 USDM en escrow, résultat haché, collecte
+4. **Pourquoi Masumi / Cardano** (30 s) : Richard se fait payer à la Task, 1 test USDM en escrow, résultat haché, collecte
    prouvée on-chain. Un agent qui gagne sa vie, sans abonnement ni clé d'API côté acheteur. Et demain, d'autres agents
    peuvent l'embaucher.
 5. **Suite** (20 s) : nouvelles niches = nouveaux fichiers ; on garde l'agent en ligne après le hack, comme le demande Masumi.
@@ -390,7 +390,7 @@ slides (.ppt ou .keynote sur Google Drive) **avec la vidéo de démo intégrée*
 2. **Agent de base sourcé** : instructions + personnalité + 4 fiches de niche + web_search / web_fetch, sur les 4 scénarios.
 3. **Questions à choix** (`INPUT_REQUIRED`) avant paiement.
 4. **Déploiement serveur** + test ordinateur éteint + demande d'accès au Workspace TOKEN2049.
-5. **Agent-Richard** : web / GitHub / YouTube d'abord, puis X, Reddit, LinkedIn avec comptes dédiés.
+5. **Agent-Reach** : web / GitHub / YouTube d'abord, puis X, Reddit, LinkedIn avec comptes dédiés.
 6. **Batterie de tests** §9 et polissage du rapport.
 6 bis. **Le bon humain** : qui contacter, e-mail avec statut, accroche datée (`docs/ROADMAP.md` phase 5), juste après M2.
 7. **Front vitrine**, vidéo, slides.
