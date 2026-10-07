@@ -10,3 +10,5 @@ node_modules/
 **/tests/golden/out/
 dist/
 .output/
+.cache/
+apps/reach-agent/test-*.md
