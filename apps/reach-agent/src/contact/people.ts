@@ -10,7 +10,7 @@ export interface PersonCandidate {
   profileUrl: string;
   /** L'entreprise apparaît dans le titre ou les extraits du profil. */
   companyMatch: boolean;
-  /** Au moins la moitié des mots du rôle cherché apparaissent dans le titre du profil (pas dans les extraits). */
+  /** Au moins la moitié des mots du rôle cherché apparaissent dans le titre, l'accroche du profil ou un poste actuel. */
   roleMatch: boolean;
 }
 
@@ -42,6 +42,11 @@ export function officialPagesRequest(role: string, company: string, domain: stri
   return { query: `${company} team leadership about press contact ${role}`, type: "auto", includeDomains: [domain], numResults: OFFICIAL_PAGES_RESULTS };
 }
 
+/** Adresses publiques du domaine ailleurs sur le web (annuaires, communiqués, PDF) : leur format sert à deviner. */
+export function domainEmailsRequest(domain: string): Record<string, unknown> {
+  return { query: `"@${domain}" email contact`, type: "auto", numResults: OFFICIAL_PAGES_RESULTS, contents: { text: { maxCharacters: 4000 } } };
+}
+
 const TITLE_SEPARATOR = /\s+[-–—|·]\s+/;
 const PERSON_NAME = /^\p{L}[\p{L}'.-]*(?:\s+\p{L}[\p{L}'.-]*){1,3}$/u;
 const LEGAL_FORMS = /\b(?:sas|sasu|sa|sarl|eurl|gmbh|ltd|limited|inc|llc|bv|ag|srl|spa|plc|corp|corporation)\b\.?/g;
@@ -60,6 +65,20 @@ export function companyKey(company: string): string {
 function roleMatches(role: string, haystack: string): boolean {
   const tokens = fold(role).split(/[^a-z0-9]+/).filter((token) => token.length >= 3 && !ROLE_STOP_WORDS.has(token));
   return tokens.length > 0 && tokens.filter((token) => haystack.includes(token)).length * 2 >= tokens.length;
+}
+
+const CURRENT_POSITION = /\((?:current|actuel|actuelle)\)/;
+
+/**
+ * Texte où lire le poste : titre, première ligne de chaque extrait (accroche du profil) et lignes marquées « (Current) ».
+ * Exa `category: "people"` ne met que le nom dans le titre ; les autres lignes d'extrait peuvent décrire un poste passé.
+ */
+function roleText(result: ExaResult): string {
+  const lines = result.highlights.flatMap((highlight) => {
+    const all = highlight.split("\n").map((line) => line.trim()).filter(Boolean);
+    return [...all.slice(0, 1), ...all.filter((line) => CURRENT_POSITION.test(fold(line)))];
+  });
+  return fold([result.title ?? "", ...lines].join(" "));
 }
 
 /** Sépare les profils de plateformes freelance (jamais lus) des personnes candidates, dédoublonnées par nom. */
@@ -82,7 +101,7 @@ export function toCandidates(results: readonly ExaResult[], company: string, rol
       headline: parsed.headline,
       profileUrl: result.url,
       companyMatch: key.length > 0 && haystack.includes(key),
-      roleMatch: roleMatches(role, fold(result.title ?? "")),
+      roleMatch: roleMatches(role, roleText(result)),
     };
     const existing = people.get(fold(parsed.name));
     if (!existing || (candidate.companyMatch && !existing.companyMatch)) people.set(fold(parsed.name), candidate);

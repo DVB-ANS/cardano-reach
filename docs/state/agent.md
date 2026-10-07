@@ -43,6 +43,9 @@ Jina retiré (quota gratuit journalier atteint). `freshnessDays` reste filtré a
   Dernier passage : 4/9, dégradé par les HTTP 429 d'Exa (0 ligne sur 6 et 7), pas par le code.
 - Garde SSRF vérifiée en direct : `localhost`, IPv4 mappées / NAT64, métadonnées cloud bloqués ; redirection
   http→https suivie avec connexion épinglée.
+- `find_contact`, mesure réelle sur 6 entreprises en parallèle (Lisi Aerospace, Mecachrome, Blockfrost, Tweag, Didomi,
+  Prototal), avant → après le lot « sources e-mail gratuites » : erreurs Exa 429 4/6 → 0/6 ; rôle confirmé 0/6 → 4/6 ;
+  e-mail publié 0 → 1 ; devinés moyenne/basse 2/4 → 3/2 ; adresse générique 2/6 → 6/6 ; Gravatar 0/6 (signal rare).
 
 ## Notes contrat
 

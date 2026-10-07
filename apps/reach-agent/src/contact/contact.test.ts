@@ -6,6 +6,7 @@ import type { PageResult } from "../search/pages.ts";
 import { companyMailDomains, extractEmails, genericContacts } from "./emails.ts";
 import { decideEmail, findContact, runFindContact, type ContactDeps } from "./find-contact.ts";
 import { checkMailDomain, type MailDns, type MailDomainCheck } from "./mail-domain.ts";
+import { githubCommitEmails } from "./github.ts";
 import { linkedinProfilesRequest, parseProfileTitle, peopleSearchRequest, toCandidates } from "./people.ts";
 import { isReadBlocked } from "./platforms.ts";
 import { emailVariants, inferFormat, splitName, type NameParts } from "./variants.ts";
@@ -146,6 +147,20 @@ describe("people and platforms", () => {
     assert.deepEqual(people.map((person) => [person.name, person.companyMatch, person.roleMatch]), [["Jane Doe", true, true], ["Bob Martin", false, false]]);
     assert.deepEqual(platformProfiles, [{ url: "https://www.malt.fr/profile/jdupont", title: "Jean Dupont - Développeur Aiken", contact: "contact via la plateforme" }]);
   });
+
+  // Réponses réelles d'Exa `category: "people"` (2026-10-07) : le titre ne porte que le nom, le poste est dans les extraits.
+  it("confirms the role from the profile headline or a current-position line, never from a past position", () => {
+    const { people } = toCandidates(
+      [
+        exaResult("https://www.linkedin.com/in/aaronrutter", "Aaron Rutter", ["Vice President of Sales at LISI AEROSPACE NORTH AMERICA\n...\nVice President"]),
+        exaResult("https://www.linkedin.com/in/tombailey", "Tom Bailey", ["### [Didomi](https://www.linkedin.com/company/didomi)\n\n#### SVP Global Sales (Current)\n\nMay 2026 - Present"]),
+        exaResult("https://www.linkedin.com/in/olduser", "Old Seller", ["Product Designer at Acme\n...\n### Head of Sales - [Acme](https://x) (2015 - 2019)"]),
+      ],
+      "Lisi Aerospace",
+      "Head of Sales",
+    );
+    assert.deepEqual(people.map((person) => [person.name, person.roleMatch]), [["Aaron Rutter", true], ["Tom Bailey", true], ["Old Seller", false]]);
+  });
 });
 
 describe("findContact (mocked Exa, pages and DNS)", () => {
@@ -173,6 +188,8 @@ describe("findContact (mocked Exa, pages and DNS)", () => {
         );
       },
       dns: () => mockDns(),
+      githubEmails: async () => [],
+      gravatarExists: async () => false,
       ...overrides,
     };
   }
@@ -224,7 +241,7 @@ describe("findContact (mocked Exa, pages and DNS)", () => {
     assert.equal(result.email.status, "not_found");
     assert.deepEqual(
       result.failures.filter((failure) => failure.step !== "read_pages"),
-      ["exa_people", "linkedin_profiles", "official_pages_search"].map((step) => ({ step, reason: "timeout" })),
+      ["exa_people", "linkedin_profiles", "official_pages_search", "domain_emails_web"].map((step) => ({ step, reason: "timeout" })),
     );
   });
 
@@ -264,6 +281,8 @@ describe("mail domain differing from the site (published on official pages)", ()
         },
         resolveAddresses: async () => [],
       }),
+      githubEmails: async () => [],
+      gravatarExists: async () => false,
     };
   }
 
@@ -290,5 +309,154 @@ describe("mail domain differing from the site (published on official pages)", ()
     assert.deepEqual(found.email, { status: "published", address: "jean.martin@dinoxsavisalp.fr", sourceUrl: contactPage("dinoxsa.com") });
     const nobody = await findContact({ company: "Dinox SA", domain: "dinoxsa.com", role: "Responsable achats" }, { signal: new AbortController().signal, deps: siteDeps("dinoxsa.com", "Écrivez à direction@dinoxsavisalp.fr", null) });
     assert.deepEqual(nobody.email, { status: "not_found", reason: "personne non identifiée", generic: { address: "direction@dinoxsavisalp.fr", sourceUrl: contactPage("dinoxsa.com") } });
+  });
+});
+
+describe("GitHub commit emails (mocked API)", () => {
+  const api: Record<string, unknown> = {
+    "/search/users?q=Alan%20type%3Aorg&per_page=5": { items: [{ login: "alan-fake" }, { login: "alan-eu" }] },
+    "/orgs/alan-fake": { blog: "https://alan-insurance.example" },
+    "/orgs/alan-eu": { blog: "alan.com" },
+    "/orgs/alan-eu/repos?sort=pushed&per_page=10": [
+      { name: "fork", fork: true, archived: false },
+      { name: "api", fork: false, archived: false },
+    ],
+    "/repos/alan-eu/api/commits?per_page=50": [
+      { html_url: "https://github.com/alan-eu/api/commit/1", commit: { author: { email: "Jane.Doe@alan.eu" }, committer: { email: "noreply@github.com" } } },
+      { html_url: "https://github.com/alan-eu/api/commit/2", commit: { author: { email: "1234+bob@users.noreply.github.com" }, committer: { email: "bot@alan.eu" } } },
+      { html_url: "https://github.com/alan-eu/api/commit/3", commit: { author: { email: "jane.doe@alan.eu" }, committer: { email: "p.martin@alan.eu" } } },
+    ],
+  };
+  const get = async (path: string) => {
+    if (!(path in api)) throw new Error(`unexpected ${path}`);
+    return api[path];
+  };
+
+  it("reads the org whose declared site is the company's, skips forks, noreply and duplicates", async () => {
+    const emails = await githubCommitEmails("Alan", "alan.com", get, new AbortController().signal);
+    assert.deepEqual(emails, [
+      { address: "jane.doe@alan.eu", sourceUrl: "https://github.com/alan-eu/api/commit/1" },
+      { address: "bot@alan.eu", sourceUrl: "https://github.com/alan-eu/api/commit/2" },
+      { address: "p.martin@alan.eu", sourceUrl: "https://github.com/alan-eu/api/commit/3" },
+    ]);
+  });
+
+  it("never reads an org whose declared site is another domain", async () => {
+    assert.deepEqual(await githubCommitEmails("Alan", "unrelated.fr", get, new AbortController().signal), []);
+  });
+
+  it("guesses on the commit mail domain, even without the site's brand", async () => {
+    const response = (results: ExaResult[]): ExaResponse => ({ results, statuses: [] });
+    const result = await findContact(
+      { company: "Blockfrost", domain: "blockfrost.io", role: "CEO" },
+      {
+        signal: new AbortController().signal,
+        deps: {
+          exaSearch: async (body) => response(body.category === "people" ? [exaResult("https://www.linkedin.com/in/jr", "John Roe", ["CEO at Blockfrost"])] : []),
+          readPages: async (urls) => urls.map((url) => ({ url, ok: false, title: null, publishedAt: null, text: "", error: "HTTP 404" })),
+          dns: () => mockDns(),
+          githubEmails: async () => [
+            { address: "anna.kowalski@iohk.io", sourceUrl: "https://github.com/blockfrost/x/commit/1" },
+            { address: "tom.smith@iohk.io", sourceUrl: "https://github.com/blockfrost/x/commit/2" },
+          ],
+          gravatarExists: async () => false,
+        },
+      },
+    );
+    assert.equal(result.email.status, "guessed");
+    assert.equal(result.email.status === "guessed" && result.email.address, "john.roe@iohk.io");
+    assert.equal(result.email.status === "guessed" && result.email.basis, "published_shape");
+  });
+});
+
+describe("commit domains (real shapes: Blockfrost commits are mostly @gmail.com)", () => {
+  it("never trusts webmail or a lone vanity domain from commits", async () => {
+    const response = (results: ExaResult[]): ExaResponse => ({ results, statuses: [] });
+    const commit = (address: string) => ({ address, sourceUrl: "https://github.com/blockfrost/x/commit/1" });
+    const result = await findContact(
+      { company: "Blockfrost", domain: "blockfrost.io", role: "CEO" },
+      {
+        signal: new AbortController().signal,
+        deps: {
+          exaSearch: async (body) => response(body.category === "people" ? [exaResult("https://www.linkedin.com/in/jr", "John Roe", ["CEO at Blockfrost"])] : []),
+          readPages: async (urls) => urls.map((url) => ({ url, ok: false, title: null, publishedAt: null, text: "", error: "HTTP 404" })),
+          dns: () => mockDns(),
+          githubEmails: async () => [commit("a.b@gmail.com"), commit("c.d@gmail.com"), commit("e.f@gmail.com"), commit("me@janeroe.dev"), commit("x.y@iohk.io")],
+          gravatarExists: async () => false,
+        },
+      },
+    );
+    assert.equal(result.email.status === "guessed" && result.email.address, "john.roe@blockfrost.io");
+  });
+});
+
+describe("public addresses of the domain on the web (Exa \"@domain\")", () => {
+  it("learns the format from addresses published elsewhere on the web", async () => {
+    const response = (results: ExaResult[]): ExaResponse => ({ results, statuses: [] });
+    const result = await findContact(
+      { company: "Acme", domain: "acme.fr", role: "Head of Procurement" },
+      {
+        signal: new AbortController().signal,
+        deps: {
+          exaSearch: async (body) => {
+            if (body.category === "people") return response([exaResult("https://www.linkedin.com/in/janedoe", "Jane Doe", ["Head of Procurement at Acme"])]);
+            if (String(body.query).includes("@acme.fr")) {
+              return response([{ url: "https://annuaire.example/acme", title: "Acme", publishedDate: null, highlights: [], text: "Contacts : paul.martin@acme.fr, sophie.leroy@acme.fr" }]);
+            }
+            return response([]);
+          },
+          readPages: async (urls) => urls.map((url) => ({ url, ok: false, title: null, publishedAt: null, text: "", error: "HTTP 404" })),
+          dns: () => mockDns(),
+          githubEmails: async () => [],
+          gravatarExists: async () => false,
+        },
+      },
+    );
+    assert.equal(result.email.status === "guessed" && result.email.address, "jane.doe@acme.fr");
+    assert.equal(result.email.status === "guessed" && result.email.confidence, "medium");
+    assert.deepEqual(result.email.status === "guessed" && result.email.evidence.map((email) => email.sourceUrl), ["https://annuaire.example/acme", "https://annuaire.example/acme"]);
+  });
+});
+
+describe("Gravatar existence check (positive signal only)", () => {
+  const response = (results: ExaResult[]): ExaResponse => ({ results, statuses: [] });
+  const run = (gravatarExists: ContactDeps["gravatarExists"]) =>
+    findContact(
+      { company: "Acme", domain: "acme.fr", role: "Head of Procurement" },
+      {
+        signal: new AbortController().signal,
+        deps: {
+          exaSearch: async (body) => response(body.category === "people" ? [exaResult("https://www.linkedin.com/in/janedoe", "Jane Doe", ["Head of Procurement at Acme"])] : []),
+          readPages: async (urls) => urls.map((url) => ({ url, ok: false, title: null, publishedAt: null, text: "", error: "HTTP 404" })),
+          dns: () => mockDns(),
+          githubEmails: async () => [],
+          gravatarExists,
+        },
+      },
+    );
+
+  it("confirms the first variant that has a Gravatar, including an alternative", async () => {
+    const checked: string[] = [];
+    const result = await run(async (address) => {
+      checked.push(address);
+      return address === "jdoe@acme.fr";
+    });
+    assert.equal(result.email.status, "confirmed");
+    assert.equal(result.email.status === "confirmed" && result.email.address, "jdoe@acme.fr");
+    assert.equal(result.email.status === "confirmed" && result.email.method, "gravatar");
+    assert.equal(checked[0], "jane.doe@acme.fr");
+  });
+
+  it("keeps the guess when no variant has a Gravatar (a 404 proves nothing)", async () => {
+    const result = await run(async () => false);
+    assert.equal(result.email.status, "guessed");
+  });
+
+  it("keeps the guess and lists the failure when Gravatar is unreachable", async () => {
+    const result = await run(async () => {
+      throw new Error("Gravatar HTTP 503");
+    });
+    assert.equal(result.email.status, "guessed");
+    assert.ok(result.failures.some((failure) => failure.step === "gravatar"));
   });
 });
