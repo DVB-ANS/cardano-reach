@@ -23,6 +23,21 @@ const UNUSABLE = new Set([
   "webmaster", "hostmaster", "mailer-daemon", "unsubscribe", "bounce", "jobs", "careers", "recrutement", "rh", "hr",
   "support", "billing", "facturation", "compta", "comptabilite", "legal", "admin", "security",
 ]);
+// Messageries grand public : jamais un domaine de courrier d'entreprise (fréquentes dans les commits GitHub).
+const FREE_MAIL = /^(?:gmail|googlemail|hotmail|outlook|live|msn|yahoo|ymail|icloud|me|mac|aol|gmx|web|protonmail|proton|pm|yandex|mail|zoho|free|orange|laposte|wanadoo|sfr)\.[a-z.]+$/;
+// Noms de machine (`device-129.home`) laissés par une config git locale.
+const LOCAL_HOST = /\.(?:home|local|lan|localdomain|internal)$/;
+const MIN_TRUSTED_ADDRESSES = 2;
+
+/** Domaines de courrier prouvés par des adresses d'une source fiable : au moins 2 adresses, ni webmail ni nom de machine. */
+export function trustedMailDomains(emails: readonly FoundEmail[]): string[] {
+  const counts: Record<string, number> = {};
+  for (const address of new Set(emails.map((email) => email.address))) {
+    const domain = emailDomain(address);
+    if (!FREE_MAIL.test(domain) && !LOCAL_HOST.test(domain)) counts[domain] = (counts[domain] ?? 0) + 1;
+  }
+  return Object.keys(counts).filter((domain) => counts[domain]! >= MIN_TRUSTED_ADDRESSES);
+}
 
 export function extractEmails(text: string): string[] {
   const plain = text.replace(/&#0*64;|&#x0*40;/gi, "@").replace(OBFUSCATED_AT, "@").replace(OBFUSCATED_DOT, ".");
@@ -68,14 +83,15 @@ function sharesBrand(a: string, b: string): boolean {
  * Domaines de courrier de l'entreprise, le plus probable en tête : celui du site et ceux des adresses publiées sur ses
  * pages qui partagent sa marque (`laro-nc.eu` → `laro-nc.de`, `dinoxsa.com` → `dinoxsavisalp.fr`). Les autres domaines
  * (hébergeur, agence web, webmail cités dans les mentions légales) sont écartés. `companyKey` : nom sans forme juridique.
+ * `trusted` : domaines prouvés par une autre source (commits de l'organisation officielle), gardés même sans la marque.
  */
-export function companyMailDomains(emails: readonly FoundEmail[], siteDomain: string, companyKey: string): string[] {
+export function companyMailDomains(emails: readonly FoundEmail[], siteDomain: string, companyKey: string, trusted: readonly string[] = []): string[] {
   const siteBrand = brand(siteDomain);
   const company = companyKey.replace(/[\s-]/g, "");
   const stats = new Map<string, { personal: number; total: number }>([[siteDomain, { personal: 0, total: 0 }]]);
   for (const { address } of emails) {
     const domain = hostMatches(emailDomain(address), siteDomain) ? siteDomain : emailDomain(address);
-    if (domain !== siteDomain && !sharesBrand(brand(domain), siteBrand) && !sharesBrand(brand(domain), company)) continue;
+    if (domain !== siteDomain && !trusted.includes(domain) && !sharesBrand(brand(domain), siteBrand) && !sharesBrand(brand(domain), company)) continue;
     const entry = stats.get(domain) ?? { personal: 0, total: 0 };
     entry.total++;
     if (isPersonal(address, [domain])) entry.personal++;

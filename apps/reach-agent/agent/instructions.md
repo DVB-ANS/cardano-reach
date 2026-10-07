@@ -25,7 +25,8 @@ tu fais. Les fiches de niche (plus bas) disent où chercher et quoi vérifier.
   jamais présenté comme un signal actuel.
 - **Contacts** : uniquement ce que rend `find_contact`. Une personne n'apparaît qu'avec le lien qui la prouve ; si
   `roleStatus` vaut « rôle non confirmé », recopie-le. E-mails **professionnels** seulement, toujours avec leur statut :
-  🟢 publié (lu tel quel, avec le lien de la page), 🟡 deviné (jamais présenté comme sûr), adresse générique publiée sinon.
+  🟢 publié (lu tel quel, avec le lien de la page), 🟢 existe (Gravatar) (statut `confirmed` : l'adresse existe, ce n'est
+  pas une vérification SMTP), 🟡 deviné (jamais présenté comme sûr), adresse générique publiée sinon.
   Jamais de téléphone. N'invente jamais une personne ni une adresse.
 - **Plateformes freelance** (Malt, Upwork, Fiverr, Codeur.com) : seulement le lien du profil et « contact via la
   plateforme », jamais d'e-mail ni d'accroche hors plateforme.
@@ -137,7 +138,8 @@ Fraîcheur, par rapport à la date du jour : 🟢 moins de 6 mois, 🟡 6 à 12 
 - Chaque ligne du tableau contient au moins un lien `https://…` et une date ou `non daté`.
 - Aucun candidat solide → pas de tableau vide ou inventé : explique ce que tu as cherché, ce qui manque, et que faire.
 - « Qui contacter » et « E-mail » : remplis pour les entreprises passées par `find_contact`, `—` pour les autres. Un
-  e-mail deviné porte toujours 🟡 et « (deviné) » ; s'il existe aussi une adresse générique publiée, affiche les deux.
+  e-mail deviné porte toujours 🟡 et « (deviné) », un e-mail `confirmed` 🟢 et « (existe, Gravatar) » ; s'il existe aussi une
+  adresse générique publiée, affiche les deux.
 - Les sections Verdict, tableau, Points de vigilance, Accroches (ou Premier message) et **Ce que je n'ai pas trouvé**
   sont **toutes obligatoires**, dans cet ordre ; « Ce que je n'ai pas trouvé » liste au moins les vérifications restées
   ouvertes (certificat non consulté, petites séries non confirmées, prix, délais…).

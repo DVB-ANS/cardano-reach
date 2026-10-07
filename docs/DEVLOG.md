@@ -344,3 +344,22 @@ cause trouvée et corrigée.
 
 **Pourquoi** : avec un scope global, un même worker aurait échoué soit sur les Tasks des juges (Workspace de
 l'événement), soit sur les Tasks personnelles. Le Workspace est une donnée de la Task, pas un réglage du worker.
+
+## 2026-10-07 — `find_contact` : quota Exa partagé, rôle confirmé, sources e-mail gratuites
+
+**Quoi** : porte de débit Exa unique dans `callExa` (8 req/s, une reprise sur 429) ; rôle lu dans l'accroche et les
+postes actuels des profils ; trois sources d'e-mail gratuites, sans compte : commits GitHub de l'organisation, adresses
+`"@domaine"` sur le web (Exa), Gravatar (nouveau statut `confirmed`, 🟢 « existe (Gravatar) », distinct d'un SMTP).
+
+**Pourquoi** : sur 6 entreprises, 0 e-mail publié et 4 recherches sur 6 en HTTP 429 ; l'agent lance 3 à 5
+`find_contact` en parallèle (3 recherches Exa chacun) alors qu'Exa plafonne à 10 req/s par clé.
+
+**Bugs & fix** :
+- La porte réservait des créneaux théoriques : un départ retardé suivi d'un départ à l'heure partaient à 20 ms. Elle
+  enchaîne désormais les départs réels (test qui échouait sous la charge de la suite complète).
+- `category: "people"` ne met que le nom dans le titre ; `roleMatch` ne lisait que le titre → 6/6 « rôle non confirmé ».
+  Seules l'accroche (1re ligne d'extrait) et les lignes « (Current) » comptent, jamais un poste passé.
+- Commits GitHub : la plupart des adresses sont personnelles (Blockfrost : 5 @gmail.com, 1 @iohk.io) ; tous les
+  domaines vus devenaient « de confiance » et l'outil devinait une adresse @gmail.com. Un domaine de commit n'est retenu
+  qu'avec 2 adresses au moins, hors webmail et noms de machine.
+- L'organisation GitHub n'est lue que si son site déclaré (`blog`) est le domaine de l'entreprise (pas d'homonyme).

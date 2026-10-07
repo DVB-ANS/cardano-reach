@@ -6,9 +6,9 @@ import { parseGithubOutput } from "./channels/github.ts";
 import { parseYoutubeOutput } from "./channels/youtube.ts";
 import { isFresh, toIsoDate } from "./dates.ts";
 import { searchBatch } from "./engine.ts";
-import { collectBefore, createLimiter } from "./limit.ts";
+import { collectBefore, createLimiter, createRateGate } from "./limit.ts";
 import { normalizeUrl, resolvePublicTarget } from "./url.ts";
-import { parseExaResponse } from "./exa.ts";
+import { callExa, parseExaResponse } from "./exa.ts";
 
 const fixture = (name: string) => readFileSync(new URL(`./__fixtures__/${name}`, import.meta.url), "utf8");
 
@@ -138,5 +138,39 @@ describe("concurrency", () => {
     const result = await searchBatch([{ channel: "reddit", query: "anything" }], { signal: new AbortController().signal, channels: new Set(["web"]) });
     assert.deepEqual(result.failures, [{ channel: "reddit", query: "anything", reason: "channel disabled" }]);
     assert.equal(result.hits.length, 0);
+  });
+});
+
+describe("exa rate limit", () => {
+  it("spaces task starts by the gate interval, shared by every caller", async () => {
+    const gate = createRateGate(40);
+    const starts: number[] = [];
+    await Promise.all(Array.from({ length: 4 }, () => gate(async () => void starts.push(performance.now()))));
+    for (let i = 1; i < starts.length; i++) assert.ok(starts[i]! - starts[i - 1]! >= 35, `start ${i} too early`);
+  });
+
+  it("drops an aborted waiter without running it", async () => {
+    const gate = createRateGate(200);
+    let ran = 0;
+    const controller = new AbortController();
+    const first = gate(async () => void ran++);
+    const second = gate(async () => void ran++, controller.signal);
+    controller.abort(new Error("stop"));
+    await first;
+    await assert.rejects(second, /stop/);
+    assert.equal(ran, 1);
+  });
+
+  it("retries an HTTP 429 once, then surfaces the error", async (t) => {
+    process.env.EXA_API_KEY = "test-key";
+    const ok = { results: [], statuses: [] };
+    const statuses = [429, 200, 429, 429];
+    t.mock.method(globalThis, "fetch", async () => {
+      const status = statuses.shift() ?? 500;
+      return new Response(status === 200 ? JSON.stringify(ok) : "rate limited", { status });
+    });
+    assert.deepEqual(await callExa("/search", {}, new AbortController().signal), { results: [], statuses: [] });
+    await assert.rejects(callExa("/search", {}, new AbortController().signal), /HTTP 429/);
+    assert.equal(statuses.length, 0);
   });
 });

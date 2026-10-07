@@ -1,9 +1,14 @@
 // Client HTTP minimal pour l'API Exa (`/search`, `/contents`), d'après le skill officiel `build-with-exa`.
 // HTTP brut plutôt que `exa-js` : le SDK n'accepte pas d'AbortSignal, or chaque appel doit respecter l'échéance du lot.
+import { setTimeout as sleep } from "node:timers/promises";
 import { isRecord, type JsonRecord } from "./json.ts";
+import { createRateGate } from "./limit.ts";
 
 const EXA_BASE_URL = "https://api.exa.ai";
 const ERROR_EXCERPT_LENGTH = 300;
+// Exa plafonne à 10 requêtes/s par clé ; reach_search, read_pages et find_contact partagent ce quota : 8/s avec marge.
+const exaGate = createRateGate(125);
+const RATE_LIMIT_RETRY_MS = 1_000;
 
 export interface ExaResult {
   url: string;
@@ -54,15 +59,26 @@ export function parseExaResponse(payload: unknown): ExaResponse {
 }
 
 export async function callExa(endpoint: "/search" | "/contents", body: Record<string, unknown>, signal: AbortSignal): Promise<ExaResponse> {
-  const response = await fetch(`${EXA_BASE_URL}${endpoint}`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-api-key": exaApiKey() },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (!response.ok) {
-    const detail = (await response.text()).slice(0, ERROR_EXCERPT_LENGTH);
-    throw new Error(`Exa ${endpoint} HTTP ${response.status}: ${detail}`);
+  for (let attempt = 0; ; attempt++) {
+    const response = await exaGate(
+      () =>
+        fetch(`${EXA_BASE_URL}${endpoint}`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-api-key": exaApiKey() },
+          body: JSON.stringify(body),
+          signal,
+        }),
+      signal,
+    );
+    if (response.status === 429 && attempt === 0) {
+      await response.body?.cancel();
+      await sleep(RATE_LIMIT_RETRY_MS, undefined, { signal });
+      continue;
+    }
+    if (!response.ok) {
+      const detail = (await response.text()).slice(0, ERROR_EXCERPT_LENGTH);
+      throw new Error(`Exa ${endpoint} HTTP ${response.status}: ${detail}`);
+    }
+    return parseExaResponse(await response.json());
   }
-  return parseExaResponse(await response.json());
 }

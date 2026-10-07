@@ -36,6 +36,35 @@ export function createLimiter(max: number): Limiter {
 }
 
 /**
+ * Porte de débit : chaque tâche démarre au moins `minIntervalMs` après le **départ réel** de la précédente (chaîne de
+ * tours), même si un départ a pris du retard. Une attente annulée rejette sans lancer `task` et rend son tour sans délai.
+ */
+export function createRateGate(minIntervalMs: number): Limiter {
+  let previous: Promise<void> = Promise.resolve();
+  return async (task, signal) => {
+    signal?.throwIfAborted();
+    const waitFor = previous;
+    const turn = Promise.withResolvers<void>();
+    previous = turn.promise;
+    if (signal) {
+      const aborted = Promise.withResolvers<never>();
+      const onAbort = () => aborted.reject(signal.reason);
+      signal.addEventListener("abort", onAbort, { once: true });
+      try {
+        await Promise.race([waitFor, aborted.promise]);
+      } catch (error) {
+        void waitFor.then(turn.resolve);
+        throw error;
+      } finally {
+        signal.removeEventListener("abort", onAbort);
+      }
+    } else await waitFor;
+    setTimeout(turn.resolve, minIntervalMs);
+    return task();
+  };
+}
+
+/**
  * Lance `worker` sur chaque élément et rend les résultats arrivés avant que `deadline` ne s'arrête.
  * Un élément non terminé à l'échéance vaut `undefined`. `worker` ne doit pas rejeter.
  */
