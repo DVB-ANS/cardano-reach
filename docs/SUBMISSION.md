@@ -44,11 +44,11 @@ Contrôle avant publication (guide Masumi §6) :
 | Livrable | Preuve | Valeur |
 | --- | --- | --- |
 | Task ID de répétition (gratuite, M1) | ID Sokosumi | ✅ `01a11285-4080-7548-ba2b-7f000402340b` (Personal Workspace) |
-| Task ID payée (M2) | ID Sokosumi | ⬜ à remplir |
-| Résultat complété | lien ou extrait du rapport | ⬜ à remplir |
+| Task ID payée (M2) | ID Sokosumi | `01a1133e-6407-707b-8753-34abd515c437` ; Task vitrine du Workspace de l'événement : `01a115ac-fefa-7496-afc3-d6aa5e800358` (5 Tasks payées réglées, tableau dans `README.md` § On-chain proof) |
+| Résultat complété | lien ou extrait du rapport | https://preprod.sokosumi.com/tasks/01a115ac-fefa-7496-afc3-d6aa5e800358 (membres du Workspace TOKEN2049) |
 | IDs d'événements de la Task (questions, paiement, résultat) | événements Sokosumi | ⬜ à remplir |
-| IDs de l'événement TOKEN2049 | organisation `01a109d1-32a9-71a3-a0e3-658b2a7987cd`, ID d'accès Workspace, statut | ⬜ à remplir |
-| Statut d'accès runtime | `GRANTED` / `taskSeatEligible: true` | ⬜ à remplir |
+| IDs de l'événement TOKEN2049 | organisation `01a109d1-32a9-71a3-a0e3-658b2a7987cd`, ID d'accès Workspace, statut | accès `01a112d0-23c1-769b-a29f-3dfc57945a85`, `GRANTED` (vérifié le 2026-10-07) |
+| Statut d'accès runtime | `GRANTED` / `taskSeatEligible: true` | `taskSeatEligible: true` ; 4 Tasks démarrées et terminées dans le Workspace TOKEN2049 |
 | Reprise sans doublon | redémarrage du worker en pleine Task : aucun second paiement ni collecte | ⬜ à remplir |
 
 ## 4. Preuve de paiement vendeur
@@ -57,14 +57,14 @@ Contrôle avant publication (guide Masumi §6) :
 | --- | --- | --- |
 | Identifiants de paiement | `blockchainIdentifier`, ID de paiement MPS | ⬜ à remplir |
 | Délais signés | `payByTime`, `submitResultTime`, `unlockTime` | ⬜ à remplir |
-| Reçu vendeur | `runtime receipt` avec `settled: true` | ⬜ à remplir |
+| Reçu vendeur | `runtime receipt` avec `settled: true` | `settled: true`, `onChainState: Withdrawn` pour les 5 Tasks (2026-10-07) |
 | Hash de la transaction de paiement confirmée (Preprod) | hash | ⬜ à remplir |
 | Lien explorateur de cette transaction | lien Cardano Preprod | ⬜ à remplir |
-| Hash de la transaction de collecte confirmée | hash | ⬜ à remplir |
-| Lien explorateur de la collecte | lien Cardano Preprod | ⬜ à remplir |
-| Adresse vendeur prévue | adresse `addr_test1…` | ⬜ à remplir |
-| Unité du token test USDM | policy ID + nom d'asset | ⬜ à remplir |
-| Montant net reçu, mesuré indépendamment | `settlement.ts` : `verified: true`, `netAtomicUnits` | ⬜ à remplir |
+| Hash de la transaction de collecte confirmée | hash | M2 `b888b4a851fe3da9c4e9b5eb1c11813d4b85cba95679d7a70968b95f9a458a80` ; les 4 autres dans `README.md` |
+| Lien explorateur de la collecte | lien Cardano Preprod | https://preprod.cardanoscan.io/transaction/b888b4a851fe3da9c4e9b5eb1c11813d4b85cba95679d7a70968b95f9a458a80 |
+| Adresse vendeur prévue | adresse `addr_test1…` | `addr_test1qz4gqkvqw7svg6n7rv65g4tndjg3u52q6nzcuawrqmeg8cwcehy9xse720ln882ese7sc5n5xk92ylr6k6ykdu9r0nhsyzkrw5` |
+| Unité du token test USDM | policy ID + nom d'asset | `16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde` + `0014df10745553444d` |
+| Montant net reçu, mesuré indépendamment | `settlement.ts` : `verified: true`, `netAtomicUnits` | +1 000 000 (1 tUSDM) par collecte, mesuré via Koios `tx_info` (sorties − entrées du vendeur) pour les 5 |
 
 ## 5. Slides et dépôt
 
