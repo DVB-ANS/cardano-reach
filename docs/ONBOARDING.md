@@ -26,7 +26,7 @@ flowchart LR
   U[Sokosumi] <--> W[apps/worker<br/>toi]
   W <-->|eve/client| A[apps/reach-agent<br/>Armand]
   A --> S[API Exa · gh · yt-dlp · twitter-cli · rdt-cli]
-  W <--> M[Masumi Payment Service + Postgres<br/>infra/ · toi]
+  W <--> M[Masumi Payment Service + Postgres<br/>infra/ · Armand]
   M <--> C[Cardano Preprod]
 ```
 
@@ -34,8 +34,8 @@ flowchart LR
 | --- | --- | --- |
 | `apps/reach-agent/` | Armand | **fait** (étape 0 + lot A, mergé) |
 | `packages/contract/`, `docs/CONTRACT.md` | partagé, gelé | **fait** |
-| `apps/worker/` | toi | **M1 prouvé**, paiement porté (M2 attend le MPS) |
-| `infra/` | Armand | à faire (VPS, Docker, Postgres + MPS) |
+| `apps/worker/` | toi | **M1 et M2 prouvés** (5 Tasks payées et collectées), tourne chez Armand |
+| `infra/` | Armand | MPS + Postgres en service chez Armand (`docs/MPS-SETUP.md`) ; compose, Caddy et runbook à faire |
 | `front/` | toi (déploiement : Armand) | **fait** (landing statique, PR #7), pas encore déployée |
 
 Règles : un `package.json` + lockfile par app (pas de workspaces npm), TypeScript strict sans `any`, branches
@@ -102,7 +102,7 @@ Pièges vérifiés :
 Lancer en local :
 
 ```bash
-export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH
+export PATH=$HOME/.nvm/versions/node/v24.21.0/bin:$PATH   # ou /opt/homebrew/opt/node@24/bin (Homebrew)
 cd apps/reach-agent && npm ci
 npm run dev                         # eve sur http://127.0.0.1:21949 (EVE_URL)
 node scripts/research.ts --text "Trouve-moi des partenaires." --answer 1 --answer "aéronautique, Europe"
@@ -126,23 +126,22 @@ docker build -f apps/reach-agent/Dockerfile -t reach-agent .
 - M0 validé : question → brief → rapport.
 - Cas réel (fixations titane EN 9100) : 0 question, recherche en ~57 s, fournisseurs réels avec liens et dates.
 - 22 tests verts, `eve build` OK, auth Basic vérifiée.
-- Golden : jusqu'à 8/9 avant l'épuisement du MCP Exa gratuit. Web, LinkedIn et lecture de pages passent maintenant par
-  l'API Exa (`/search`, `/contents`) : **il faut `EXA_API_KEY`** (https://dashboard.exa.ai/api-keys).
-- X et Reddit branchés (twitter-cli, rdt-cli) ; ils s'activent dès qu'un compte dédié est configuré.
-- YouTube bloqué sur le poste d'Armand (à tester sur le VPS).
-- Image Docker jamais construite (pas de Docker en local).
+- Golden `gpt-6.1-sol` dans l'image Docker : 8/8 verts (web, LinkedIn et lecture de pages via l'API Exa).
+- Canaux actifs dans l'image : web, LinkedIn, GitHub, YouTube, X (compte dédié). Reddit attend un compte dédié.
+- Image Docker construite et en service chez Armand (`reach-agent-local`, 127.0.0.1:3000).
 
 ## 6. Ce qui te revient (lot B, détail dans `docs/PLAN.md`)
 
 1. **B1** : compte Sokosumi Preprod, Vendor, Coworker, clé runtime : **fait** (IDs dans `docs/state/worker.md`).
-   MPS + Postgres + wallet financé : chez Armand (VPS).
+   MPS + Postgres + wallet financé : **fait** chez Armand.
 2. **B2 / B3** : worker TS strict dans `apps/worker/src/` (Sokosumi, questions `INPUT_REQUIRED` avant paiement,
    paiement Masumi, API MIP-003) : **fait** (#17, #18). Référence Masumi clonée à côté du repo
    (`../demo-agent-token2049`, branche `live-demo-name-finder`).
 3. **M1** Task gratuite avec question : **prouvé**. **M2** Task payée, collecte confirmée on-chain (**éliminatoire**) :
-   procédure prête dans `docs/state/worker.md`, attend le MPS → **M4** déploiement serveur.
+   **prouvé** (5 Tasks payées et collectées, preuves dans `README.md` et `docs/state/worker.md`) → **M4** test
+   ordinateurs éteints.
 
-Un seul exécuteur de Tasks à la fois : ton worker. Armand ne lance jamais de worker, il teste avec `research.ts`.
+Un seul exécuteur de Tasks à la fois : le worker en service chez Armand. Ne relance pas de worker local.
 
 ## 7. Front
 

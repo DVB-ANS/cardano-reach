@@ -7,3 +7,5 @@
 !**/.env.example
 **/tests/golden/out
 .git
+**/.cache
+apps/reach-agent/test-*.md

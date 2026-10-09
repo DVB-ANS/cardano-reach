@@ -55,7 +55,7 @@ Jina retiré (quota gratuit journalier atteint). `freshnessDays` reste filtré a
 ## Blocages
 
 - `OPENAI_API_KEY` et `EXA_API_KEY` renseignées dans `.env.local` (ignoré, mode 600) ; bench et golden rejoués.
-- Comptes X et Reddit dédiés au projet : à créer pour activer ces canaux.
+- Compte Reddit dédié au projet : à créer pour activer ce canal (X actif avec `@cardano_reach`).
 - Le poste utilise Node 22 ; utiliser l'image Docker validée ou installer Node 24 pour les commandes locales.
 - Postgres + MPS (`docs/MPS-SETUP.md`), `infra/` et compose complet restent à faire.
 - `npm audit --omit=dev` signale 4 vulnérabilités modérées et 1 haute via `eve` → `guarded-fetch` / `undici` ;

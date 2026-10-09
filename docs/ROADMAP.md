@@ -16,11 +16,11 @@ sourcées de la phase 5 : `docs/research/phase5.md`.
 | --- | --- |
 | Contrat worker ↔ agent | fait, gelé (`packages/contract`) |
 | Agent eve (`apps/reach-agent`) | fait : moteur multi-canaux, 4 niches, garde de phase, SSRF, 22 tests verts |
-| Canaux | web / LinkedIn / lecture de pages via l'API Exa ; X et Reddit attendent des comptes dédiés ; YouTube bloqué en local |
+| Canaux | actifs dans l'image Docker : web, LinkedIn, lecture de pages (API Exa), GitHub, YouTube, X (compte dédié) ; Reddit attend un compte dédié |
 | Front (`front/`) | landing statique faite, pas déployée |
 | Coworker Sokosumi | Vendor « Cardano Reach », Coworker « Richard » (fiche remplie), clé runtime |
-| Worker (`apps/worker`) | **M1 prouvé** sur Sokosumi Preprod ; paiement Masumi porté et testé hors ligne (26 tests) |
-| MPS, wallets, infra | **rien** : attend Postgres + MPS sur le VPS d'Armand (seul blocage de M2) |
+| Worker (`apps/worker`) | **M1 et M2 prouvés** : 5 Tasks payées et collectées on-chain (`README.md` § On-chain proof) |
+| MPS, wallets, infra | Postgres + MPS, agent (Docker), worker et API MIP-003 en service chez Armand ; pas de compose, Caddy ni runbook ; test ordinateurs éteints à faire |
 
 ---
 
@@ -46,15 +46,15 @@ développeurs qui mergent en parallèle.
 
 Sans ça, rien d'autre ne compte.
 
-- [ ] **Clés** (A) : `OPENAI_API_KEY`, `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
+- [x] **Clés** (A) : `OPENAI_API_KEY`, `EXA_API_KEY` dans `apps/reach-agent/.env.local`.
 - [x] **B1 Compte** (N) : `sokosumi --preprod auth login`, Vendor, Coworker `--capability tasks --personal`, clé runtime.
-- [ ] **B1 Serveur** (A) : SSH au VPS, Postgres + MPS en Docker (port 3012 sur 127.0.0.1), clé
+- [x] **B1 Serveur** (A) : SSH au VPS, Postgres + MPS en Docker (port 3012 sur 127.0.0.1), clé
   Blockfrost Preprod, seed (sortie supprimée), selling wallet financé.
 - [x] **B2 Worker** (N) : cloner `masumi-network/demo-agent-token2049` (branche `live-demo-name-finder`), porter en
   TS strict dans `apps/worker/src/` (tableau de correspondance dans `PLAN.md` §B2). Paiement compris (#18).
 - [x] **B3 Intake** (N) : questions `INPUT_REQUIRED` **avant** paiement, reprise sans doublon.
 - [x] **M1** : Task gratuite avec question → réponse → rapport (#17, preuves dans `docs/state/worker.md`).
-- [ ] **M2** : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
+- [x] **M2** : Task payée → `runtime receipt` `settled: true` → hash de collecte ouvert sur l'explorateur.
 
 **Sortie** : un Task ID payé + un hash de collecte confirmé, notés dans `docs/state/worker.md`.
 
@@ -62,7 +62,7 @@ Sans ça, rien d'autre ne compte.
 
 - [ ] **M4 Déploiement** (A) : `infra/docker-compose.yml` (postgres, mps, reach-agent, worker, agent-api, caddy),
   `restart: unless-stopped`, test **ordinateurs fermés** depuis un autre appareil.
-- [ ] **Workspace TOKEN2049** (N) : accès accordé (`GRANTED`) ; le worker suit le Workspace de chaque Task (personnel ou événement), sans réglage.
+- [x] **Workspace TOKEN2049** (N) : accès accordé (`GRANTED`) ; le worker suit le Workspace de chaque Task (personnel ou événement), sans réglage.
 - [ ] **Qualité du rapport** (A) : golden 8/8 avec `gpt-6.1-sol`, relecture manuelle des liens (grille `BRIEF.md` §9.2).
 - [ ] **Vérification codée des liens** (A) : avant de rendre le rapport, re-fetch de chaque URL, suppression des lignes
   dont la source ne répond pas ou ne mentionne pas l'entreprise. « No link, no line » garanti par le code, pas le prompt.

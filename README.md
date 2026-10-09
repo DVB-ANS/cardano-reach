@@ -52,7 +52,7 @@ The worker never runs the model before the escrow is confirmed, hashes the exact
 flowchart LR
   U[Utilisateur<br/>Sokosumi Preprod] <-->|Task, questions, rapport| W[apps/worker<br/>worker Sokosumi]
   W <-->|eve/client<br/>packages/contract| A[apps/reach-agent<br/>agent eve]
-  A --> S[API Exa · GitHub · YouTube · X · Reddit]
+  A --> S[API Exa · GitHub · YouTube · X]
   A --> O[OpenAI]
   W <--> M[Masumi Payment Service<br/>+ Postgres]
   M <--> C[Cardano Preprod]
@@ -67,7 +67,7 @@ parallèle multi-canaux → rapport Markdown sourcé → collecte du paiement on
 | Chemin | Contenu |
 | --- | --- |
 | `apps/reach-agent/` | agent eve 0.71.0 : instructions, fiches de niche, outils, moteur de recherche (`src/search/`), scripts |
-| `apps/worker/` | worker Sokosumi (questions avant paiement, M1 prouvé) + paiement Masumi, API standard MIP-003 |
+| `apps/worker/` | worker Sokosumi (questions avant paiement) + paiement Masumi (M1, M2 prouvés), API standard MIP-003 |
 | `packages/contract/` | protocole worker ↔ agent, gelé (voir `docs/CONTRACT.md`) |
 | `front/` | landing statique Nuxt 4 + Tailwind 4 |
 | `docs/` | plan, roadmap, tâches, onboarding, devlog, état de chaque app |
@@ -126,9 +126,16 @@ Procédure M2 et preuves : `docs/state/worker.md`.
 
 ## Déployer
 
-Cible : un VPS avec Docker Compose (Postgres, Masumi Payment Service, agent, worker, Caddy) ; seule
-`https://REACH_DOMAIN/agent-api/` est publique. Le front est un site statique (`pnpm generate`). Détails et état :
-`docs/ROADMAP.md`, `docs/TASKS.md`.
+En service aujourd'hui sur un serveur Linux (machine d'Armand), sans port public :
+
+- Postgres + Masumi Payment Service (127.0.0.1:3012), installés selon `docs/MPS-SETUP.md` ;
+- agent eve dans Docker (`docker build -f apps/reach-agent/Dockerfile -t reach-agent .`, 127.0.0.1:3000) ;
+- worker (`PAID_TASKS_ENABLED=true npm start`) et API MIP-003 (`npm run agent-api`, 127.0.0.1:21950) en services
+  `systemctl --user`.
+
+Le worker interroge Sokosumi en sortie : aucune URL publique n'est nécessaire pour les Tasks. Un seul worker par
+Coworker. Procédure et preuves : `docs/state/worker.md`. Le front est un site statique (`pnpm generate`).
+État et suite : `docs/ROADMAP.md`, `docs/TASKS.md`.
 
 ## CI et secrets
 
