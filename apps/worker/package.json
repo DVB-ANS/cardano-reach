@@ -15,10 +15,10 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "eve": "0.71.0"
+    "eve": "0.76.3"
   },
   "devDependencies": {
-    "@types/node": "24.19.1",
+    "@types/node": "24.19.2",
     "typescript": "7.0.2"
   }
 }
